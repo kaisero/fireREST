@@ -72,7 +72,7 @@ class FireREST(object):
         if limit:
             if '?' in request:
                 url += '&limit=' + str(limit)
-            else:
+            elif limit > 0:
                 url += '?limit=' + str(limit)
         data = requests.get(url, headers=self.headers, verify=self.verify_cert, timeout=self.timeout)
         payload = data.json()
@@ -114,7 +114,7 @@ class FireREST(object):
     def get_object_id_by_name(self, object_type, name, domain='Global'):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
         obj_type = object_type.lower() + 's'
-        data = self._get(self.api_config_request_url + domain_url + 'object/%s' % obj_type).json()
+        data = self._get(self.api_config_request_url + domain_url + 'object/%s' % obj_type)[0].json()
         for item in data['items']:
             if item['name'] == name:
                 return item['id']
@@ -163,7 +163,7 @@ class FireREST(object):
 
     def get_system_version(self):
         request = self.api_platform_request_url + 'info/serverversion'
-        return self._get(request)
+        return self._get(request, limit=0)
 
     def get_audit_records(self, domain='Global'):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
@@ -198,6 +198,7 @@ class FireREST(object):
 
     def update_object(self, object_type, object_id, data, domain='Global'):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
+        object_type = object_type.lower() + 's'
         request = self.api_config_request_url + domain_url + 'object/' + object_type + '/' + object_id
         return self._put(request, data)
 
@@ -212,8 +213,8 @@ class FireREST(object):
     def get_object(self, object_type, object_id, domain='Global'):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
         obj_type = object_type.lower() + 's'
-        request = self._get(self.api_config_request_url + domain_url + 'object/' + obj_type + '/' + object_id)
-        return request
+        request = self._get(self.api_config_request_url + domain_url + 'object/' + obj_type + '/' + object_id, limit=0)
+        return request[0]
 
     ######################################################################
     # </OBJECTS>
@@ -231,7 +232,7 @@ class FireREST(object):
 
     def get_device(self, device_id, domain='Global'):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._get(self.api_config_request_url + domain_url + 'devices/devicerecords/' + device_id)
+        request = self._get(self.api_config_request_url + domain_url + 'devices/devicerecords/' + device_id, limit=0)
         return request
 
     ######################################################################
@@ -287,7 +288,7 @@ class FireREST(object):
     def get_policy(self, policy_id, policy_type, expanded=False, domain='Global'):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
         policy_type = self.url_policy[policy_type]
-        request = self._get(self.api_config_request_url + domain_url + 'policy/' + policy_type + '/' + policy_id)
+        request = self._get(self.api_config_request_url + domain_url + 'policy/' + policy_type + '/' + policy_id, limit=0)
         if expanded:
             request += '?expanded=True'
         return request
@@ -303,7 +304,7 @@ class FireREST(object):
         domain_url = self.get_domain_url(self.get_domain_id(domain))
         request = self._get(
             self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules/' + rule_id,
-            limit=None)
+            limit=0)
         return request
 
     def update_acp_rule(self, policy_id, rule_id, data, domain='Global'):
