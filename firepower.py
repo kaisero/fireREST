@@ -4,7 +4,7 @@ import time
 
 from rainbow_logging_handler import RainbowLoggingHandler
 
-from lib.firepowerREST.fireREST import FireREST
+from fireREST import FireREST
 
 
 class FirePOWER(object):
