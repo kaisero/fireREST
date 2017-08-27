@@ -147,6 +147,14 @@ class FireREST(object):
                 return item['id']
         return None
 
+    def get_syslogalert_id_by_name(self, syslogalert_name, domain='Global'):
+        domain_url = self.get_domain_url(self.get_domain_id(domain))
+        data = self.get_syslogalerts(domain)[0].json()
+        for item in data['items']:
+            if item['name'] == syslogalert_name:
+                return item['id']
+        return None
+
     def get_domain_id(self, name):
         for domain in self.domains:
             if domain['name'] == name:
@@ -311,4 +319,9 @@ class FireREST(object):
         request = self._put(
             self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules/' + rule_id,
             data)
+        return request
+
+    def get_syslogalerts(self, domain='Global'):
+        domain_url = self.get_domain_url(self.get_domain_id(domain))
+        request = self._get(self.api_config_request_url + domain_url + 'policy/syslogalerts')
         return request
