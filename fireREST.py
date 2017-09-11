@@ -2,7 +2,6 @@ import json
 import requests
 import sys
 import logging
-from rainbow_logging_handler import RainbowLoggingHandler
 
 from requests.auth import HTTPBasicAuth
 
@@ -25,7 +24,7 @@ class FireREST(object):
         self.logger = logging.getLogger('FireREST')
         self.logger.setLevel(loglevel)
         formatter = logging.Formatter('%(asctime)s [%(name)s] [%(levelname)s] %(message)s')
-        handler = RainbowLoggingHandler(sys.stderr, color_funcName=('black', 'yellow', True))
+        handler = logging.StreamHandler()
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
@@ -79,7 +78,7 @@ class FireREST(object):
         responses.append(data)
         if data.status_code == 200 and 'paging' in payload.keys():
             pages = int(payload['paging']['pages'])
-            for i in xrange(1, pages, 1):
+            for i in range(1, pages, 1):
                 url_with_offset = url + '&offset=' + str(int(i) * int(limit))
                 response_page = requests.get(url_with_offset, headers=self.headers, verify=self.verify_cert,
                                              timeout=self.timeout)
