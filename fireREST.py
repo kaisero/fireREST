@@ -2,7 +2,6 @@ import json
 import requests
 import sys
 import logging
-from rainbow_logging_handler import RainbowLoggingHandler
 
 from requests.auth import HTTPBasicAuth
 
@@ -25,7 +24,7 @@ class FireREST(object):
         self.logger = logging.getLogger('FireREST')
         self.logger.setLevel(loglevel)
         formatter = logging.Formatter('%(asctime)s [%(name)s] [%(levelname)s] %(message)s')
-        handler = RainbowLoggingHandler(sys.stderr, color_funcName=('black', 'yellow', True))
+        handler = logging.StreamHandler()
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
 
@@ -79,7 +78,7 @@ class FireREST(object):
         responses.append(data)
         if data.status_code == 200 and 'paging' in payload.keys():
             pages = int(payload['paging']['pages'])
-            for i in xrange(1, pages, 1):
+            for i in range(1, pages, 1):
                 url_with_offset = url + '&offset=' + str(int(i) * int(limit))
                 response_page = requests.get(url_with_offset, headers=self.headers, verify=self.verify_cert,
                                              timeout=self.timeout)
@@ -144,6 +143,14 @@ class FireREST(object):
             self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules').json()
         for item in data['items']:
             if item['name'] == rule_name:
+                return item['id']
+        return None
+
+    def get_syslogalert_id_by_name(self, syslogalert_name, domain='Global'):
+        domain_url = self.get_domain_url(self.get_domain_id(domain))
+        data = self.get_syslogalerts(domain)[0].json()
+        for item in data['items']:
+            if item['name'] == syslogalert_name:
                 return item['id']
         return None
 
@@ -312,4 +319,9 @@ class FireREST(object):
         request = self._put(
             self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules/' + rule_id,
             data)
+        return request
+
+    def get_syslogalerts(self, domain='Global'):
+        domain_url = self.get_domain_url(self.get_domain_id(domain))
+        request = self._get(self.api_config_request_url + domain_url + 'policy/syslogalerts')
         return request
