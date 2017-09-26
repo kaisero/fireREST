@@ -25,6 +25,28 @@ class FireRESTAuthException(Exception):
     pass
 
 
+class RequestDebugDecorator(object):
+    def __init__(self, action):
+        self.action = action
+
+    def __call__(self, f):
+        def wrapped_f(*args):
+            action = self.action
+            logger = args[0].logger
+            request = args[1]
+            if logger:
+                logger.debug('{0}: {1}'.format(action, request))
+                result = f(*args)
+                status_code = result.status_code
+                logger.debug('Response Code: {0}'.format(status_code))
+                if status_code >= 400:
+                    logger.debug('Error: {0}'.format(result.content))
+            else:
+                result = f(*args)
+            return result
+        return wrapped_f
+
+
 class FireREST(object):
     def __init__(self, hostname=None, username=None, password=None,
                  protocol='https', verify_cert=False, logger=None, domain='Global', timeout=120):
@@ -48,6 +70,14 @@ class FireREST(object):
             return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_AUTH_URL, path)
         return '{0}://{1}{2}'.format(self.protocol, self.hostname, path)
 
+    @RequestDebugDecorator('GET')
+    def _get_request(self, request, params=dict(), limit=None):
+        if limit:
+            params['limit'] = limit
+        response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
+                                timeout=self.timeout)
+        return response
+
     def _login(self):
         try:
             request = self._url('auth')
@@ -68,38 +98,38 @@ class FireREST(object):
         except FireRESTApiException as exc:
             self.logger.error(exc.message)
 
+    @RequestDebugDecorator('DELETE')
     def _delete(self, request, params=dict()):
         response = requests.delete(request, headers=HEADERS, params=params, verify=self.verify_cert,
                                    timeout=self.timeout)
         return response
 
     def _get(self, request, params=dict(), limit=None):
-        if limit:
-            params['limit'] = limit
         responses = list()
-        response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
-                                timeout=self.timeout)
+        response = self._get_request(request, params, limit)
         responses.append(response)
         payload = response.json()
         if 'paging' in payload.keys():
             pages = int(payload['paging']['pages'])
             for i in range(1, pages, 1):
                 params['offset'] = str(int(i) * int(limit))
-                response_page = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
-                                             timeout=self.timeout)
+                response_page = self._get_request(request, params, limit)
                 responses.append(response_page)
         return responses
 
+    @RequestDebugDecorator('PATCH')
     def _patch(self, request, data=dict(), params=dict()):
         response = requests.patch(request, data=json.dumps(data), headers=HEADERS, params=params,
                                   verify=self.verify_cert, timeout=self.timeout)
         return response
 
+    @RequestDebugDecorator('POST')
     def _post(self, request, data=dict(), params=dict()):
         response = requests.post(request, data=json.dumps(data), headers=HEADERS, params=params,
                                  verify=self.verify_cert, timeout=self.timeout)
         return response
 
+    @RequestDebugDecorator('PUT')
     def _put(self, request, data=dict(), params=dict()):
         response = requests.put(request, data=json.dumps(data), headers=HEADERS, params=params,
                                 verify=self.verify_cert, timeout=self.timeout)
