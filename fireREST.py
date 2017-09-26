@@ -1,6 +1,5 @@
 import json
 import requests
-import sys
 import logging
 
 from requests.auth import HTTPBasicAuth
@@ -8,8 +7,8 @@ from requests.auth import HTTPBasicAuth
 requests.packages.urllib3.disable_warnings()
 
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
-API_PLATFORM_REQ_URL = '/api/fmc_platform/v1/'
-API_CONFIG_REQ_URL = '/api/fmc_config/v1/'
+API_PLATFORM_URL = '/api/fmc_platform/v1'
+API_CONFIG_URL = '/api/fmc_config/v1'
 
 HEADERS = {
     'Content-Type': 'application/json',
@@ -18,310 +17,272 @@ HEADERS = {
 }
 
 
+class FireRESTApiException(Exception):
+    pass
+
+
+class FireRESTAuthException(Exception):
+    pass
+
+
 class FireREST(object):
-    def __init__(self, device=None, username=None, password=None, verify_cert=False, timeout=120, loglevel=20):
-
-        self.logger = logging.getLogger('FireREST')
-        self.logger.setLevel(loglevel)
-        formatter = logging.Formatter('%(asctime)s [%(name)s] [%(levelname)s] %(message)s')
-        handler = logging.StreamHandler()
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-
-        self.device = device
+    def __init__(self, hostname=None, username=None, password=None,
+                 protocol='https', verify_cert=False, logger=None, domain='Global', timeout=120):
+        self.logger = logger
+        self.hostname = hostname
         self.username = username
         self.password = password
+        self.protocol = protocol
         self.verify_cert = verify_cert
         self.timeout = timeout
         self.cred = HTTPBasicAuth(self.username, self.password)
-        self.api_platform_request_url = API_PLATFORM_REQ_URL
-        self.api_config_request_url = API_CONFIG_REQ_URL
-        self.headers = HEADERS
-        self.url_policy = {
-            'accesspolicy': 'accesspolicies',
-            'filepolicy': 'filepolicies',
-            'intrusionpolicy': 'intrusionpolicies',
-            'snmpalert': 'snmpalerts',
-            'syslogalert': 'syslogalerts'
-        }
+        self._login()
+        self.domain = self.get_domain_id(domain)
 
+    def _url(self, namespace='base', path=''):
+        if namespace == 'config':
+            return '{0}://{1}{2}/domain/{3}{4}'.format(self.protocol, self.hostname, API_CONFIG_URL, self.domain, path)
+        if namespace == 'platform':
+            return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_PLATFORM_URL, path)
+        if namespace == 'auth':
+            return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_AUTH_URL, path)
+        return '{0}://{1}{2}'.format(self.protocol, self.hostname, path)
+
+    def _login(self):
         try:
-            request = requests.post('https://' + self.device + API_AUTH_URL, headers=HEADERS,
-                                    auth=self.cred,
-                                    verify=self.verify_cert)
-            self.token = request.headers.get('X-auth-access-token', default=None)
-            self.domains = json.loads(request.headers.get('DOMAINS', default=None))
-            self.headers['X-auth-access-token'] = self.token
-        except Exception as error:
-            self.logger.error('Could not generate Authentication Token, check connection parameters')
-            self.logger.error('Exception: %s ' % error.message)
-            sys.exit()
+            request = self._url('auth')
+            response = requests.post(request, headers=HEADERS, auth=self.cred, verify=self.verify_cert)
 
-    ######################################################################
-    # General Functions
-    ######################################################################
-    def _delete(self, request):
-        url = 'https://' + self.device + request
-        data = requests.delete(url, headers=self.headers, verify=self.verify_cert, timeout=self.timeout)
-        return data
+            if response.status_code == 401:
+                raise FireRESTAuthException('FireREST API Authentication to {0} failed.'.format(self.hostname))
 
-    def _get(self, request, limit=50):
-        responses = list()
-        url = 'https://' + self.device + request
+            token = response.headers.get('X-auth-access-token', default=None)
+            if not token:
+                raise FireRESTApiException('Could not retrieve token from {0}.'.format(request))
+
+            HEADERS['X-auth-access-token'] = token
+            self.domains = json.loads(response.headers.get('DOMAINS', default=None))
+        except ConnectionError:
+            self.logger.error(
+                'Could not connect to {0}. Max retries exceeded with url: {1}'.format(self.hostname, request))
+        except FireRESTApiException as exc:
+            self.logger.error(exc.message)
+
+    def _delete(self, request, params=dict()):
+        response = requests.delete(request, headers=HEADERS, params=params, verify=self.verify_cert,
+                                   timeout=self.timeout)
+        return response
+
+    def _get(self, request, params=dict(), limit=None):
         if limit:
-            if '?' in request:
-                url += '&limit=' + str(limit)
-            elif limit > 0:
-                url += '?limit=' + str(limit)
-        data = requests.get(url, headers=self.headers, verify=self.verify_cert, timeout=self.timeout)
-        payload = data.json()
-        responses.append(data)
-        if data.status_code == 200 and 'paging' in payload.keys():
+            params['limit'] = limit
+        responses = list()
+        response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
+                                timeout=self.timeout)
+        responses.append(response)
+        payload = response.json()
+        if 'paging' in payload.keys():
             pages = int(payload['paging']['pages'])
             for i in range(1, pages, 1):
-                url_with_offset = url + '&offset=' + str(int(i) * int(limit))
-                response_page = requests.get(url_with_offset, headers=self.headers, verify=self.verify_cert,
+                params['offset'] = str(int(i) * int(limit))
+                response_page = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
                                              timeout=self.timeout)
                 responses.append(response_page)
         return responses
 
-    def _patch(self, request, data):
-        url = 'https://' + self.device + request
-        data = requests.patch(url, data=json.dumps(data), headers=self.headers, verify=self.verify_cert,
-                              timeout=self.timeout)
-        return data
+    def _patch(self, request, data=dict(), params=dict()):
+        response = requests.patch(request, data=json.dumps(data), headers=HEADERS, params=params,
+                                  verify=self.verify_cert, timeout=self.timeout)
+        return response
 
-    def _post(self, request, data=False):
-        url = 'https://' + self.device + request
-        if data:
-            data = requests.post(url, data=json.dumps(data), headers=self.headers, verify=self.verify_cert,
-                                 timeout=self.timeout)
-        else:
-            data = requests.post(url, headers=self.headers, verify=self.verify_cert, timeout=self.timeout)
-        return data
+    def _post(self, request, data=dict(), params=dict()):
+        response = requests.post(request, data=json.dumps(data), headers=HEADERS, params=params,
+                                 verify=self.verify_cert, timeout=self.timeout)
+        return response
 
-    def _put(self, request, data):
-        url = 'https://' + self.device + request
-        data = requests.put(url, data=json.dumps(data), headers=self.headers, verify=self.verify_cert,
-                            timeout=self.timeout)
-        return data
+    def _put(self, request, data=dict(), params=dict()):
+        response = requests.put(request, data=json.dumps(data), headers=HEADERS, params=params,
+                                verify=self.verify_cert, timeout=self.timeout)
+        return response
 
-    ######################################################################
-    # HELPER FUNCTIONS
-    ######################################################################
-
-    def get_object_id_by_name(self, object_type, name, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        obj_type = object_type.lower() + 's'
-        data = self._get(self.api_config_request_url + domain_url + 'object/%s' % obj_type)[0].json()
-        for item in data['items']:
-            if item['name'] == name:
-                return item['id']
+    def get_object_id_by_name(self, obj_type, obj_name):
+        request = '/object/{0}'.format(obj_type)
+        url = self._url('config', request)
+        response = self._get(url)
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == obj_name:
+                    return payload['id']
         return None
 
-    def get_device_id_by_name(self, name, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        data = self._get(self.api_config_request_url + domain_url + 'devices/devicerecords').json()
-        for item in data['items']:
-            if item['name'] == name:
-                return item['id']
+    def get_device_id_by_name(self, device_name):
+        request = '/devices/devicerecords'
+        url = self._url('config', request)
+        response = self._get(url)
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == device_name:
+                    return payload['id']
         return None
 
-    def get_acp_id_by_name(self, name, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        responses = self._get(self.api_config_request_url + domain_url + 'policy/accesspolicies')
-        for response in responses:
-            for item in response.json()['items']:
-                if item['name'] == name:
-                    return item['id']
+    def get_acp_id_by_name(self, policy_name):
+        request = '/policy/accesspolicies'
+        url = self._url('config', request)
+        response = self._get(url)
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == policy_name:
+                    return payload['id']
         return None
 
-    def get_rule_id_by_name(self, policy_name, rule_name, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
+    def get_rule_id_by_name(self, policy_name, rule_name):
         policy_id = self.get_acp_id_by_name(policy_name)
-        data = self._get(
-            self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules').json()
-        for item in data['items']:
-            if item['name'] == rule_name:
-                return item['id']
+        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        url = self._url('config', request)
+        response = self._get(url)
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == rule_name:
+                    return payload['id']
         return None
 
-    def get_syslogalert_id_by_name(self, syslogalert_name, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        data = self.get_syslogalerts(domain)[0].json()
-        for item in data['items']:
-            if item['name'] == syslogalert_name:
-                return item['id']
+    def get_syslogalert_id_by_name(self, syslogalert_name):
+        response = self.get_syslogalerts()
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == syslogalert_name:
+                    return item['id']
         return None
 
     def get_domain_id(self, name):
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
-        logging.warn('Could not find domain with name %s. Make sure full path is provided' % domain['name'])
-        logging.debug('Available Domains: %s' % self.domains)
-
-    def get_domain_url(self, domain_id):
-        return 'domain/%s/' % domain_id
-
-    ######################################################################
-    # <SYSTEM>
-    ######################################################################
+        logging.error('Could not find domain with name %s. Make sure full path is provided' % self.domain['name'])
+        logging.debug('Available Domains: {0}'.format(', '.join((domain['name'] for domain in self.domains))))
+        return None
 
     def get_system_version(self):
-        request = self.api_platform_request_url + 'info/serverversion'
-        return self._get(request, limit=0)
+        request = '/info/serverversion'
+        url = self._url('platform', request)
+        return self._get(url)
 
-    def get_audit_records(self, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self.api_platform_request_url + domain_url + 'audit/auditrecords'
-        return self._get(request)
+    def get_audit_records(self):
+        request = '/audit/auditrecords'
+        url = self._url('platform', request)
+        return self._get(url)
 
-    ######################################################################
-    # <OBJECTS>
-    ######################################################################
+    def create_object(self, object_type, data):
+        request = '/object/{0}'.format(object_type)
+        url = self._url('config', request)
+        return self._post(url, data)
 
-    def create_object(self, object_type, data, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        obj_type = object_type.lower() + 's'
-        request = self.api_config_request_url + domain_url + 'object/' + obj_type
-        response = self._post(request, data)
-        if response.status_code == 201:
-            self.logger.info('Object %s of type %s successfully created' % (data['name'], object_type))
-        else:
-            if response.status_code == 400 and 'error' in response.json():
-                if 'The object name already exists' in response.json()['error']['messages'][0]['description']:
-                    self.logger.info('Import of Object %s skipped, Object already exists.' % data['name'])
-            else:
-                self.logger.error('Import of Object %s failed with Reason: %s' % (
-                    data['name'], response.json()))
-                self.logger.debug('Object Dump: %s' % data)
-        return response
+    def delete_object(self, object_type, object_id):
+        request = '/object/{0}/{1}'.format(object_type, object_id)
+        url = self._url('config', request)
+        return self._delete(url)
 
-    def delete_object(self, object_type, object_id, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self.api_config_request_url + domain_url + 'object/' + object_type + '/' + object_id
-        return self._delete(request)
+    def update_object(self, object_type, object_id, data):
+        request = '/object/{0}/{1}'.format(object_type, object_id)
+        url = self._url('config', request)
+        return self._put(url, data)
 
-    def update_object(self, object_type, object_id, data, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        object_type = object_type.lower() + 's'
-        request = self.api_config_request_url + domain_url + 'object/' + object_type + '/' + object_id
-        return self._put(request, data)
+    def get_objects(self, object_type, expanded=False):
+        request = '/object/{0}'.format(object_type)
+        url = self._url('config', request)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
-    def get_objects(self, object_type, expanded=False, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        obj_type = object_type.lower() + 's'
-        request = self.api_config_request_url + domain_url + 'object/' + obj_type
-        if expanded:
-            request += '?expanded=True'
-        return self._get(request)
+    def get_object(self, object_type, object_id):
+        request = '/object/{0}/{1}'.format(object_type, object_id)
+        url = self._url('config', request)
+        return self._get(url)
 
-    def get_object(self, object_type, object_id, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        obj_type = object_type.lower() + 's'
-        request = self._get(self.api_config_request_url + domain_url + 'object/' + obj_type + '/' + object_id, limit=0)
-        return request[0]
+    def get_devices(self):
+        request = '/devices/devicerecords'
+        url = self._url('config', request)
+        return self._get(url)
 
-    ######################################################################
-    # </OBJECTS>
-    ######################################################################
+    def get_device(self, device_id):
+        request = '/devices/devicerecords/{0}'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
 
+    def get_deployment(self):
+        request = '/deployment/deployabledevices'
+        url = self._url('config', request)
+        return self._get(url)
 
-    ######################################################################
-    # <DEVICES>
-    ######################################################################
+    def set_deployment(self, data):
+        request = '/deployment/deployabledevices'
+        url = self._url('config', request)
+        return self._post(url, data)
 
-    def get_devices(self, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._get(self.api_config_request_url + domain_url + 'devices/devicerecords')
-        return request
+    def create_policy(self, policy_type, data):
+        request = '/policy/{0}'.format(policy_type)
+        url = self._url('config', request)
+        return self._post(url, data)
 
-    def get_device(self, device_id, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._get(self.api_config_request_url + domain_url + 'devices/devicerecords/' + device_id, limit=0)
-        return request
+    def delete_policy(self, policy_id, policy_type):
+        request = '/policy/{0}/{1}'.format(policy_type, policy_id)
+        url = self._url('config', request)
+        return self._delete(url)
 
-    ######################################################################
-    # </DEVICES>
-    ######################################################################
+    def update_policy(self, policy_id, policy_type, data):
+        request = '/policy/{0}/{1}'.format(policy_type, policy_id)
+        url = self._url('config', request)
+        return self._put(url, data)
 
-    ######################################################################
-    # <DEPLOYMENT>
-    ######################################################################
+    def get_policies(self, policy_type):
+        request = '/policy/{0}'.format(policy_type)
+        url = self._url('config', request)
+        return self._get(url)
 
-    def get_deploy_devices(self, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._get(self.api_config_request_url + domain_url + 'deployment/deployabledevices')
-        return request
+    def get_policy(self, policy_id, policy_type, expanded=False):
+        request = '/policy/{0}/{1}'.format(policy_type, policy_id)
+        params = {
+            'expanded': expanded
+        }
+        url = self._url('config', request)
+        return self._get(url, params)
 
-    def deploy_configuration(self, data, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._post(self.api_config_request_url + domain_url + 'deployment/deploymentrequests')
-        return request
+    def get_acp_rules(self, policy_id, expanded=False):
+        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        params = {
+            'expanded': expanded
+        }
+        url = self._url('config', request)
+        return self._get(url, params)
 
-    ######################################################################
-    # </DEPLOYMENT>
-    ######################################################################
+    def get_acp_rule(self, policy_id, rule_id):
+        request = '/policy/accesspolicies/{0}/accessrules/{1}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._get(url)
 
-    ######################################################################
-    # <POLICIES>
-    ######################################################################
+    def create_acp_rule(self, policy_id, data):
+        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        url = self._url('config', request)
+        return self._post(url, data)
 
-    def create_policy(self, policy_type, data, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        policy_type = self.url_policy['policy_type']
-        request = self.api_config_request_url + domain_url + 'policy/' + policy_type + '/'
-        return self._post(request, data)
+    def create_acp_rules(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
+        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        url = self._url('config', request)
+        params = {
+            'category': category,
+            'section': section,
+            'insert_before': insert_before,
+            'insert_after': insert_after
+        }
+        return self._post(url, data, params)
 
-    def delete_policy(self, policy_id, policy_type, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        policy_type = self.url_policy['policy_type']
-        request = self.api_config_request_url + domain_url + 'policy/' + policy_type + '/' + policy_id
-        return self._delete(request)
+    def update_acp_rule(self, policy_id, rule_id, data):
+        request = '/policy/accesspolicies/{0}/accessrules/{1}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._put(url, data)
 
-    def update_policy(self, policy_id, policy_type, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        policy_type = self.url_policy['policy_type']
-        request = self.api_config_request_url + domain_url + 'policy/' + policy_type + '/' + policy_id
-        return self._put(request)
-
-    def get_policies(self, policy_type, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        policy_type = self.url_policy['policy_type']
-        request = self._get(self.api_config_request_url + domain_url + 'policy/' + policy_type)
-        return request
-
-    def get_policy(self, policy_id, policy_type, expanded=False, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        policy_type = self.url_policy[policy_type]
-        request = self._get(self.api_config_request_url + domain_url + 'policy/' + policy_type + '/' + policy_id, limit=0)
-        if expanded:
-            request += '?expanded=True'
-        return request
-
-    def get_acp_rules(self, policy_id, expanded=False, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules'
-        if expanded:
-            request += '?expanded=True'
-        return self._get(request)
-
-    def get_acp_rule(self, policy_id, rule_id, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._get(
-            self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules/' + rule_id,
-            limit=0)
-        return request
-
-    def update_acp_rule(self, policy_id, rule_id, data, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._put(
-            self.api_config_request_url + domain_url + 'policy/accesspolicies/' + policy_id + '/accessrules/' + rule_id,
-            data)
-        return request
-
-    def get_syslogalerts(self, domain='Global'):
-        domain_url = self.get_domain_url(self.get_domain_id(domain))
-        request = self._get(self.api_config_request_url + domain_url + 'policy/syslogalerts')
-        return request
+    def get_syslogalerts(self):
+        request = 'policy/syslogalerts'
+        url = self._url('config', request)
+        return self._get(url)
