@@ -34,23 +34,21 @@ class RequestDebugDecorator(object):
             action = self.action
             logger = args[0].logger
             request = args[1]
-            if logger:
-                logger.debug('{0}: {1}'.format(action, request))
-                result = f(*args)
-                status_code = result.status_code
-                logger.debug('Response Code: {0}'.format(status_code))
-                if status_code >= 400:
-                    logger.debug('Error: {0}'.format(result.content))
-            else:
-                result = f(*args)
+            logger.debug('{0}: {1}'.format(action, request))
+            result = f(*args)
+            status_code = result.status_code
+            logger.debug('Response Code: {0}'.format(status_code))
+            if status_code >= 400:
+                logger.debug('Error: {0}'.format(result.content))
             return result
+
         return wrapped_f
 
 
 class FireREST(object):
     def __init__(self, hostname=None, username=None, password=None,
                  protocol='https', verify_cert=False, logger=None, domain='Global', timeout=120):
-        self.logger = logger
+        self.logger = self._get_logger(logger)
         self.hostname = hostname
         self.username = username
         self.password = password
@@ -61,6 +59,13 @@ class FireREST(object):
         self._login()
         self.domain = self.get_domain_id(domain)
 
+    def _get_logger(self, logger):
+        if not logger:
+            dummy_logger = logging.getLogger('FireREST')
+            dummy_logger.addHandler(logging.NullHandler())
+            return dummy_logger
+        return logger
+
     def _url(self, namespace='base', path=''):
         if namespace == 'config':
             return '{0}://{1}{2}/domain/{3}{4}'.format(self.protocol, self.hostname, API_CONFIG_URL, self.domain, path)
@@ -69,14 +74,6 @@ class FireREST(object):
         if namespace == 'auth':
             return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_AUTH_URL, path)
         return '{0}://{1}{2}'.format(self.protocol, self.hostname, path)
-
-    @RequestDebugDecorator('GET')
-    def _get_request(self, request, params=dict(), limit=None):
-        if limit:
-            params['limit'] = limit
-        response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
-                                timeout=self.timeout)
-        return response
 
     def _login(self):
         try:
@@ -102,6 +99,14 @@ class FireREST(object):
     def _delete(self, request, params=dict()):
         response = requests.delete(request, headers=HEADERS, params=params, verify=self.verify_cert,
                                    timeout=self.timeout)
+        return response
+
+    @RequestDebugDecorator('GET')
+    def _get_request(self, request, params=dict(), limit=None):
+        if limit:
+            params['limit'] = limit
+        response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
+                                timeout=self.timeout)
         return response
 
     def _get(self, request, params=dict(), limit=None):
