@@ -94,6 +94,7 @@ class FireREST(object):
                 'Could not connect to {0}. Max retries exceeded with url: {1}'.format(self.hostname, request))
         except FireRESTApiException as exc:
             self.logger.error(exc.message)
+        self.logger.debug('Successfully authenticated to {0}'.format(self.hostname))
 
     @RequestDebugDecorator('DELETE')
     def _delete(self, request, params=dict()):
@@ -195,6 +196,14 @@ class FireREST(object):
                 return domain['uuid']
         logging.error('Could not find domain with name %s. Make sure full path is provided' % self.domain['name'])
         logging.debug('Available Domains: {0}'.format(', '.join((domain['name'] for domain in self.domains))))
+        return None
+
+    def get_domain_name(self, id):
+        for domain in self.domains:
+            if domain['id'] == id:
+                return domain['name']
+        logging.error('Could not find domain with id %s. Make sure full path is provided' % self.domain['id'])
+        logging.debug('Available Domains: {0}'.format(', '.join((domain['id'] for domain in self.domains))))
         return None
 
     def get_system_version(self):
