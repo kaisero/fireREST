@@ -110,7 +110,7 @@ class FireREST(object):
                                 timeout=self.timeout)
         return response
 
-    def _get(self, request, params=dict(), limit=None):
+    def _get(self, request, params=dict(), limit=50):
         responses = list()
         response = self._get_request(request, params, limit)
         responses.append(response)
