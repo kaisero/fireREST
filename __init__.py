@@ -245,7 +245,7 @@ class FireREST(object):
 
     def get_object(self, object_type, object_id):
         request = '/object/{0}/{1}'.format(object_type, object_id)
-        url = self._url('config', request)
+        url = self._url('config', request, limit=None)
         return self._get(url)
 
     def get_devices(self):
@@ -255,7 +255,7 @@ class FireREST(object):
 
     def get_device(self, device_id):
         request = '/devices/devicerecords/{0}'.format(device_id)
-        url = self._url('config', request)
+        url = self._url('config', request, limit=None)
         return self._get(url)
 
     def get_deployment(self):
@@ -293,7 +293,7 @@ class FireREST(object):
         params = {
             'expanded': expanded
         }
-        url = self._url('config', request)
+        url = self._url('config', request, limit=None)
         return self._get(url, params)
 
     def get_acp_rules(self, policy_id, expanded=False):
@@ -306,7 +306,7 @@ class FireREST(object):
 
     def get_acp_rule(self, policy_id, rule_id):
         request = '/policy/accesspolicies/{0}/accessrules/{1}'.format(policy_id, rule_id)
-        url = self._url('config', request)
+        url = self._url('config', request, limit=None)
         return self._get(url)
 
     def create_acp_rule(self, policy_id, data):
