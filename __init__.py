@@ -46,7 +46,7 @@ class RequestDebugDecorator(object):
 
 
 class FireREST(object):
-    def __init__(self, hostname=None, username=None, password=None,
+    def __init__(self, hostname=None, username=None, password=None, token=None,
                  protocol='https', verify_cert=False, logger=None, domain='Global', timeout=120):
         self.logger = self._get_logger(logger)
         self.hostname = hostname
@@ -56,8 +56,11 @@ class FireREST(object):
         self.verify_cert = verify_cert
         self.timeout = timeout
         self.cred = HTTPBasicAuth(self.username, self.password)
-        self._login()
         self.domain = self.get_domain_id(domain)
+        if token is None:
+            self._login()
+        else:
+            HEADERS['X-auth-access-token'] = token
 
     def _get_logger(self, logger):
         if not logger:
