@@ -115,15 +115,16 @@ class FireREST(object):
                                 timeout=self.timeout)
         return response
 
-    def _get(self, request, params=dict(), limit=50):
+    def _get(self, request, params=dict(), limit=None):
         responses = list()
         response = self._get_request(request, params, limit)
         responses.append(response)
         payload = response.json()
         if 'paging' in payload.keys():
             pages = int(payload['paging']['pages'])
+            limit = int(payload['paging']['limit'])
             for i in range(1, pages, 1):
-                params['offset'] = str(int(i) * int(limit))
+                params['offset'] = str(int(i) * limit)
                 response_page = self._get_request(request, params, limit)
                 responses.append(response_page)
         return responses
@@ -247,7 +248,7 @@ class FireREST(object):
     def get_object(self, object_type, object_id):
         request = '/object/{0}/{1}'.format(object_type, object_id)
         url = self._url('config', request)
-        return self._get(url, limit=None)
+        return self._get(url)
 
     def get_devices(self):
         request = '/devices/devicerecords'
@@ -257,7 +258,7 @@ class FireREST(object):
     def get_device(self, device_id):
         request = '/devices/devicerecords/{0}'.format(device_id)
         url = self._url('config', request)
-        return self._get(url, limit=None)
+        return self._get(url)
 
     def get_deployment(self):
         request = '/deployment/deployabledevices'
@@ -295,7 +296,7 @@ class FireREST(object):
             'expanded': expanded
         }
         url = self._url('config', request)
-        return self._get(url, params, limit=None)
+        return self._get(url, params)
 
     def get_acp_rules(self, policy_id, expanded=False):
         request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
@@ -308,7 +309,7 @@ class FireREST(object):
     def get_acp_rule(self, policy_id, rule_id):
         request = '/policy/accesspolicies/{0}/accessrules/{1}'.format(policy_id, rule_id)
         url = self._url('config', request)
-        return self._get(url, limit=None)
+        return self._get(url)
 
     def create_acp_rule(self, policy_id, data):
         request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
