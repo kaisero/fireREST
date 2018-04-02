@@ -1,10 +1,11 @@
 import json
 import requests
 import logging
+import urllib3
 
 from requests.auth import HTTPBasicAuth
 
-requests.packages.urllib3.disable_warnings()
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
 API_PLATFORM_URL = '/api/fmc_platform/v1'
