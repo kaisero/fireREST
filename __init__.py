@@ -56,12 +56,12 @@ class FireREST(object):
         self.verify_cert = verify_cert
         self.timeout = timeout
         self.cred = HTTPBasicAuth(self.username, self.password)
-        self.domain = self.get_domain_id(domain)
         if token is None:
             self._login()
         else:
-            self.domains = [domain]
-            HEADERS['X-auth-access-token'] = token
+            self.domains = token['domains']
+            HEADERS['X-auth-access-token'] = token['token']
+        self.domain = self.get_domain_id(domain)
 
     def _get_logger(self, logger):
         if not logger:
