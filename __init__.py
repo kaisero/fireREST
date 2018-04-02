@@ -60,6 +60,7 @@ class FireREST(object):
         if token is None:
             self._login()
         else:
+            self.domains = [domain]
             HEADERS['X-auth-access-token'] = token
 
     def _get_logger(self, logger):
