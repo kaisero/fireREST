@@ -49,6 +49,20 @@ class RequestDebugDecorator(object):
 class FireREST(object):
     def __init__(self, hostname=None, username=None, password=None, token=None,
                  protocol='https', verify_cert=False, logger=None, domain='Global', timeout=120):
+        """
+        Initialize FireREST object
+        :param hostname: ip address or dns name of fmc
+        :param username: fmc username
+        :param password: fmc password
+        :param token: authentication token (can be provided in case FireREST should not generate one at init).
+                      Make sure to pass the headers of a successful authentication to the token variable,
+                      otherwise this will fail
+        :param protocol: protocol used to access fmc api. default = https
+        :param verify_cert: check fmc certificate for vailidity. default = False
+        :param logger: optional logger instance, in case debug logging is needed
+        :param domain: name of the fmc domain. default = Global
+        :param timeout: timeout value for http requests. default = 120
+        """
         self.logger = self._get_logger(logger)
         self.hostname = hostname
         self.username = username
@@ -65,6 +79,11 @@ class FireREST(object):
         self.domain = self.get_domain_id(domain)
 
     def _get_logger(self, logger):
+        """
+        Generate dummy logger in case FireREST has been initialized without a logger
+        :param logger: logger instance
+        :return: dummy logger instance if logger is None, otherwise return logger variable again
+        """
         if not logger:
             dummy_logger = logging.getLogger('FireREST')
             dummy_logger.addHandler(logging.NullHandler())
@@ -72,6 +91,12 @@ class FireREST(object):
         return logger
 
     def _url(self, namespace='base', path=''):
+        """
+        Generate URLs on the fly for requests to firepower api
+        :param namespace: name of the url namespace that should be used. options: base, config, auth. default = base
+        :param path: the url path for which a full url should be created
+        :return: url in string format
+        """
         if namespace == 'config':
             return '{0}://{1}{2}/domain/{3}{4}'.format(self.protocol, self.hostname, API_CONFIG_URL, self.domain, path)
         if namespace == 'platform':
