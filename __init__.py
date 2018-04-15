@@ -8,6 +8,7 @@ from requests.auth import HTTPBasicAuth
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
+API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
 API_PLATFORM_URL = '/api/fmc_platform/v1'
 API_CONFIG_URL = '/api/fmc_config/v1'
 
@@ -23,6 +24,10 @@ class FireRESTApiException(Exception):
 
 
 class FireRESTAuthException(Exception):
+    pass
+
+
+class FireRESTAuthRefreshException(Exception):
     pass
 
 
@@ -42,12 +47,11 @@ class RequestDebugDecorator(object):
             if status_code >= 400:
                 logger.debug('Error: {0}'.format(result.content))
             return result
-
         return wrapped_f
 
 
 class FireREST(object):
-    def __init__(self, hostname=None, username=None, password=None, token=None,
+    def __init__(self, hostname=None, username=None, password=None, session=None,
                  protocol='https', verify_cert=False, logger=None, domain='Global', timeout=120):
         """
         Initialize FireREST object
@@ -63,6 +67,7 @@ class FireREST(object):
         :param domain: name of the fmc domain. default = Global
         :param timeout: timeout value for http requests. default = 120
         """
+        self.refresh_counter = 0
         self.logger = self._get_logger(logger)
         self.hostname = hostname
         self.username = username
@@ -71,14 +76,16 @@ class FireREST(object):
         self.verify_cert = verify_cert
         self.timeout = timeout
         self.cred = HTTPBasicAuth(self.username, self.password)
-        if token is None:
+        if session is None:
             self._login()
         else:
-            self.domains = token['domains']
-            HEADERS['X-auth-access-token'] = token['token']
+            self.domains = session['domains']
+            HEADERS['X-auth-access-token'] = session['X-auth-access-token']
+            HEADERS['X-auth-refresh-token'] = session['X-auth-refresh-token']
         self.domain = self.get_domain_id(domain)
 
-    def _get_logger(self, logger):
+    @staticmethod
+    def _get_logger(logger):
         """
         Generate dummy logger in case FireREST has been initialized without a logger
         :param logger: logger instance
@@ -103,6 +110,8 @@ class FireREST(object):
             return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_PLATFORM_URL, path)
         if namespace == 'auth':
             return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_AUTH_URL, path)
+        if namespace == 'refresh':
+            return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_REFRESH_URL, path)
         return '{0}://{1}{2}'.format(self.protocol, self.hostname, path)
 
     def _login(self):
@@ -113,11 +122,13 @@ class FireREST(object):
             if response.status_code == 401:
                 raise FireRESTAuthException('FireREST API Authentication to {0} failed.'.format(self.hostname))
 
-            token = response.headers.get('X-auth-access-token', default=None)
-            if not token:
-                raise FireRESTApiException('Could not retrieve token from {0}.'.format(request))
+            access_token = response.headers.get('X-auth-access-token', default=None)
+            refresh_token = response.headers.get('X-auth-refresh-token', default=None)
+            if not access_token or not refresh_token:
+                raise FireRESTApiException('Could not retrieve tokens from {0}.'.format(request))
 
-            HEADERS['X-auth-access-token'] = token
+            HEADERS['X-auth-access-token'] = access_token
+            HEADERS['X-auth-refresh-token'] = refresh_token
             self.domains = json.loads(response.headers.get('DOMAINS', default=None))
         except ConnectionError:
             self.logger.error(
@@ -126,10 +137,37 @@ class FireREST(object):
             self.logger.error(exc.message)
         self.logger.debug('Successfully authenticated to {0}'.format(self.hostname))
 
+    def _refresh(self):
+        if self.refresh_counter > 3:
+            raise FireRESTAuthRefreshException('Refresh Token has already been refreshed 3 times. Session to {} must'
+                                               'be re-authenticated.'.format(self.hostname))
+        try:
+            self.refresh_counter += 1
+            request = self._url('refresh')
+            response = requests.post(request, headers=HEADERS, verify=self.verify_cert)
+
+            access_token = response.headers.get('X-auth-access-token', default=None)
+            refresh_token = response.headers.get('X-auth-refresh-token', default=None)
+            if not access_token or not refresh_token:
+                raise FireRESTAuthRefreshException('Could not refresh tokens from {0}.'.format(request))
+
+            HEADERS['X-auth-access-token'] = access_token
+            HEADERS['X-auth-refresh-token'] = refresh_token
+        except ConnectionError:
+            self.logger.error(
+                'Could not connect to {0}. Max retries exceeded with url: {1}'.format(self.hostname, request))
+        except FireRESTApiException as exc:
+            self.logger.error(exc.message)
+        self.logger.debug('Successfully refreshed authorization token for {0}'.format(self.hostname))
+
     @RequestDebugDecorator('DELETE')
     def _delete(self, request, params=dict()):
         response = requests.delete(request, headers=HEADERS, params=params, verify=self.verify_cert,
                                    timeout=self.timeout)
+        if response.status_code == 401:
+            if 'Access token invalid' in str(response.json()):
+                self._refresh()
+                return self._delete(request, params)
         return response
 
     @RequestDebugDecorator('GET')
@@ -138,6 +176,10 @@ class FireREST(object):
             params['limit'] = limit
         response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
                                 timeout=self.timeout)
+        if response.status_code == 401:
+            if 'Access token invalid' in str(response.json()):
+                self._refresh()
+                return self._get_request(request, params, limit)
         return response
 
     def _get(self, request, params=dict(), limit=None):
@@ -158,18 +200,30 @@ class FireREST(object):
     def _patch(self, request, data=dict(), params=dict()):
         response = requests.patch(request, data=json.dumps(data), headers=HEADERS, params=params,
                                   verify=self.verify_cert, timeout=self.timeout)
+        if response.status_code == 401:
+            if 'Access token invalid' in str(response.json()):
+                self._refresh()
+                return self._patch(request, data, params)
         return response
 
     @RequestDebugDecorator('POST')
     def _post(self, request, data=dict(), params=dict()):
         response = requests.post(request, data=json.dumps(data), headers=HEADERS, params=params,
                                  verify=self.verify_cert, timeout=self.timeout)
+        if response.status_code == 401:
+            if 'Access token invalid' in str(response.json()):
+                self._refresh()
+                return self._post(request, data, params)
         return response
 
     @RequestDebugDecorator('PUT')
     def _put(self, request, data=dict(), params=dict()):
         response = requests.put(request, data=json.dumps(data), headers=HEADERS, params=params,
                                 verify=self.verify_cert, timeout=self.timeout)
+        if response.status_code == 401:
+            if 'Access token invalid' in str(response.json()):
+                self._refresh()
+                return self._put(request, data, params)
         return response
 
     def get_object_id_by_name(self, obj_type, obj_name):
