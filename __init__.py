@@ -47,6 +47,7 @@ class RequestDebugDecorator(object):
             if status_code >= 400:
                 logger.debug('Error: {0}'.format(result.content))
             return result
+
         return wrapped_f
 
 
@@ -58,8 +59,8 @@ class FireREST(object):
         :param hostname: ip address or dns name of fmc
         :param username: fmc username
         :param password: fmc password
-        :param token: authentication token (can be provided in case FireREST should not generate one at init).
-                      Make sure to pass the headers of a successful authentication to the token variable,
+        :param session: authentication session (can be provided in case FireREST should not generate one at init).
+                      Make sure to pass the headers of a successful authentication to the session variable,
                       otherwise this will fail
         :param protocol: protocol used to access fmc api. default = https
         :param verify_cert: check fmc certificate for vailidity. default = False
@@ -115,6 +116,9 @@ class FireREST(object):
         return '{0}://{1}{2}'.format(self.protocol, self.hostname, path)
 
     def _login(self):
+        """
+        Login to fmc api and save X-auth-access-token, X-auth-refresh-token and DOMAINS to variables
+        """
         try:
             request = self._url('auth')
             response = requests.post(request, headers=HEADERS, auth=self.cred, verify=self.verify_cert)
@@ -138,9 +142,14 @@ class FireREST(object):
         self.logger.debug('Successfully authenticated to {0}'.format(self.hostname))
 
     def _refresh(self):
+        """
+        Refresh X-auth-access-token using X-auth-refresh-token- This operation is performed for up to three
+        times, afterwards a re-authentication using _login will be performed
+        """
         if self.refresh_counter > 3:
-            raise FireRESTAuthRefreshException('Refresh Token has already been refreshed 3 times. Session to {} must'
-                                               'be re-authenticated.'.format(self.hostname))
+            self.logger.info(
+                'Authentication token has already been used 3 times, api re-authentication will be performed')
+            self._login()
         try:
             self.refresh_counter += 1
             request = self._url('refresh')
@@ -162,6 +171,12 @@ class FireREST(object):
 
     @RequestDebugDecorator('DELETE')
     def _delete(self, request, params=dict()):
+        """
+        DELETE Operation for FMC REST API. In case of authentication issues session will be refreshed
+        :param request: URL of request that should be performed
+        :param params: dict of parameters for http request
+        :return: requests.Response object
+        """
         response = requests.delete(request, headers=HEADERS, params=params, verify=self.verify_cert,
                                    timeout=self.timeout)
         if response.status_code == 401:
@@ -172,6 +187,13 @@ class FireREST(object):
 
     @RequestDebugDecorator('GET')
     def _get_request(self, request, params=dict(), limit=None):
+        """
+        GET Operation for FMC REST API. In case of authentication issues session will be refreshed
+        :param request: URL of request that should be performed
+        :param params: dict of parameters for http request
+        :param limit: set custom limit for paging. If not set, api will default to 25
+        :return: requests.Response object
+        """
         if limit:
             params['limit'] = limit
         response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
@@ -183,6 +205,13 @@ class FireREST(object):
         return response
 
     def _get(self, request, params=dict(), limit=None):
+        """
+        GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
+        :param request: URL of request that should be performed
+        :param params: dict of parameters for http request
+        :param limit: set custom limit for paging. If not set, api will default to 25
+        :return: list of requests.Response objects
+        """
         responses = list()
         response = self._get_request(request, params, limit)
         responses.append(response)
@@ -198,6 +227,14 @@ class FireREST(object):
 
     @RequestDebugDecorator('PATCH')
     def _patch(self, request, data=dict(), params=dict()):
+        """
+        PATCH Operation for FMC REST API. In case of authentication issues session will be refreshed
+        As of FPR 6.2.3 this function is not in use because FMC API does not support PATCH operations
+        :param request: URL of request that should be performed
+        :param data: dictionary of data that will be sent to the api
+        :param params: dict of parameters for http request
+        :return: requests.Response object
+        """
         response = requests.patch(request, data=json.dumps(data), headers=HEADERS, params=params,
                                   verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
@@ -208,6 +245,13 @@ class FireREST(object):
 
     @RequestDebugDecorator('POST')
     def _post(self, request, data=dict(), params=dict()):
+        """
+        POST Operation for FMC REST API. In case of authentication issues session will be refreshed
+        :param request: URL of request that should be performed
+        :param data: dictionary of data that will be sent to the api
+        :param params: dict of parameters for http request
+        :return: requests.Response object
+        """
         response = requests.post(request, data=json.dumps(data), headers=HEADERS, params=params,
                                  verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
@@ -218,6 +262,13 @@ class FireREST(object):
 
     @RequestDebugDecorator('PUT')
     def _put(self, request, data=dict(), params=dict()):
+        """
+        PUT Operation for FMC REST API. In case of authentication issues session will be refreshed
+        :param request: URL of request that should be performed
+        :param data: dictionary of data that will be sent to the api
+        :param params: dict of parameters for http request
+        :return: requests.Response object
+        """
         response = requests.put(request, data=json.dumps(data), headers=HEADERS, params=params,
                                 verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
@@ -227,6 +278,12 @@ class FireREST(object):
         return response
 
     def get_object_id_by_name(self, obj_type, obj_name):
+        """
+        helper function to retrieve object id by name
+        :param obj_type: object types that will be queried
+        :param obj_name:  name of the object
+        :return: id if object is found, None otherwise
+        """
         request = '/object/{0}'.format(obj_type)
         url = self._url('config', request)
         response = self._get(url)
@@ -237,6 +294,11 @@ class FireREST(object):
         return None
 
     def get_device_id_by_name(self, device_name):
+        """
+        helper function to retrieve device id by name
+        :param device_name:  name of the device
+        :return: id if device is found, None otherwise
+        """
         request = '/devices/devicerecords'
         url = self._url('config', request)
         response = self._get(url)
@@ -247,6 +309,11 @@ class FireREST(object):
         return None
 
     def get_acp_id_by_name(self, policy_name):
+        """
+        helper function to retrieve access control policy id by name
+        :param policy_name:  name of the access control policy
+        :return: id if access control policy is found, None otherwise
+        """
         request = '/policy/accesspolicies'
         url = self._url('config', request)
         response = self._get(url)
@@ -257,6 +324,12 @@ class FireREST(object):
         return None
 
     def get_rule_id_by_name(self, policy_name, rule_name):
+        """
+        helper function to retrieve access control policy rule id by name
+        :param policy_name: name of the access control policy that will be queried
+        :param rule_name:  name of the access control policy rule
+        :return: id if access control policy rule is found, None otherwise
+        """
         policy_id = self.get_acp_id_by_name(policy_name)
         request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
         url = self._url('config', request)
@@ -268,6 +341,11 @@ class FireREST(object):
         return None
 
     def get_syslogalert_id_by_name(self, syslogalert_name):
+        """
+        helper function to retrieve syslog alert object id by name
+        :param syslogalert_name: name of syslog alert object
+        :return: id if syslog alert is found, None otherwise
+        """
         response = self.get_syslogalerts()
         for item in response:
             for payload in item.json()['items']:
@@ -276,6 +354,11 @@ class FireREST(object):
         return None
 
     def get_domain_id(self, name):
+        """
+        helper function to retrieve domain id from list of domains
+        :param name: name of the domain
+        :return: did if domain is found, None otherwise
+        """
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
@@ -284,6 +367,11 @@ class FireREST(object):
         return None
 
     def get_domain_name(self, id):
+        """
+        helper function to retrieve domain name by id
+        :param id: id of the domain
+        :return: name if domain is found, None otherwise
+        """
         for domain in self.domains:
             if domain['uuid'] == id:
                 return domain['name']
