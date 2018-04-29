@@ -325,6 +325,21 @@ class FireREST(object):
                     return ha_pair['id']
         return None
 
+    def get_nat_policy_id_by_name(self, nat_policy_name: str):
+        """
+        helper function to retrieve nat policy id by name
+        :param nat_policy_name: name of nat policy
+        :return: policy id if nat policy is found, None otherwise
+        """
+        request = '/policy/ftdnatpolicies'
+        url = self._url(request)
+        response = self._get(url)
+        for item in response:
+            for nat_policy in item.json()['items']:
+                if nat_policy['name'] == nat_policy_name:
+                    return nat_policy['id']
+        return None
+
     def get_acp_id_by_name(self, policy_name: str):
         """
         helper function to retrieve access control policy id by name
@@ -370,6 +385,19 @@ class FireREST(object):
                     return syslogalert['id']
         return None
 
+    def get_snmpalert_id_by_name(self, snmpalert_name: str):
+        """
+        helper function to retrieve snmp alert object id by name
+        :param snmpalert_name: name of snmp alert object
+        :return: snmpalert id if snmp alert is found, None otherwise
+        """
+        response = self.get_snmpalerts()
+        for item in response:
+            for snmpalert in item.json()['items']:
+                if snmpalert['name'] == snmpalert_name:
+                    return snmpalert['id']
+        return None
+
     def get_domain_id_by_name(self, domain_name: str):
         """
         helper function to retrieve domain id from list of domains
@@ -404,6 +432,16 @@ class FireREST(object):
     def get_audit_records(self):
         request = '/audit/auditrecords'
         url = self._url('platform', request)
+        return self._get(url)
+
+    def get_syslogalerts(self):
+        request = 'policy/syslogalerts'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_snmpalerts(self):
+        request = 'policy/snmpalerts'
+        url = self._url('config', request)
         return self._get(url)
 
     def create_object(self, object_type: str, data: Dict):
@@ -504,6 +542,14 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
+    def get_policy(self, policy_id: str, policy_type: str, expanded=False):
+        request = '/policy/{}/{}'.format(policy_type, policy_id)
+        params = {
+            'expanded': expanded
+        }
+        url = self._url('config', request)
+        return self._get(url, params)
+
     def update_policy(self, policy_id: str, policy_type: str, data: Dict):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
@@ -513,14 +559,6 @@ class FireREST(object):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._delete(url)
-
-    def get_policy(self, policy_id: str, policy_type: str, expanded=False):
-        request = '/policy/{}/{}'.format(policy_type, policy_id)
-        params = {
-            'expanded': expanded
-        }
-        url = self._url('config', request)
-        return self._get(url, params)
 
     def create_acp_rule(self, policy_id: str, data: Dict, section=None, category=None, insert_before=None,
                         insert_after=None):
@@ -569,7 +607,52 @@ class FireREST(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_syslogalerts(self):
-        request = 'policy/syslogalerts'
+    def create_autonat_rule(self, policy_id: str, data: Dict):
+        request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_autonat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/autonatrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._get(url)
+
+    def get_autonat_rules(self, policy_id: str):
+        request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_autonat_rule(self, policy_id: str, data: Dict):
+        request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
+        url = self._url('config', request)
+        return self._put(url)
+
+    def delete_autonat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/autonatrules/{}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
+    def create_manualnat_rule(self, policy_id: str, data: Dict):
+        request = '/policy/ftdnatpolicies/{}/manualnatrules'.format(policy_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_manualnat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_manualnat_rules(self, policy_id: str):
+        request = '/policy/ftdnatpolicies/manualnatrules/{}'.format(policy_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_manualnat_rule(self, policy_id: str, data: Dict):
+        request = '/policy/ftdnatpolicies/{}/manualnatrules'.format(policy_id)
+        url = self._url('config', request)
+        return self._put(url)
+
+    def delete_manualnat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._delete(url)
