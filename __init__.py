@@ -656,3 +656,23 @@ class FireREST(object):
         request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._delete(url)
+
+    def create_policy_assignment(self, data: Dict):
+        request = '/assignment/policyassignments'
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_policy_assignments(self):
+        request = '/assignment/policyassignments'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_policy_assignment(self, policy_id):
+        request = '/assignment/policyassignments/{}'.format(policy_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_policy_assignment(self, policy_id: str, data: Dict):
+        request = '/assignment/policyassignments'
+        url = self._url('config', request)
+        return self._put(url, data)
