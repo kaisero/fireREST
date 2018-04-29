@@ -612,6 +612,56 @@ class FireREST(object):
         url = self._url('config', request)
         return self._delete(url)
 
+    def create_ftd_ipv4_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_ftd_ipv4_routes(self, device_id: str):
+        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_ftd_ipv4_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(device_id, route_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_ftd_ipv4_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_ftd_ipv4_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(device_id, route_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
+    def create_ftd_ipv6_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_ftd_ipv6_routes(self, device_id: str):
+        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_ftd_ipv6_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(device_id, route_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_ftd_ipv6_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_ftd_ipv6_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(device_id, route_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
     def create_deployment(self, data: Dict):
         request = '/deployment/deploymentrequests'
         url = self._url('config', request)
