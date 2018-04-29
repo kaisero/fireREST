@@ -40,12 +40,12 @@ class RequestDebugDecorator(object):
             action = self.action
             logger = args[0].logger
             request = args[1]
-            logger.debug('{0}: {1}'.format(action, request))
+            logger.debug('{}: {}'.format(action, request))
             result = f(*args)
             status_code = result.status_code
-            logger.debug('Response Code: {0}'.format(status_code))
+            logger.debug('Response Code: {}'.format(status_code))
             if status_code >= 400:
-                logger.debug('Error: {0}'.format(result.content))
+                logger.debug('Error: {}'.format(result.content))
             return result
 
         return wrapped_f
@@ -106,14 +106,14 @@ class FireREST(object):
         :return: url in string format
         """
         if namespace == 'config':
-            return '{0}://{1}{2}/domain/{3}{4}'.format(self.protocol, self.hostname, API_CONFIG_URL, self.domain, path)
+            return '{}://{}{}/domain/{}{}'.format(self.protocol, self.hostname, API_CONFIG_URL, self.domain, path)
         if namespace == 'platform':
-            return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_PLATFORM_URL, path)
+            return '{}://{}{}{}'.format(self.protocol, self.hostname, API_PLATFORM_URL, path)
         if namespace == 'auth':
-            return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_AUTH_URL, path)
+            return '{}://{}{}{}'.format(self.protocol, self.hostname, API_AUTH_URL, path)
         if namespace == 'refresh':
-            return '{0}://{1}{2}{3}'.format(self.protocol, self.hostname, API_REFRESH_URL, path)
-        return '{0}://{1}{2}'.format(self.protocol, self.hostname, path)
+            return '{}://{}{}{}'.format(self.protocol, self.hostname, API_REFRESH_URL, path)
+        return '{}://{}{}'.format(self.protocol, self.hostname, path)
 
     def _login(self):
         """
@@ -124,26 +124,26 @@ class FireREST(object):
             response = requests.post(request, headers=HEADERS, auth=self.cred, verify=self.verify_cert)
 
             if response.status_code == 401:
-                raise FireRESTAuthException('FireREST API Authentication to {0} failed.'.format(self.hostname))
+                raise FireRESTAuthException('FireREST API Authentication to {} failed.'.format(self.hostname))
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
-                raise FireRESTApiException('Could not retrieve tokens from {0}.'.format(request))
+                raise FireRESTApiException('Could not retrieve tokens from {}.'.format(request))
 
             HEADERS['X-auth-access-token'] = access_token
             HEADERS['X-auth-refresh-token'] = refresh_token
             self.domains = json.loads(response.headers.get('DOMAINS', default=None))
         except ConnectionError:
             self.logger.error(
-                'Could not connect to {0}. Max retries exceeded with url: {1}'.format(self.hostname, request))
+                'Could not connect to {0}. Max retries exceeded with url: {}'.format(self.hostname, request))
         except FireRESTApiException as exc:
             self.logger.error(exc.message)
-        self.logger.debug('Successfully authenticated to {0}'.format(self.hostname))
+        self.logger.debug('Successfully authenticated to {}'.format(self.hostname))
 
     def _refresh(self):
         """
-        Refresh X-auth-access-token using X-auth-refresh-token- This operation is performed for up to three
+        Refresh X-auth-access-token using X-auth-refresh-token. This operation is performed for up to three
         times, afterwards a re-authentication using _login will be performed
         """
         if self.refresh_counter > 3:
@@ -158,16 +158,16 @@ class FireREST(object):
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
-                raise FireRESTAuthRefreshException('Could not refresh tokens from {0}.'.format(request))
+                raise FireRESTAuthRefreshException('Could not refresh tokens from {}.'.format(request))
 
             HEADERS['X-auth-access-token'] = access_token
             HEADERS['X-auth-refresh-token'] = refresh_token
         except ConnectionError:
             self.logger.error(
-                'Could not connect to {0}. Max retries exceeded with url: {1}'.format(self.hostname, request))
+                'Could not connect to {}. Max retries exceeded with url: {}'.format(self.hostname, request))
         except FireRESTApiException as exc:
             self.logger.error(exc.message)
-        self.logger.debug('Successfully refreshed authorization token for {0}'.format(self.hostname))
+        self.logger.debug('Successfully refreshed authorization token for {}'.format(self.hostname))
 
     @RequestDebugDecorator('DELETE')
     def _delete(self, request, params=dict()):
@@ -362,8 +362,8 @@ class FireREST(object):
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
-        logging.error('Could not find domain with name {0}. Make sure full path is provided'.format(name))
-        logging.debug('Available Domains: {0}'.format(', '.join((domain['name'] for domain in self.domains))))
+        logging.error('Could not find domain with name {}. Make sure full path is provided'.format(name))
+        logging.debug('Available Domains: {}'.format(', '.join((domain['name'] for domain in self.domains))))
         return None
 
     def get_domain_name(self, id):
@@ -375,8 +375,8 @@ class FireREST(object):
         for domain in self.domains:
             if domain['uuid'] == id:
                 return domain['name']
-        logging.error('Could not find domain with id {0}. Make sure full path is provided'.format(id))
-        logging.debug('Available Domains: {0}'.format(', '.join((domain['uuid'] for domain in self.domains))))
+        logging.error('Could not find domain with id {}. Make sure full path is provided'.format(id))
+        logging.debug('Available Domains: {}'.format(', '.join((domain['uuid'] for domain in self.domains))))
         return None
 
     def get_system_version(self):
@@ -390,22 +390,22 @@ class FireREST(object):
         return self._get(url)
 
     def create_object(self, object_type, data):
-        request = '/object/{0}'.format(object_type)
+        request = '/object/{}'.format(object_type)
         url = self._url('config', request)
         return self._post(url, data)
 
     def delete_object(self, object_type, object_id):
-        request = '/object/{0}/{1}'.format(object_type, object_id)
+        request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._delete(url)
 
     def update_object(self, object_type, object_id, data):
-        request = '/object/{0}/{1}'.format(object_type, object_id)
+        request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._put(url, data)
 
     def get_objects(self, object_type, expanded=False):
-        request = '/object/{0}'.format(object_type)
+        request = '/object/{}'.format(object_type)
         url = self._url('config', request)
         params = {
             'expanded': expanded
@@ -413,7 +413,7 @@ class FireREST(object):
         return self._get(url, params)
 
     def get_object(self, object_type, object_id):
-        request = '/object/{0}/{1}'.format(object_type, object_id)
+        request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._get(url)
 
@@ -423,7 +423,7 @@ class FireREST(object):
         return self._get(url)
 
     def get_device(self, device_id):
-        request = '/devices/devicerecords/{0}'.format(device_id)
+        request = '/devices/devicerecords/{}'.format(device_id)
         url = self._url('config', request)
         return self._get(url)
 
@@ -438,27 +438,27 @@ class FireREST(object):
         return self._post(url, data)
 
     def create_policy(self, policy_type, data):
-        request = '/policy/{0}'.format(policy_type)
+        request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
         return self._post(url, data)
 
     def delete_policy(self, policy_id, policy_type):
-        request = '/policy/{0}/{1}'.format(policy_type, policy_id)
+        request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._delete(url)
 
     def update_policy(self, policy_id, policy_type, data):
-        request = '/policy/{0}/{1}'.format(policy_type, policy_id)
+        request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._put(url, data)
 
     def get_policies(self, policy_type):
-        request = '/policy/{0}'.format(policy_type)
+        request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
         return self._get(url)
 
     def get_policy(self, policy_id, policy_type, expanded=False):
-        request = '/policy/{0}/{1}'.format(policy_type, policy_id)
+        request = '/policy/{}/{}'.format(policy_type, policy_id)
         params = {
             'expanded': expanded
         }
@@ -466,7 +466,7 @@ class FireREST(object):
         return self._get(url, params)
 
     def get_acp_rules(self, policy_id, expanded=False):
-        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         params = {
             'expanded': expanded
         }
@@ -474,12 +474,12 @@ class FireREST(object):
         return self._get(url, params)
 
     def get_acp_rule(self, policy_id, rule_id):
-        request = '/policy/accesspolicies/{0}/accessrules/{1}'.format(policy_id, rule_id)
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._get(url)
 
     def create_acp_rule(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
-        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         url = self._url('config', request)
         params = {
             'category': category,
@@ -490,7 +490,7 @@ class FireREST(object):
         return self._post(url, data, params)
 
     def create_acp_rules(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
-        request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
+        request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         url = self._url('config', request)
         params = {
             'category': category,
@@ -501,7 +501,7 @@ class FireREST(object):
         return self._post(url, data, params)
 
     def update_acp_rule(self, policy_id, rule_id, data):
-        request = '/policy/accesspolicies/{0}/accessrules/{1}'.format(policy_id, rule_id)
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._put(url, data)
 
