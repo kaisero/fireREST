@@ -522,6 +522,96 @@ class FireREST(object):
         url = self._url('config', request)
         return self._delete(url)
 
+    def get_ftd_physical_interfaces(self, device_id: str):
+        request = '/devices/devicerecords/{}/physicalinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_ftd_physical_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/physicalinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_ftd_physical_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/physicalinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def create_ftd_redundant_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_ftd_redundant_interfaces(self, device_id: str):
+        request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_ftd_redundant_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_ftd_redundant_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
+    def create_ftd_portchannel_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_ftd_portchannel_interfaces(self, device_id: str):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_ftd_portchannel_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_ftd_portchannel_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
+    def create_ftd_sub_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/subinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._post(url, data)
+
+    def get_ftd_sub_interfaces(self, device_id: str):
+        request = '/devices/devicerecords/{}/subinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_ftd_sub_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/subinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_ftd_sub_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/subinterfaces'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_ftd_sub_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/subinterfaces/{}'.format(device_id, interface_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
     def create_deployment(self, data: Dict):
         request = '/deployment/deploymentrequests'
         url = self._url('config', request)
