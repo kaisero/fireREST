@@ -309,6 +309,21 @@ class FireREST(object):
                     return payload['id']
         return None
 
+    def get_device_hapair_id_by_name(self, device_hapair_name):
+        """
+        heloer function to retrieve device ha-pair id by name
+        :param device_hapair_name: name of the ha-pair
+        :return: id if ha-pair is found, None otherwise
+        """
+        request = 'devicehapairs/ftddevicehapairs'
+        url = self._url(request)
+        response = self._get(url)
+        for item in response:
+            for ha_pair in item.json()['items']:
+                if ha_pair['name'] == device_hapair_name:
+                    return ha_pair['id']
+        return None
+
     def get_acp_id_by_name(self, policy_name):
         """
         helper function to retrieve access control policy id by name
@@ -324,7 +339,7 @@ class FireREST(object):
                     return payload['id']
         return None
 
-    def get_rule_id_by_name(self, policy_name, rule_name):
+    def get_acp_rule_id_by_name(self, policy_name, rule_name):
         """
         helper function to retrieve access control policy rule id by name
         :param policy_name: name of the access control policy that will be queried
@@ -395,16 +410,6 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def delete_object(self, object_type, object_id):
-        request = '/object/{}/{}'.format(object_type, object_id)
-        url = self._url('config', request)
-        return self._delete(url)
-
-    def update_object(self, object_type, object_id, data):
-        request = '/object/{}/{}'.format(object_type, object_id)
-        url = self._url('config', request)
-        return self._put(url, data)
-
     def get_objects(self, object_type, expanded=False):
         request = '/object/{}'.format(object_type)
         url = self._url('config', request)
@@ -418,6 +423,21 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
+    def update_object(self, object_type, object_id, data):
+        request = '/object/{}/{}'.format(object_type, object_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_object(self, object_type, object_id):
+        request = '/object/{}/{}'.format(object_type, object_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
+    def create_device(self, data):
+        request = '/devices/devicerecords'
+        url = self._url('config', request)
+        return self._post(url, data)
+
     def get_devices(self):
         request = '/devices/devicerecords'
         url = self._url('config', request)
@@ -428,35 +448,70 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
+    def update_device(self, data):
+        request = '/devices/devicerecords/{}'.format(device_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_device(self, device_id):
+        request = '/devices/devicerecords/{}'.format(device_id)
+        url = self._url('config', request)
+        return self._delete(url)
+
+    def get_device_hapairs(self):
+        request = '/devicehapairs/ftddevicehapairs'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def create_device_hapair(self, data):
+        request = '/devicehapairs/ftddevicehapairs/{}'
+        url = self._url('config', request)
+        return self._get(url, data)
+
+    def get_device_hapair(self, device_hapair_id):
+        request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_device_hapair(self, data, device_hapair_id):
+        request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
+        url = self._url('config', request)
+        return self._put(url, data)
+
+    def delete_device_hapair(self, device_hapair_id):
+        request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
+        url = self._url('config', request)
+        return self._delete(url, data)
+
+    def create_deployment(self, data):
+        request = '/deployment/deploymentrequests'
+        url = self._url('config', request)
+        return self._post(url, data)
+
     def get_deployment(self):
         request = '/deployment/deployabledevices'
         url = self._url('config', request)
         return self._get(url)
-
-    def set_deployment(self, data):
-        request = '/deployment/deployabledevices'
-        url = self._url('config', request)
-        return self._post(url, data)
 
     def create_policy(self, policy_type, data):
         request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
         return self._post(url, data)
 
-    def delete_policy(self, policy_id, policy_type):
-        request = '/policy/{}/{}'.format(policy_type, policy_id)
+    def get_policies(self, policy_type):
+        request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
-        return self._delete(url)
+        return self._get(url)
 
     def update_policy(self, policy_id, policy_type, data):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def get_policies(self, policy_type):
-        request = '/policy/{}'.format(policy_type)
+    def delete_policy(self, policy_id, policy_type):
+        request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
-        return self._get(url)
+        return self._delete(url)
 
     def get_policy(self, policy_id, policy_type, expanded=False):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
@@ -465,19 +520,6 @@ class FireREST(object):
         }
         url = self._url('config', request)
         return self._get(url, params)
-
-    def get_acp_rules(self, policy_id, expanded=False):
-        request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
-        params = {
-            'expanded': expanded
-        }
-        url = self._url('config', request)
-        return self._get(url, params)
-
-    def get_acp_rule(self, policy_id, rule_id):
-        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
-        url = self._url('config', request)
-        return self._get(url)
 
     def create_acp_rule(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
@@ -501,10 +543,28 @@ class FireREST(object):
         }
         return self._post(url, data, params)
 
+    def get_acp_rule(self, policy_id, rule_id):
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_acp_rules(self, policy_id, expanded=False):
+        request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
+        params = {
+            'expanded': expanded
+        }
+        url = self._url('config', request)
+        return self._get(url, params)
+
     def update_acp_rule(self, policy_id, rule_id, data):
         request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._put(url, data)
+
+    def delete_acp_rule(self, policy_id, rule_id):
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
+        url = self._url('config', request)
+        return self._delete(url)
 
     def get_syslogalerts(self):
         request = 'policy/syslogalerts'
