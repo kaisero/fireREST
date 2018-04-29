@@ -478,10 +478,16 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def create_acp_rule(self, policy_id, data):
+    def create_acp_rule(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
         request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
         url = self._url('config', request)
-        return self._post(url, data)
+        params = {
+            'category': category,
+            'section': section,
+            'insert_before': insert_before,
+            'insert_after': insert_after
+        }
+        return self._post(url, data, params)
 
     def create_acp_rules(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
         request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
