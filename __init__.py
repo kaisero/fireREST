@@ -3,6 +3,7 @@ import requests
 import logging
 import urllib3
 
+from typing import Dict
 from requests.auth import HTTPBasicAuth
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -83,7 +84,7 @@ class FireREST(object):
             self.domains = session['domains']
             HEADERS['X-auth-access-token'] = session['X-auth-access-token']
             HEADERS['X-auth-refresh-token'] = session['X-auth-refresh-token']
-        self.domain = self.get_domain_id(domain)
+        self.domain = self.get_domain_id_by_name(domain)
 
     @staticmethod
     def _get_logger(logger):
@@ -171,7 +172,7 @@ class FireREST(object):
         self.logger.debug('Successfully refreshed authorization token for {}'.format(self.hostname))
 
     @RequestDebugDecorator('DELETE')
-    def _delete(self, request, params=None):
+    def _delete(self, request: str, params=None):
         """
         DELETE Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -187,7 +188,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('GET')
-    def _get_request(self, request, params=None, limit=None):
+    def _get_request(self, request: str, params=None, limit=None):
         """
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -205,7 +206,7 @@ class FireREST(object):
                 return self._get_request(request, params, limit)
         return response
 
-    def _get(self, request, params=None, limit=None):
+    def _get(self, request: str, params=None, limit=None):
         """
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -227,7 +228,7 @@ class FireREST(object):
         return responses
 
     @RequestDebugDecorator('PATCH')
-    def _patch(self, request, data=None, params=None):
+    def _patch(self, request: str, data=None, params=None):
         """
         PATCH Operation for FMC REST API. In case of authentication issues session will be refreshed
         As of FPR 6.2.3 this function is not in use because FMC API does not support PATCH operations
@@ -245,7 +246,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('POST')
-    def _post(self, request, data=None, params=None):
+    def _post(self, request: str, data=None, params=None):
         """
         POST Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -262,7 +263,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('PUT')
-    def _put(self, request, data=None, params=None):
+    def _put(self, request: str, data=None, params=None):
         """
         PUT Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -278,12 +279,12 @@ class FireREST(object):
                 return self._put(request, data, params)
         return response
 
-    def get_object_id_by_name(self, obj_type, obj_name):
+    def get_object_id_by_name(self, obj_type: str, obj_name: str):
         """
         helper function to retrieve object id by name
         :param obj_type: object types that will be queried
         :param obj_name:  name of the object
-        :return: id if object is found, None otherwise
+        :return: object id if object is found, None otherwise
         """
         request = '/object/{0}'.format(obj_type)
         url = self._url('config', request)
@@ -294,11 +295,11 @@ class FireREST(object):
                     return payload['id']
         return None
 
-    def get_device_id_by_name(self, device_name):
+    def get_device_id_by_name(self, device_name: str):
         """
         helper function to retrieve device id by name
         :param device_name:  name of the device
-        :return: id if device is found, None otherwise
+        :return: device id if device is found, None otherwise
         """
         request = '/devices/devicerecords'
         url = self._url('config', request)
@@ -309,7 +310,7 @@ class FireREST(object):
                     return payload['id']
         return None
 
-    def get_device_hapair_id_by_name(self, device_hapair_name):
+    def get_device_hapair_id_by_name(self, device_hapair_name: str):
         """
         heloer function to retrieve device ha-pair id by name
         :param device_hapair_name: name of the ha-pair
@@ -324,74 +325,74 @@ class FireREST(object):
                     return ha_pair['id']
         return None
 
-    def get_acp_id_by_name(self, policy_name):
+    def get_acp_id_by_name(self, policy_name: str):
         """
         helper function to retrieve access control policy id by name
         :param policy_name:  name of the access control policy
-        :return: id if access control policy is found, None otherwise
+        :return: acp id if access control policy is found, None otherwise
         """
         request = '/policy/accesspolicies'
         url = self._url('config', request)
         response = self._get(url)
         for item in response:
-            for payload in item.json()['items']:
-                if payload['name'] == policy_name:
-                    return payload['id']
+            for acp in item.json()['items']:
+                if acp['name'] == policy_name:
+                    return acp['id']
         return None
 
-    def get_acp_rule_id_by_name(self, policy_name, rule_name):
+    def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
         """
         helper function to retrieve access control policy rule id by name
         :param policy_name: name of the access control policy that will be queried
         :param rule_name:  name of the access control policy rule
-        :return: id if access control policy rule is found, None otherwise
+        :return: acp rule id if access control policy rule is found, None otherwise
         """
         policy_id = self.get_acp_id_by_name(policy_name)
         request = '/policy/accesspolicies/{0}/accessrules'.format(policy_id)
         url = self._url('config', request)
         response = self._get(url)
         for item in response:
-            for payload in item.json()['items']:
-                if payload['name'] == rule_name:
-                    return payload['id']
+            for acp_rule in item.json()['items']:
+                if acp_rule['name'] == rule_name:
+                    return acp_rule['id']
         return None
 
-    def get_syslogalert_id_by_name(self, syslogalert_name):
+    def get_syslogalert_id_by_name(self, syslogalert_name: str):
         """
         helper function to retrieve syslog alert object id by name
         :param syslogalert_name: name of syslog alert object
-        :return: id if syslog alert is found, None otherwise
+        :return: syslogalert id if syslog alert is found, None otherwise
         """
         response = self.get_syslogalerts()
         for item in response:
-            for payload in item.json()['items']:
-                if payload['name'] == syslogalert_name:
-                    return item['id']
+            for syslogalert in item.json()['items']:
+                if syslogalert['name'] == syslogalert_name:
+                    return syslogalert['id']
         return None
 
-    def get_domain_id(self, name):
+    def get_domain_id_by_name(self, domain_name: str):
         """
         helper function to retrieve domain id from list of domains
-        :param name: name of the domain
+        :param domain_name: name of the domain
         :return: did if domain is found, None otherwise
         """
         for domain in self.domains:
-            if domain['name'] == name:
+            if domain['name'] == domain_name:
                 return domain['uuid']
-        logging.error('Could not find domain with name {}. Make sure full path is provided'.format(name))
+        logging.error('Could not find domain with name {}. Make sure full path is provided'.format(domain_name))
         logging.debug('Available Domains: {}'.format(', '.join((domain['name'] for domain in self.domains))))
         return None
 
-    def get_domain_name(self, id):
+    def get_domain_name_by_id(self, domain_id: str):
         """
         helper function to retrieve domain name by id
-        :param id: id of the domain
+        :param domain_id: id of the domain
         :return: name if domain is found, None otherwise
         """
         for domain in self.domains:
-            if domain['uuid'] == id:
+            if domain['uuid'] == domain_id:
                 return domain['name']
-        logging.error('Could not find domain with id {}. Make sure full path is provided'.format(id))
+        logging.error('Could not find domain with id {}. Make sure full path is provided'.format(domain_id))
         logging.debug('Available Domains: {}'.format(', '.join((domain['uuid'] for domain in self.domains))))
         return None
 
@@ -405,12 +406,12 @@ class FireREST(object):
         url = self._url('platform', request)
         return self._get(url)
 
-    def create_object(self, object_type, data):
+    def create_object(self, object_type: str, data: Dict):
         request = '/object/{}'.format(object_type)
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_objects(self, object_type, expanded=False):
+    def get_objects(self, object_type: str, expanded=False):
         request = '/object/{}'.format(object_type)
         url = self._url('config', request)
         params = {
@@ -418,22 +419,22 @@ class FireREST(object):
         }
         return self._get(url, params)
 
-    def get_object(self, object_type, object_id):
+    def get_object(self, object_type: str, object_id: str):
         request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_object(self, object_type, object_id, data):
+    def update_object(self, object_type: str, object_id: str, data: Dict):
         request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_object(self, object_type, object_id):
+    def delete_object(self, object_type: str, object_id: str):
         request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_device(self, data):
+    def create_device(self, data: Dict):
         request = '/devices/devicerecords'
         url = self._url('config', request)
         return self._post(url, data)
@@ -443,17 +444,17 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_device(self, device_id):
+    def get_device(self, device_id: str):
         request = '/devices/devicerecords/{}'.format(device_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_device(self, data):
+    def update_device(self, device_id: str, data: Dict):
         request = '/devices/devicerecords/{}'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_device(self, device_id):
+    def delete_device(self, device_id: str):
         request = '/devices/devicerecords/{}'.format(device_id)
         url = self._url('config', request)
         return self._delete(url)
@@ -463,27 +464,27 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def create_device_hapair(self, data):
+    def create_device_hapair(self, data: Dict):
         request = '/devicehapairs/ftddevicehapairs/{}'
         url = self._url('config', request)
         return self._get(url, data)
 
-    def get_device_hapair(self, device_hapair_id):
+    def get_device_hapair(self, device_hapair_id: str):
         request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_device_hapair(self, data, device_hapair_id):
+    def update_device_hapair(self, data: Dict, device_hapair_id: str):
         request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_device_hapair(self, device_hapair_id):
+    def delete_device_hapair(self, device_hapair_id: str):
         request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
         url = self._url('config', request)
-        return self._delete(url, data)
+        return self._delete(url)
 
-    def create_deployment(self, data):
+    def create_deployment(self, data: Dict):
         request = '/deployment/deploymentrequests'
         url = self._url('config', request)
         return self._post(url, data)
@@ -493,27 +494,27 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def create_policy(self, policy_type, data):
+    def create_policy(self, policy_type: str, data: Dict):
         request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policies(self, policy_type):
+    def get_policies(self, policy_type: str):
         request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_policy(self, policy_id, policy_type, data):
+    def update_policy(self, policy_id: str, policy_type: str, data: Dict):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_policy(self, policy_id, policy_type):
+    def delete_policy(self, policy_id: str, policy_type: str):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_policy(self, policy_id, policy_type, expanded=False):
+    def get_policy(self, policy_id: str, policy_type: str, expanded=False):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         params = {
             'expanded': expanded
@@ -521,7 +522,8 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    def create_acp_rule(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
+    def create_acp_rule(self, policy_id: str, data: Dict, section=None, category=None, insert_before=None,
+                        insert_after=None):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         url = self._url('config', request)
         params = {
@@ -532,7 +534,8 @@ class FireREST(object):
         }
         return self._post(url, data, params)
 
-    def create_acp_rules(self, policy_id, data, section=None, category=None, insert_before=None, insert_after=None):
+    def create_acp_rules(self, policy_id: str, data: Dict, section=None, category=None, insert_before=None,
+                         insert_after=None):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         url = self._url('config', request)
         params = {
@@ -543,12 +546,12 @@ class FireREST(object):
         }
         return self._post(url, data, params)
 
-    def get_acp_rule(self, policy_id, rule_id):
+    def get_acp_rule(self, policy_id: str, rule_id: str):
         request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def get_acp_rules(self, policy_id, expanded=False):
+    def get_acp_rules(self, policy_id: str, expanded=False):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         params = {
             'expanded': expanded
@@ -556,12 +559,12 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    def update_acp_rule(self, policy_id, rule_id, data):
+    def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
         request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_acp_rule(self, policy_id, rule_id):
+    def delete_acp_rule(self, policy_id: str, rule_id: str):
         request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._delete(url)
