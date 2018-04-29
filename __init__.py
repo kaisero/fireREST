@@ -119,8 +119,8 @@ class FireREST(object):
         """
         Login to fmc api and save X-auth-access-token, X-auth-refresh-token and DOMAINS to variables
         """
+        request = self._url('auth')
         try:
-            request = self._url('auth')
             response = requests.post(request, headers=HEADERS, auth=self.cred, verify=self.verify_cert)
 
             if response.status_code == 401:
@@ -150,9 +150,10 @@ class FireREST(object):
             self.logger.info(
                 'Authentication token has already been used 3 times, api re-authentication will be performed')
             self._login()
+
+        request = self._url('refresh')
         try:
             self.refresh_counter += 1
-            request = self._url('refresh')
             response = requests.post(request, headers=HEADERS, verify=self.verify_cert)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
@@ -170,7 +171,7 @@ class FireREST(object):
         self.logger.debug('Successfully refreshed authorization token for {}'.format(self.hostname))
 
     @RequestDebugDecorator('DELETE')
-    def _delete(self, request, params=dict()):
+    def _delete(self, request, params=None):
         """
         DELETE Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -186,7 +187,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('GET')
-    def _get_request(self, request, params=dict(), limit=None):
+    def _get_request(self, request, params=None, limit=None):
         """
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -204,7 +205,7 @@ class FireREST(object):
                 return self._get_request(request, params, limit)
         return response
 
-    def _get(self, request, params=dict(), limit=None):
+    def _get(self, request, params=None, limit=None):
         """
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -226,7 +227,7 @@ class FireREST(object):
         return responses
 
     @RequestDebugDecorator('PATCH')
-    def _patch(self, request, data=dict(), params=dict()):
+    def _patch(self, request, data=None, params=None):
         """
         PATCH Operation for FMC REST API. In case of authentication issues session will be refreshed
         As of FPR 6.2.3 this function is not in use because FMC API does not support PATCH operations
@@ -244,7 +245,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('POST')
-    def _post(self, request, data=dict(), params=dict()):
+    def _post(self, request, data=None, params=None):
         """
         POST Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -261,7 +262,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('PUT')
-    def _put(self, request, data=dict(), params=dict()):
+    def _put(self, request, data=None, params=None):
         """
         PUT Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
