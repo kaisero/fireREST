@@ -306,6 +306,32 @@ class FireREST(object):
                 return self._put(request, data, params)
         return response
 
+    def prepare_json(self,
+                     operation: str,
+                     obj_type: str,
+                     data: Dict):
+        """
+        Prepare json object for api operation
+        :param operation: PUT, POST
+        :param obj_type: see supported types in schema.py
+        :param data: json representing api object
+        :return: sanatized api object
+        """
+        return
+
+    def valid_json(self,
+                   operation: str,
+                   obj_type: str,
+                   data: Dict):
+        """
+        Validate json object to verify
+        :param operation: PUT, POST
+        :param obj_type: see supported types in schema.py
+        :param data: json representing api object
+        :return: dictionary containing results of json evaluation
+        """
+        return
+
     def get_object_id_by_name(self,
                               obj_type: str,
                               obj_name: str):
@@ -319,9 +345,9 @@ class FireREST(object):
         url = self._url('config', request)
         response = self._get(url)
         for item in response:
-            for payload in item.json()['items']:
-                if payload['name'] == obj_name:
-                    return payload['id']
+            for obj in item.json()['items']:
+                if obj['name'] == obj_name:
+                    return obj['id']
         return None
 
     def get_device_id_by_name(self, device_name: str):
@@ -334,9 +360,9 @@ class FireREST(object):
         url = self._url('config', request)
         response = self._get(url)
         for item in response:
-            for payload in item.json()['items']:
-                if payload['name'] == device_name:
-                    return payload['id']
+            for device in item.json()['items']:
+                if device['name'] == device_name:
+                    return device['id']
         return None
 
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
@@ -403,30 +429,30 @@ class FireREST(object):
                     return acp_rule['id']
         return None
 
-    def get_syslogalert_id_by_name(self, syslogalert_name: str):
+    def get_syslog_alert_id_by_name(self, syslog_alert_name: str):
         """
         helper function to retrieve syslog alert object id by name
-        :param syslogalert_name: name of syslog alert object
+        :param syslog_alert_name: name of syslog alert object
         :return: syslogalert id if syslog alert is found, None otherwise
         """
         response = self.get_syslogalerts()
         for item in response:
-            for syslogalert in item.json()['items']:
-                if syslogalert['name'] == syslogalert_name:
-                    return syslogalert['id']
+            for syslog_alert in item.json()['items']:
+                if syslog_alert['name'] == syslog_alert_name:
+                    return syslog_alert['id']
         return None
 
-    def get_snmpalert_id_by_name(self, snmpalert_name: str):
+    def get_snmp_alert_id_by_name(self, snmp_alert_name: str):
         """
         helper function to retrieve snmp alert object id by name
-        :param snmpalert_name: name of snmp alert object
+        :param snmp_alert_name: name of snmp alert object
         :return: snmpalert id if snmp alert is found, None otherwise
         """
         response = self.get_snmpalerts()
         for item in response:
-            for snmpalert in item.json()['items']:
-                if snmpalert['name'] == snmpalert_name:
-                    return snmpalert['id']
+            for snmp_alert in item.json()['items']:
+                if snmp_alert['name'] == snmp_alert_name:
+                    return snmp_alert['id']
         return None
 
     def get_domain_id_by_name(self, domain_name: str):
