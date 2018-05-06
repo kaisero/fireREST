@@ -5,18 +5,12 @@ import urllib3
 
 from typing import Dict
 from requests.auth import HTTPBasicAuth
-from urllib3.exceptions import NewConnectionError, ConnectionError
+from urllib3.exceptions import ConnectionError
 
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
 API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
 API_PLATFORM_URL = '/api/fmc_platform/v1'
 API_CONFIG_URL = '/api/fmc_config/v1'
-
-HEADERS = {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-    'User-Agent': 'fireREST'
-}
 
 
 class FireRESTApiException(Exception):
@@ -79,6 +73,11 @@ class FireREST(object):
         :param domain: name of the fmc domain. default = Global
         :param timeout: timeout value for http requests. default = 120
         """
+        self.headers = {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'User-Agent': 'fireREST'
+        }
         self.refresh_counter = 0
         self.logger = self._get_logger(logger)
         self.hostname = hostname
@@ -92,8 +91,8 @@ class FireREST(object):
             self._login()
         else:
             self.domains = session['domains']
-            HEADERS['X-auth-access-token'] = session['X-auth-access-token']
-            HEADERS['X-auth-refresh-token'] = session['X-auth-refresh-token']
+            self.headers['X-auth-access-token'] = session['X-auth-access-token']
+            self.headers['X-auth-refresh-token'] = session['X-auth-refresh-token']
         self.domain = self.get_domain_id_by_name(domain)
 
     @staticmethod
@@ -134,7 +133,7 @@ class FireREST(object):
         """
         request = self._url('auth')
         try:
-            response = requests.post(request, headers=HEADERS, auth=self.cred, verify=self.verify_cert)
+            response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
 
             if response.status_code in (401, 403):
                 self.logger.error('API Authentication to {} failed.'.format(self.hostname))
@@ -146,8 +145,8 @@ class FireREST(object):
                 self.logger.error('Could not retrieve tokens from {}.'.format(request))
                 raise FireRESTApiException('Could not retrieve tokens from {}.'.format(request))
 
-            HEADERS['X-auth-access-token'] = access_token
-            HEADERS['X-auth-refresh-token'] = refresh_token
+            self.headers['X-auth-access-token'] = access_token
+            self.headers['X-auth-refresh-token'] = refresh_token
             self.domains = json.loads(response.headers.get('DOMAINS', default=None))
             self.logger.debug('Successfully authenticated to {}'.format(self.hostname))
         except ConnectionError:
@@ -168,15 +167,15 @@ class FireREST(object):
         request = self._url('refresh')
         try:
             self.refresh_counter += 1
-            response = requests.post(request, headers=HEADERS, verify=self.verify_cert)
+            response = requests.post(request, headers=self.headers, verify=self.verify_cert)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
                 raise FireRESTAuthRefreshException('Could not refresh tokens from {}.'.format(request))
 
-            HEADERS['X-auth-access-token'] = access_token
-            HEADERS['X-auth-refresh-token'] = refresh_token
+            self.headers['X-auth-access-token'] = access_token
+            self.headers['X-auth-refresh-token'] = refresh_token
         except ConnectionError:
             self.logger.error(
                 'Could not connect to {}. Max retries exceeded with url: {}'.format(self.hostname, request))
@@ -194,7 +193,7 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.delete(request, headers=HEADERS, params=params, verify=self.verify_cert,
+        response = requests.delete(request, headers=self.headers, params=params, verify=self.verify_cert,
                                    timeout=self.timeout)
         if response.status_code == 401:
             if 'Access token invalid' in str(response.json()):
@@ -216,7 +215,7 @@ class FireREST(object):
         """
         if limit:
             params['limit'] = limit
-        response = requests.get(request, headers=HEADERS, params=params, verify=self.verify_cert,
+        response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
                                 timeout=self.timeout)
         if response.status_code == 401:
             if 'Access token invalid' in str(response.json()):
@@ -261,7 +260,7 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.patch(request, data=json.dumps(data), headers=HEADERS, params=params,
+        response = requests.patch(request, data=json.dumps(data), headers=self.headers, params=params,
                                   verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
             if 'Access token invalid' in str(response.json()):
@@ -281,7 +280,7 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.post(request, data=json.dumps(data), headers=HEADERS, params=params,
+        response = requests.post(request, data=json.dumps(data), headers=self.headers, params=params,
                                  verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
             if 'Access token invalid' in str(response.json()):
@@ -301,7 +300,7 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.put(request, data=json.dumps(data), headers=HEADERS, params=params,
+        response = requests.put(request, data=json.dumps(data), headers=self.headers, params=params,
                                 verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
             if 'Access token invalid' in str(response.json()):
