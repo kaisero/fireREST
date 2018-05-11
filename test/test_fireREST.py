@@ -1,7 +1,4 @@
 import unittest
-import sys
-
-sys.path.append('/home/okaiser/PycharmProjects/fireREST')
 
 from fireREST import FireREST
 from fireREST import FireRESTApiException, FireRESTAuthException, FireRESTAuthRefreshException
