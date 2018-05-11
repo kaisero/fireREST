@@ -1,3 +1,4 @@
 json
+jsonschema
 requests
 urllib3
