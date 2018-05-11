@@ -3,10 +3,64 @@ import sys
 
 sys.path.append('/home/okaiser/PycharmProjects/fireREST')
 
-from copy import deepcopy
 from fireREST import FireREST
 from fireREST import FireRESTApiException, FireRESTAuthException, FireRESTAuthRefreshException
 from requests.auth import HTTPBasicAuth
+
+
+class TestFireRESTAuth(unittest.TestCase):
+
+    def setUp(self):
+        hostname = 'fmc.example.com'
+        username = 'admin'
+        password = 'Cisco123'
+
+        self.api = FireREST(hostname=hostname,
+                            username=username,
+                            password=password)
+
+    def tearDown(self):
+        return
+
+    def test_authentication(self):
+        self.api.domains = dict()
+        del self.api.headers['X-auth-access-token']
+        del self.api.headers['X-auth-refresh-token']
+
+        self.api._login()
+
+        self.assertTrue(self.api.domains)
+        self.assertIn('X-auth-access-token', self.api.headers)
+        self.assertIn('X-auth-refresh-token', self.api.headers)
+
+    def test_authentication_with_incorrect_credentials(self):
+        self.api.cred = HTTPBasicAuth('admin', 'incorrect-password')
+        self.assertRaises(FireRESTAuthException, self.api._login)
+
+    def test_authentication_refresh_counter_after_successful_authentication(self):
+        self.api._login()
+        expected_counter = 0
+        actual_counter = self.api.refresh_counter
+
+        self.assertEqual(actual_counter, expected_counter)
+
+    def test_authentication_refresh_counter_incrementing(self):
+        counter_before_refresh = self.api.refresh_counter
+        self.api._refresh()
+
+        expected_counter = counter_before_refresh + 1
+        actual_counter = self.api.refresh_counter
+
+        self.assertEqual(actual_counter, expected_counter)
+
+    def test_re_authentication(self):
+        self.api.refresh_counter = 3
+        self.api._refresh()
+
+        expected_counter = 0
+        actual_counter = self.api.refresh_counter
+
+        self.assertEqual(actual_counter, expected_counter)
 
 
 class TestFireREST(unittest.TestCase):
@@ -23,7 +77,7 @@ class TestFireREST(unittest.TestCase):
                            password=cls.password)
 
     def setUp(self):
-        self.api_copy = deepcopy(self.api)
+        return
 
     def tearDown(self):
         return
@@ -79,31 +133,6 @@ class TestFireREST(unittest.TestCase):
         actual_url = self.api._url(namespace='refresh', path='/test')
 
         self.assertEqual(actual_url, expected_url)
-
-    def test_authentication(self):
-        self.api_copy.domains = dict()
-        del self.api_copy.headers['X-auth-access-token']
-        del self.api_copy.headers['X-auth-refresh-token']
-
-        self.api_copy._login()
-
-        self.assertTrue(self.api_copy.domains)
-        self.assertIn('X-auth-access-token', self.api_copy.headers)
-        self.assertIn('X-auth-refresh-token', self.api_copy.headers)
-
-    def test_authentication_with_incorrect_credentials(self):
-        self.api_copy.cred = HTTPBasicAuth('admin', 'incorrect-password')
-        self.assertRaises(FireRESTAuthException, self.api_copy._login)
-
-    def test_authentication_with_incorrect_destination(self):
-        self.api_copy.hostname = '127.0.0.1'
-        self.assertRaises(FireRESTApiException, self.api_copy._login)
-
-    def test_refresh(self):
-        return
-
-    def test_authentication_triggered_by_refresh(self):
-        return
 
 
 if __name__ == '__main__':
