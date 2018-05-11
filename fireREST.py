@@ -156,8 +156,12 @@ class FireREST(object):
             self.headers['X-auth-refresh-token'] = refresh_token
             self.domains = json.loads(
                 response.headers.get('DOMAINS', default=None))
+            self.refresh_counter = 0
             self.logger.debug(
                 'Successfully authenticated to {}'.format(self.hostname))
+        except ConnectionRefusedError:
+            self.logger.error('Could not connect to {}. Connection refused'.format(self.hostname))
+            raise
         except ConnectionError:
             self.logger.error(
                 'Could not connect to {}. Max retries exceeded with url: {}'.format(self.hostname, request))
@@ -168,10 +172,11 @@ class FireREST(object):
         Refresh X-auth-access-token using X-auth-refresh-token. This operation is performed for up to three
         times, afterwards a re-authentication using _login will be performed
         """
-        if self.refresh_counter > 3:
+        if self.refresh_counter > 2:
             self.logger.info(
                 'Authentication token has already been used 3 times, api re-authentication will be performed')
             self._login()
+            return
 
         request = self._url('refresh')
         try:
@@ -185,7 +190,7 @@ class FireREST(object):
                 'X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
                 raise FireRESTAuthRefreshException(
-                    'Could not refresh tokens from {}.'.format(request))
+                    'Could not refresh tokens from {}. Response Code: {}'.format(request, response.status_code))
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
