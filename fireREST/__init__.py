@@ -346,11 +346,15 @@ class FireREST(object):
         :param syslogalert_name: name of syslog alert object
         :return: id if syslog alert is found, None otherwise
         """
-        response = self.get_syslogalerts()
+        # response = self.get_syslogalerts()
+        request = '/policy/syslogalerts'
+        url = self._url('config', request)
+        response = self._get(url)
+
         for item in response:
             for payload in item.json()['items']:
                 if payload['name'] == syslogalert_name:
-                    return item['id']
+                    return payload['id']
         return None
 
     def get_domain_id(self, name):
@@ -500,6 +504,61 @@ class FireREST(object):
         return self._put(url, data)
 
     def get_syslogalerts(self):
-        request = 'policy/syslogalerts'
+        request = '/policy/syslogalerts'
         url = self._url('config', request)
         return self._get(url)
+
+    def get_intrusion_policies(self):
+        request = '/policy/intrusionpolicies'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_intrusion_policy_id_by_name(self, intrusion_policy_name):
+        """
+        helper function to retrieve intrusion policy object id by name
+        :param intrusion_policy_name: name of intrusion policy object
+        :return: id if intrusion policy is found, None otherwise
+        """
+        response = self.get_intrusion_policies()
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == intrusion_policy_name:
+                    return payload['id']
+        return None
+
+    def get_variable_sets(self):
+        request = '/object/variablesets'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_variable_set_id_by_name(self, variable_set_name):
+        """
+        helper function to retrieve variable set object id by name
+        :param variable_set_name: name of variable set object
+        :return: id if variable set is found, None otherwise
+        """
+        response = self.get_variable_sets()
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == variable_set_name:
+                    return payload['id']
+        return None
+
+    def get_file_policies(self):
+        request = '/policy/filepolicies'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def get_file_policy_id_by_name(self, file_policy_name):
+        """
+        helper function to retrieve file policy object id by name
+        :param file_policy_name: name of file policy object
+        :return: id if file policy is found, None otherwise
+        """
+        response = self.get_file_policies()
+        for item in response:
+            for payload in item.json()['items']:
+                if payload['name'] == file_policy_name:
+                    return payload['id']
+        return None
+
