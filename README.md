@@ -65,4 +65,4 @@ Rule: test rule 3, in Policy: api-test-policy.
 ![before](https://imgur.com/ELof6xB.png)
 
 #### After
-![after](https://imgur.com/Hk9Vzof)
+![after](https://imgur.com/Hk9Vzof.png)
