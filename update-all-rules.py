@@ -7,9 +7,9 @@ from fireREST import FireREST
 # Make sure ACP and all logging and inspection objects already exist.
 
 loglevel = 'DEBUG'
-device = '10.12.100.34'
+device = 'fmc.domain.com'
 username = 'api-user'
-password = 'Ir0n1234!@#$'
+password = 'api-password'
 domain = 'Global'
 ac_policy = 'api-test-policy'
 
