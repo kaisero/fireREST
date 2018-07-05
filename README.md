@@ -23,6 +23,7 @@ device = 'fmc.domain.com'
 username = 'api-user'
 password = 'api-password'
 domain = 'Global'
+ac_policy = 'api-test-policy'
 ```
 #### Define Inspection and Logging Settings
 Then specify the objects you want to apply to the rules, as well as the settings for the logging.
