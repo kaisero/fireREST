@@ -7,9 +7,9 @@ from fireREST import FireREST
 # Make sure ACP and all logging and inspection objects already exist.
 
 loglevel = 'DEBUG'
-device = '10.12.100.34'
+device = '10.10.10.100'
 username = 'api-user'
-password = 'Ir0n1234!@#$'
+password = 'api-password'
 domain = 'Global'
 ac_policy = 'api-test-policy'
 
@@ -136,6 +136,22 @@ for response in acp_rules:
         # Remove metadata fields from existing rule. This is required since the API does not support
         # PATCH operations as of version 6.2.1 of FMC. That's why we have to delete metadata before we use a PUT
         # operation to change our ACP rule.
+
+        # Check if rule action is ALLOW. If not, intrusion settings will not work and it can't be logged at end.
+        #  If this is true, overwrite defined settings.
+        if payload['action'] != 'ALLOW':
+            print('  Rule not set to ALLOW, clearing intrusion settings. Overwriting log settings with log at '
+                  'beginning and send to event viewer.')
+
+            # Overwrite logging settings (syslog server will remain if it was defined)
+            payload['sendEventsToFMC'] = 'true'
+            payload['logBegin'] = 'true'
+            payload['logEnd'] = 'false'
+
+            # Clear inspection settings.
+            payload.pop('variableSet', None)
+            payload.pop('ipsPolicy', None)
+            payload.pop('filePolicy', None)
 
         del payload['metadata']
         del payload['links']
