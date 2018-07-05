@@ -167,4 +167,3 @@ for response in acp_rules:
             print(' [SUCCESS]'.format(acp_rule_name))
         else:
             print(' [ERROR] Could not update settings. Status code: {0}'.format(result.status_code))
-            print(' [ERROR_RESULT]' + str(result))
