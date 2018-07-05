@@ -7,9 +7,9 @@ from fireREST import FireREST
 # Make sure ACP and all logging and inspection objects already exist.
 
 loglevel = 'DEBUG'
-device = 'fmc.domain.com'
+device = '10.12.100.34'
 username = 'api-user'
-password = 'api-password'
+password = 'Ir0n1234!@#$'
 domain = 'Global'
 ac_policy = 'api-test-policy'
 
@@ -30,23 +30,43 @@ log_at_end = 'true'
 api = FireREST(hostname=device, username=username, password=password)
 
 # Get IDs for specified objects. API PK = UUID, so we have to find the matching api object for the name specified.
-acp_id = api.get_acp_id_by_name(ac_policy)
-syslog_server_id = api.get_syslogalert_id_by_name(syslog_to_server)
-intrusion_policy_id = api.get_intrusion_policy_id_by_name(intrusion_policy)
-file_policy_id = api.get_file_policy_id_by_name(file_policy)
-variable_set_id = api.get_variable_set_id_by_name(variable_set)
+if ac_policy:
+    acp_id = api.get_acp_id_by_name(ac_policy)
+else:
+    acp_id = "Not defined"
 
+if syslog_to_server:
+    syslog_server_id = api.get_syslogalert_id_by_name(syslog_to_server)
+else:
+    syslog_server_id = "Not defined"
 
-print("-" * 80)
+if intrusion_policy:
+    intrusion_policy_id = api.get_intrusion_policy_id_by_name(intrusion_policy)
+else:
+    intrusion_policy_id = "Not defined"
+
+if file_policy:
+    file_policy_id = api.get_file_policy_id_by_name(file_policy)
+else:
+    file_policy_id = "Not defined"
+
+if variable_set:
+    variable_set_id = api.get_variable_set_id_by_name(variable_set)
+else:
+    variable_set_id = "Not defined"
+
+print("-" * 85)
 print("Domain: " + api.get_domain_id(domain))
-print("-" * 80)
+print("-" * 85)
 print("Access control policy: {0}: {1}".format(ac_policy, acp_id))
 print(" Intrusion policy: {0}: {1}".format(intrusion_policy, intrusion_policy_id))
 print(" File policy: {0}: {1}".format(file_policy, file_policy_id))
+print(" Variable Set: {0}: {1}".format(variable_set, variable_set_id))
 print(" Log server: {0}: {1}".format(syslog_to_server, syslog_server_id))
+print(" Log to event viewer: {0}".format(log_to_fmc))
 print(" Log at beginning: {0} ".format(log_at_begin))
 print(" Log at end: {0} ".format(log_at_end))
-print("-" * 80)
+print("-" * 85)
 
 # Get all access control rules for the access control policy specified
 acp_rules = api.get_acp_rules(acp_id, expanded=True)
@@ -74,7 +94,7 @@ for response in acp_rules:
         else:
             print('  Syslog configuration already exists, or not specified. Skipping syslog config.')
 
-        if log_to_fmc and 'sendEventsToFMC' not in acp_rule and 'sendEventsToFMC' != log_to_fmc:
+        if log_to_fmc and ('sendEventsToFMC' not in acp_rule or 'sendEventsToFMC' != log_to_fmc):
             payload['sendEventsToFMC'] = log_to_fmc
         else:
             print('  Log to FMC already set to {0}, or not specified. Skipping sending logs to FMC.'.format(log_to_fmc))
@@ -105,6 +125,14 @@ for response in acp_rules:
         else:
             print('  File Policy configuration already exists, or not specified. Skipping file policy configuration.')
 
+        if variable_set and 'variableSet' not in acp_rule:
+            # Set IPS policy config
+            payload['variableSet'] = {
+                "id": variable_set_id
+            }
+        else:
+            print('  Variable Set configuration already exists, or not specified. Skipping variable set.')
+
         # Remove metadata fields from existing rule. This is required since the API does not support
         # PATCH operations as of version 6.2.1 of FMC. That's why we have to delete metadata before we use a PUT
         # operation to change our ACP rule.
@@ -113,7 +141,7 @@ for response in acp_rules:
         del payload['links']
 
         print('  Sending updated rule configuration...')
-        # print('Sent payload: ' + str(payload))
+        print('Sent payload: ' + str(payload))
 
         # Send json payload to FMC REST API
         result = api.update_acp_rule(policy_id=acp_id, rule_id=acp_rule['id'], data=payload)
@@ -122,3 +150,4 @@ for response in acp_rules:
             print(' [SUCCESS]'.format(acp_rule_name))
         else:
             print(' [ERROR] Could not update settings. Status code: {0}'.format(result.status_code))
+            print(' [ERROR_RESULT]' + str(result))
