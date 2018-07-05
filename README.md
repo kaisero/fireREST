@@ -10,7 +10,7 @@ pip install -r fireREST/requirements.txt
 Afterwards, you can use the specific tool script you want.
 ## update-all-rules.py
 ### Why
-The bases for creating this script was to update all the rules in a specified access policy with inspection and logging settings.
+The basis for creating this script was to update all the rules in a specified access policy with inspection and logging settings.
 
 When migrating a firewall to Firepower Threat Defense using the Firepower Management Center Migration Tool, the access rules are all converted to a pre-filter policy or an access policy depending on your selection. If you select access policy, the rules don't get any inspection or logging settings. Afterwards, you'd have to manually go in and update each rule which is not scalable for large rulesets.
 
