@@ -43,33 +43,52 @@ log_at_end = 'true'
 
 ### Execution
 ```bash
-(fire) [rwolfe@devbox bulk-rule-update]$ python update-intrusion-policy.py
---------------------------------------------------------------------------------
+(fpenv) [rwolfe@devbox fmc-tools]$ python update-all-rules.py
+-------------------------------------------------------------------------------------
 Domain: e276abec-e0f2-11e3-8169-6d9ed49b625f
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 Access control policy: api-test-policy: 0050568C-D66C-0ed3-0000-171798708124
  Intrusion policy: api-intrusion-policy: 0ce70864-7eeb-11e8-8f7e-9ede74934a97
  File policy: api-file-policy: f0781542-7f03-11e8-8f7e-9ede74934a97
+ Variable Set: api-variable-set: e1658ab2-7f03-11e8-8f7e-9ede74934a97
  Log server: api-syslog-server: 573468de-7f05-11e8-971f-b0981aec49c1
+ Log to event viewer: true
  Log at beginning: false
  Log at end: true
---------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------
 Rule: test rule 1, in Policy: api-test-policy.
-  Log to FMC already set to true, or not specified. Skipping sending logs to FMC.
+  Syslog configuration already exists, or not specified. Skipping syslog config.
+  Intrusion Policy configuration already exists, or not specified. Skipping intrusion policy.
+  File Policy configuration already exists, or not specified. Skipping file policy configuration.
+  Variable Set configuration already exists, or not specified. Skipping variable set.
   Sending updated rule configuration...
  [SUCCESS]
 Rule: test rule 2, in Policy: api-test-policy.
-  Log to FMC already set to true, or not specified. Skipping sending logs to FMC.
+  Syslog configuration already exists, or not specified. Skipping syslog config.
+  Intrusion Policy configuration already exists, or not specified. Skipping intrusion policy.
+  File Policy configuration already exists, or not specified. Skipping file policy configuration.
+  Variable Set configuration already exists, or not specified. Skipping variable set.
   Sending updated rule configuration...
  [SUCCESS]
 Rule: test rule 3, in Policy: api-test-policy.
-  Log to FMC already set to true, or not specified. Skipping sending logs to FMC.
+  Syslog configuration already exists, or not specified. Skipping syslog config.
+  Intrusion Policy configuration already exists, or not specified. Skipping intrusion policy.
+  File Policy configuration already exists, or not specified. Skipping file policy configuration.
+  Variable Set configuration already exists, or not specified. Skipping variable set.
   Sending updated rule configuration...
  [SUCCESS]
-(fire) [rwolfe@devbox bulk-rule-update]$
+Rule: test rule 4, in Policy: api-test-policy.
+  Syslog configuration already exists, or not specified. Skipping syslog config.
+  Rule not set to ALLOW, clearing intrusion settings. Overwriting log settings with log at beginning and send to event viewer.
+  Sending updated rule configuration...
+ [SUCCESS]
+Rule: test rule 5, in Policy: api-test-policy.
+  Variable Set configuration already exists, or not specified. Skipping variable set.
+  Sending updated rule configuration...
+ [SUCCESS]
 ```
 
-#### Results in GUI
+#### Example Results in GUI
 ##### Before
 ![before](https://imgur.com/ELof6xB.png)
 
