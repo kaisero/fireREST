@@ -139,9 +139,10 @@ for response in acp_rules:
 
         del payload['metadata']
         del payload['links']
-
         print('  Sending updated rule configuration...')
-        print('Sent payload: ' + str(payload))
+
+        # Print payload to send for debugging
+        # print('Sent payload: ' + str(payload))
 
         # Send json payload to FMC REST API
         result = api.update_acp_rule(policy_id=acp_id, rule_id=acp_rule['id'], data=payload)
