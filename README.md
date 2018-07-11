@@ -8,6 +8,42 @@ git clone https://github.com/rnwolfe/fmc-tools/fmc-tools.git
 pip install -r fireREST/requirements.txt
 ```
 Afterwards, you can use the specific tool script you want.
+
+## Table of Contents
+1. [export-acp-to-csv.py](#export-acp-to-csv.py)
+2. [update-all-rules.py](#update-all-rules.py)
+## export-acp-to-csv.py
+### Why
+The basis for this script was to export all of the rules in a specific access policy to a CSV spreadsheet for use in analyzing the ruleset for consolidation, optimization, or otherwise. It could also be used as a form of version control / comparison over time. For example, this script could be run as a cron job and a diff run on two different iterations of the policy for troubleshooting purposes.
+### Usage
+#### FMC Details
+In this script, just update the top of file variables with your FMC information and the access policy name you wish to export. The domain is normally `Global` in most cases: 
+```python
+device = 'fmc.domain.com'
+username = 'api-user'
+password = 'api-password'
+domain = 'Global'
+ac_policy = 'api-test-policy'
+```
+
+### Execution
+```bash
+$ python export-acp-to-csv.py
+-------------------------------------------------------------------------------------
+Domain: e276abec-e0f2-11e3-8169-6d9ed49b625f
+-------------------------------------------------------------------------------------
+Access control policy: api-test-policy: 0050568C-D66C-0ed3-0000-171798708124
+-------------------------------------------------------------------------------------
+Writing rule #1 to CSV...
+Writing rule #2 to CSV...
+Writing rule #3 to CSV...
+Writing rule #4 to CSV...
+Writing rule #5 to CSV...
+File is at: ./api-test-policy.csv
+```
+
+#### Example Results
+Please see [example CSV output file here](https://github.com/rnwolfe/fmc-tools/blob/master/api-test-policy.csv).
 ## update-all-rules.py
 ### Why
 The basis for creating this script was to update all the rules in a specified access policy with inspection and logging settings.
@@ -44,7 +80,7 @@ log_at_end = 'true'
 
 ### Execution
 ```bash
-(fpenv) [rwolfe@devbox fmc-tools]$ python update-all-rules.py
+$ python update-all-rules.py
 -------------------------------------------------------------------------------------
 Domain: e276abec-e0f2-11e3-8169-6d9ed49b625f
 -------------------------------------------------------------------------------------
