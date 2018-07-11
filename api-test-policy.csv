@@ -1,0 +1,6 @@
+#, name, enabled, action, sourceZones, destZones, sourceNetworks, destNetworks, sourcePorts, destPorts, ipsPolicy, variableSet, filePolicy, logBegin, logEnd, sendEventsToFMC, syslogConfig
+1, test rule 1, True, ALLOW, inside, services, some_source;192_Private, some_dest;172_Private, Bittorrent, Bittorrent, api-intrusion-policy, Default-Set, api-file-policy, False, True, True, api-syslog-server
+2, test rule 2, True, ALLOW, any, any, any, any, any, any, api-intrusion-policy, Default-Set, api-file-policy, False, True, True, api-syslog-server
+3, test rule 3, True, ALLOW, any, any, any, any, any, any, api-intrusion-policy, Default-Set, api-file-policy, False, True, True, api-syslog-server
+4, test rule 4, True, BLOCK, any, any, any, any, any, any, none, none, none, True, False, True, api-syslog-server
+5, test rule 5, False, ALLOW, any, any, any, any, any, any, api-intrusion-policy, Default-Set, api-file-policy, False, True, True, api-syslog-server
