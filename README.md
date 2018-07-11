@@ -10,8 +10,8 @@ pip install -r fireREST/requirements.txt
 Afterwards, you can use the specific tool script you want.
 
 ## Table of Contents
-1. [export-acp-to-csv.py](#export-acp-to-csv.py)
-2. [update-all-rules.py](#update-all-rules.py)
+1. [export-acp-to-csv.py](#export-acp-to-csvpy)
+2. [update-all-rules.py](#update-all-rulespy)
 ## export-acp-to-csv.py
 ### Why
 The basis for this script was to export all of the rules in a specific access policy to a CSV spreadsheet for use in analyzing the ruleset for consolidation, optimization, or otherwise. It could also be used as a form of version control / comparison over time. For example, this script could be run as a cron job and a diff run on two different iterations of the policy for troubleshooting purposes.
