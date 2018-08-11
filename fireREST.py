@@ -49,16 +49,8 @@ class FireREST(object):
     API_PLATFORM_URL = '/api/fmc_platform/v1'
     API_CONFIG_URL = '/api/fmc_config/v1'
 
-    def __init__(self,
-                 hostname=str(),
-                 username=str(),
-                 password=str(),
-                 session=dict(),
-                 protocol='https',
-                 verify_cert=False,
-                 logger=None,
-                 domain='Global',
-                 timeout=120):
+    def __init__(self, hostname=str(), username=str(), password=str(), session=dict(), protocol='https',
+                 verify_cert=False, logger=None, domain='Global', timeout=120):
         """
         Initialize FireREST object
         :param hostname: ip address or dns name of fmc
@@ -108,9 +100,7 @@ class FireREST(object):
             return dummy_logger
         return logger
 
-    def _url(self,
-             namespace='base',
-             path=str()):
+    def _url(self, namespace='base', path=str()):
         """
         Generate URLs on the fly for requests to firepower api
         :param namespace: name of the url namespace that should be used. options: base, config, auth. default = base
@@ -133,38 +123,29 @@ class FireREST(object):
         """
         request = self._url('auth')
         try:
-            response = requests.post(
-                request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
+            response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
 
             if response.status_code in (401, 403):
-                self.logger.error(
-                    'API Authentication to {} failed.'.format(self.hostname))
-                raise FireRESTAuthException(
-                    'API Authentication to {} failed.'.format(self.hostname))
+                self.logger.error('API Authentication to {} failed.'.format(self.hostname))
+                raise FireRESTAuthException('API Authentication to {} failed.'.format(self.hostname))
 
-            access_token = response.headers.get(
-                'X-auth-access-token', default=None)
-            refresh_token = response.headers.get(
-                'X-auth-refresh-token', default=None)
+            access_token = response.headers.get('X-auth-access-token', default=None)
+            refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
-                self.logger.error(
-                    'Could not retrieve tokens from {}.'.format(request))
-                raise FireRESTApiException(
-                    'Could not retrieve tokens from {}.'.format(request))
+                self.logger.error('Could not retrieve tokens from {}.'.format(request))
+                raise FireRESTApiException('Could not retrieve tokens from {}.'.format(request))
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
-            self.domains = json.loads(
-                response.headers.get('DOMAINS', default=None))
+            self.domains = json.loads(response.headers.get('DOMAINS', default=None))
             self.refresh_counter = 0
-            self.logger.debug(
-                'Successfully authenticated to {}'.format(self.hostname))
+            self.logger.debug('Successfully authenticated to {}'.format(self.hostname))
         except ConnectionRefusedError:
             self.logger.error('Could not connect to {}. Connection refused'.format(self.hostname))
             raise
         except ConnectionError:
-            self.logger.error(
-                'Could not connect to {}. Max retries exceeded with url: {}'.format(self.hostname, request))
+            self.logger.error('Could not connect to {}. Max retries exceeded with url: {}'
+                              .format(self.hostname, request))
             raise
 
     def _refresh(self):
@@ -181,26 +162,22 @@ class FireREST(object):
         request = self._url('refresh')
         try:
             self.refresh_counter += 1
-            response = requests.post(
-                request, headers=self.headers, verify=self.verify_cert)
+            response = requests.post(request, headers=self.headers, verify=self.verify_cert)
 
-            access_token = response.headers.get(
-                'X-auth-access-token', default=None)
-            refresh_token = response.headers.get(
-                'X-auth-refresh-token', default=None)
+            access_token = response.headers.get('X-auth-access-token', default=None)
+            refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
-                raise FireRESTAuthRefreshException(
-                    'Could not refresh tokens from {}. Response Code: {}'.format(request, response.status_code))
+                raise FireRESTAuthRefreshException('Could not refresh tokens from {}. Response Code: {}'
+                                                   .format(request, response.status_code))
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
         except ConnectionError:
-            self.logger.error(
-                'Could not connect to {}. Max retries exceeded with url: {}'.format(self.hostname, request))
+            self.logger.error('Could not connect to {}. Max retries exceeded with url: {}'
+                              .format(self.hostname, request))
         except FireRESTApiException as exc:
             self.logger.error(str(exc))
-        self.logger.debug(
-            'Successfully refreshed authorization token for {}'.format(self.hostname))
+        self.logger.debug('Successfully refreshed authorization token for {}'.format(self.hostname))
 
     @RequestDebugDecorator('DELETE')
     def _delete(self,
@@ -221,10 +198,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('GET')
-    def _get_request(self,
-                     request: str,
-                     params=dict(),
-                     limit=int()):
+    def _get_request(self, request: str, params=dict(), limit=int()):
         """
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -242,10 +216,7 @@ class FireREST(object):
                 return self._get_request(request, params, limit)
         return response
 
-    def _get(self,
-             request: str,
-             params=dict(),
-             limit=int()):
+    def _get(self, request: str, params=dict(), limit=int()):
         """
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -267,10 +238,7 @@ class FireREST(object):
         return responses
 
     @RequestDebugDecorator('PATCH')
-    def _patch(self,
-               request: str,
-               data: Dict,
-               params=dict()):
+    def _patch(self, request: str, data: Dict, params=dict()):
         """
         PATCH Operation for FMC REST API. In case of authentication issues session will be refreshed
         As of FPR 6.2.3 this function is not in use because FMC API does not support PATCH operations
@@ -288,10 +256,7 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('POST')
-    def _post(self,
-              request: str,
-              data: Dict,
-              params=dict()):
+    def _post(self, request: str, data: Dict, params=dict()):
         """
         POST Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -322,15 +287,12 @@ class FireREST(object):
         response = requests.put(request, data=json.dumps(data), headers=self.headers, params=params,
                                 verify=self.verify_cert, timeout=self.timeout)
         if response.status_code == 401:
-            if 'Access token invalid' in str(response.json()):
+            if 'Access token invalid' in response.text:
                 self._refresh()
                 return self._put(request, data, params)
         return response
 
-    def prepare_json(self,
-                     operation: str,
-                     obj_type: str,
-                     data: Dict):
+    def prepare_json(self, operation: str, obj_type: str, data: Dict):
         """
         Prepare json object for api operation
         :param operation: PUT, POST
@@ -340,10 +302,7 @@ class FireREST(object):
         """
         return
 
-    def valid_json(self,
-                   operation: str,
-                   obj_type: str,
-                   data: Dict):
+    def valid_json(self, operation: str, obj_type: str, data: Dict):
         """
         Validate json object to verify
         :param operation: PUT, POST
@@ -353,9 +312,7 @@ class FireREST(object):
         """
         return
 
-    def get_object_id_by_name(self,
-                              obj_type: str,
-                              obj_name: str):
+    def get_object_id_by_name(self, obj_type: str, obj_name: str):
         """
         helper function to retrieve object id by name
         :param obj_type: object types that will be queried
@@ -431,9 +388,7 @@ class FireREST(object):
                     return acp['id']
         return None
 
-    def get_acp_rule_id_by_name(self,
-                                policy_name: str,
-                                rule_name: str):
+    def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
         """
         helper function to retrieve access control policy rule id by name
         :param policy_name: name of the access control policy that will be queried
@@ -485,10 +440,8 @@ class FireREST(object):
         for domain in self.domains:
             if domain['name'] == domain_name:
                 return domain['uuid']
-        logging.error(
-            'Could not find domain with name {}. Make sure full path is provided'.format(domain_name))
-        logging.debug('Available Domains: {}'.format(
-            ', '.join((domain['name'] for domain in self.domains))))
+        self.logger.error('Could not find domain with name {}. Make sure full path is provided'.format(domain_name))
+        self.logger.debug('Available Domains: {}'.format(', '.join((domain['name'] for domain in self.domains))))
         return None
 
     def get_domain_name_by_id(self, domain_id: str):
@@ -500,10 +453,8 @@ class FireREST(object):
         for domain in self.domains:
             if domain['uuid'] == domain_id:
                 return domain['name']
-        logging.error(
-            'Could not find domain with id {}. Make sure full path is provided'.format(domain_id))
-        logging.debug('Available Domains: {}'.format(
-            ', '.join((domain['uuid'] for domain in self.domains))))
+        self.logger.error('Could not find domain with id {}. Make sure full path is provided'.format(domain_id))
+        self.logger.debug('Available Domains: {}'.format(', '.join((domain['uuid'] for domain in self.domains))))
         return None
 
     def get_system_version(self):
@@ -526,16 +477,12 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def create_object(self,
-                      object_type: str,
-                      data: Dict):
+    def create_object(self, object_type: str, data: Dict):
         request = '/object/{}'.format(object_type)
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_objects(self,
-                    object_type: str,
-                    expanded=False):
+    def get_objects(self, object_type: str, expanded=False):
         request = '/object/{}'.format(object_type)
         url = self._url('config', request)
         params = {
@@ -543,24 +490,17 @@ class FireREST(object):
         }
         return self._get(url, params)
 
-    def get_object(self,
-                   object_type: str,
-                   object_id: str):
+    def get_object(self, object_type: str, object_id: str):
         request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_object(self,
-                      object_type: str,
-                      object_id: str,
-                      data: Dict):
+    def update_object(self, object_type: str, object_id: str, data: Dict):
         request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_object(self,
-                      object_type: str,
-                      object_id: str):
+    def delete_object(self, object_type: str, object_id: str):
         request = '/object/{}/{}'.format(object_type, object_id)
         url = self._url('config', request)
         return self._delete(url)
@@ -580,9 +520,7 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def update_device(self,
-                      device_id: str,
-                      data: Dict):
+    def update_device(self, device_id: str, data: Dict):
         request = '/devices/devicerecords/{}'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
@@ -607,9 +545,7 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def update_device_hapair(self,
-                             data: Dict,
-                             device_hapair_id: str):
+    def update_device_hapair(self, data: Dict, device_hapair_id: str):
         request = '/devicehapairs/ftddevicehapairs/{}'.format(device_hapair_id)
         url = self._url('config', request)
         return self._put(url, data)
@@ -625,101 +561,67 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_ftd_physical_interface(self,
-                                   device_id: str,
-                                   interface_id: str):
-        request = '/devices/devicerecords/{}/physicalinterfaces/{}'.format(
-            device_id, interface_id)
+    def get_ftd_physical_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/physicalinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_physical_interface(self,
-                                      device_id: str,
-                                      data: Dict):
-        request = '/devices/devicerecords/{}/physicalinterfaces'.format(
-            device_id)
+    def update_ftd_physical_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/physicalinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def create_ftd_redundant_interface(self,
-                                       device_id: str,
-                                       data: Dict):
-        request = '/devices/devicerecords/{}/redundantinterfaces'.format(
-            device_id)
+    def create_ftd_redundant_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._post(url, data)
 
     def get_ftd_redundant_interfaces(self, device_id: str):
-        request = '/devices/devicerecords/{}/redundantinterfaces'.format(
-            device_id)
+        request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def get_ftd_redundant_interface(self,
-                                    device_id: str,
-                                    interface_id: str):
-        request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(
-            device_id, interface_id)
+    def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_redundant_interface(self,
-                                       device_id: str,
-                                       data: Dict):
-        request = '/devices/devicerecords/{}/redundantinterfaces'.format(
-            device_id)
+    def update_ftd_redundant_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_redundant_interface(self,
-                                       device_id: str,
-                                       interface_id: str):
-        request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(
-            device_id, interface_id)
+    def delete_ftd_redundant_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_ftd_portchannel_interface(self,
-                                         device_id: str,
-                                         data: Dict):
-        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(
-            device_id)
+    def create_ftd_portchannel_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._post(url, data)
 
     def get_ftd_portchannel_interfaces(self, device_id: str):
-        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(
-            device_id)
+        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def get_ftd_portchannel_interface(self,
-                                      device_id: str,
-                                      interface_id: str):
-        request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(
-            device_id, interface_id)
+    def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_portchannel_interface(self,
-                                         device_id: str,
-                                         data: Dict):
-        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(
-            device_id)
+    def update_ftd_portchannel_interface(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_portchannel_interface(self,
-                                         device_id: str,
-                                         interface_id: str):
-        request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(
-            device_id, interface_id)
+    def delete_ftd_portchannel_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_ftd_sub_interface(self,
-                                 device_id: str,
-                                 data: Dict):
+    def create_ftd_sub_interface(self, device_id: str, data: Dict):
         request = '/devices/devicerecords/{}/subinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._post(url, data)
@@ -729,102 +631,68 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_ftd_sub_interface(self,
-                              device_id: str,
-                              interface_id: str):
-        request = '/devices/devicerecords/{}/subinterfaces/{}'.format(
-            device_id, interface_id)
+    def get_ftd_sub_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/subinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_sub_interface(self,
-                                 device_id: str,
-                                 data: Dict):
+    def update_ftd_sub_interface(self, device_id: str, data: Dict):
         request = '/devices/devicerecords/{}/subinterfaces'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_sub_interface(self,
-                                 device_id: str,
-                                 interface_id: str):
-        request = '/devices/devicerecords/{}/subinterfaces/{}'.format(
-            device_id, interface_id)
+    def delete_ftd_sub_interface(self, device_id: str, interface_id: str):
+        request = '/devices/devicerecords/{}/subinterfaces/{}'.format(device_id, interface_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_ftd_ipv4_route(self,
-                              device_id: str,
-                              data: Dict):
-        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(
-            device_id)
+    def create_ftd_ipv4_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
         url = self._url('config', request)
         return self._post(url, data)
 
     def get_ftd_ipv4_routes(self, device_id: str):
-        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(
-            device_id)
+        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def get_ftd_ipv4_route(self,
-                           device_id: str,
-                           route_id: str):
-        request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(
-            device_id, route_id)
+    def get_ftd_ipv4_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(device_id, route_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_ipv4_route(self,
-                              device_id: str,
-                              data: Dict):
-        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(
-            device_id)
+    def update_ftd_ipv4_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_ipv4_route(self,
-                              device_id: str,
-                              route_id: str):
-        request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(
-            device_id, route_id)
+    def delete_ftd_ipv4_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(device_id, route_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_ftd_ipv6_route(self,
-                              device_id: str,
-                              data: Dict):
-        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(
-            device_id)
+    def create_ftd_ipv6_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
         url = self._url('config', request)
         return self._post(url, data)
 
     def get_ftd_ipv6_routes(self, device_id: str):
-        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(
-            device_id)
+        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def get_ftd_ipv6_route(self,
-                           device_id: str,
-                           route_id: str):
-        request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(
-            device_id, route_id)
+    def get_ftd_ipv6_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(device_id, route_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_ipv6_route(self,
-                              device_id: str,
-                              data: Dict):
-        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(
-            device_id)
+    def update_ftd_ipv6_route(self, device_id: str, data: Dict):
+        request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_ipv6_route(self,
-                              device_id: str,
-                              route_id: str):
-        request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(
-            device_id, route_id)
+    def delete_ftd_ipv6_route(self, device_id: str, route_id: str):
+        request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(device_id, route_id)
         url = self._url('config', request)
         return self._delete(url)
 
@@ -838,9 +706,7 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def create_policy(self,
-                      policy_type: str,
-                      data: Dict):
+    def create_policy(self, policy_type: str, data: Dict):
         request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
         return self._post(url, data)
@@ -850,10 +716,7 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_policy(self,
-                   policy_id: str,
-                   policy_type: str,
-                   expanded=False):
+    def get_policy(self, policy_id: str, policy_type: str, expanded=False):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         params = {
             'expanded': expanded
@@ -861,28 +724,18 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    def update_policy(self,
-                      policy_id: str,
-                      policy_type: str,
-                      data: Dict):
+    def update_policy(self, policy_id: str, policy_type: str, data: Dict):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_policy(self,
-                      policy_id: str,
-                      policy_type: str):
+    def delete_policy(self, policy_id: str, policy_type: str):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_acp_rule(self,
-                        policy_id: str,
-                        data: Dict,
-                        section=str(),
-                        category=str(),
-                        insert_before=int(),
-                        insert_after=int()):
+    def create_acp_rule(self, policy_id: str, data: Dict, section=str(), category=str(),
+                        insert_before=int(), insert_after=int()):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         url = self._url('config', request)
         params = {
@@ -893,13 +746,8 @@ class FireREST(object):
         }
         return self._post(url, data, params)
 
-    def create_acp_rules(self,
-                         policy_id: str,
-                         data: Dict,
-                         section=str(),
-                         category=str(),
-                         insert_before=int(),
-                         insert_after=int()):
+    def create_acp_rules(self, policy_id: str, data: Dict, section=str(), category=str(),
+                         insert_before=int(), insert_after=int()):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         url = self._url('config', request)
         params = {
@@ -910,17 +758,12 @@ class FireREST(object):
         }
         return self._post(url, data, params)
 
-    def get_acp_rule(self,
-                     policy_id: str,
-                     rule_id: str):
-        request = '/policy/accesspolicies/{}/accessrules/{}'.format(
-            policy_id, rule_id)
+    def get_acp_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._get(url)
 
-    def get_acp_rules(self,
-                      policy_id: str,
-                      expanded=False):
+    def get_acp_rules(self, policy_id: str, expanded=False):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
         params = {
             'expanded': expanded
@@ -928,35 +771,23 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    def update_acp_rule(self,
-                        policy_id: str,
-                        rule_id: str,
-                        data: Dict):
-        request = '/policy/accesspolicies/{}/accessrules/{}'.format(
-            policy_id, rule_id)
+    def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_acp_rule(self,
-                        policy_id: str,
-                        rule_id: str):
-        request = '/policy/accesspolicies/{}/accessrules/{}'.format(
-            policy_id, rule_id)
+    def delete_acp_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/accesspolicies/{}/accessrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_autonat_rule(self,
-                            policy_id: str,
-                            data: Dict):
+    def create_autonat_rule(self, policy_id: str, data: Dict):
         request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_autonat_rule(self,
-                         policy_id: str,
-                         rule_id: str):
-        request = '/policy/ftdnatpolicies/{}/autonatrules/{}'.format(
-            policy_id, rule_id)
+    def get_autonat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/autonatrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._get(url)
 
@@ -965,33 +796,23 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def update_autonat_rule(self,
-                            policy_id: str,
-                            data: Dict):
+    def update_autonat_rule(self, policy_id: str, data: Dict):
         request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_autonat_rule(self,
-                            policy_id: str,
-                            rule_id: str):
-        request = '/policy/ftdnatpolicies/{}/autonatrules/{}'.format(
-            policy_id, rule_id)
+    def delete_autonat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/autonatrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_manualnat_rule(self,
-                              policy_id: str,
-                              data: Dict):
+    def create_manualnat_rule(self, policy_id: str, data: Dict):
         request = '/policy/ftdnatpolicies/{}/manualnatrules'.format(policy_id)
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_manualnat_rule(self,
-                           policy_id: str,
-                           rule_id: str):
-        request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(
-            policy_id, rule_id)
+    def get_manualnat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._get(url)
 
@@ -1000,18 +821,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def update_manualnat_rule(self,
-                              policy_id: str,
-                              data: Dict):
+    def update_manualnat_rule(self, policy_id: str, data: Dict):
         request = '/policy/ftdnatpolicies/{}/manualnatrules'.format(policy_id)
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_manualnat_rule(self,
-                              policy_id: str,
-                              rule_id: str):
-        request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(
-            policy_id, rule_id)
+    def delete_manualnat_rule(self, policy_id: str, rule_id: str):
+        request = '/policy/ftdnatpolicies/{}/manualnatrules/{}'.format(policy_id, rule_id)
         url = self._url('config', request)
         return self._delete(url)
 
@@ -1030,9 +846,7 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def update_policy_assignment(self,
-                                 policy_id: str,
-                                 data: Dict):
+    def update_policy_assignment(self, policy_id: str, data: Dict):
         request = '/assignment/policyassignments/{}'.format(policy_id)
         url = self._url('config', request)
         return self._put(url, data)
