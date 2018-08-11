@@ -3,6 +3,7 @@ import requests
 import logging
 import urllib3
 
+from time import sleep
 from typing import Dict
 from requests.auth import HTTPBasicAuth
 from urllib3.exceptions import ConnectionError
@@ -19,6 +20,11 @@ class FireRESTAuthException(Exception):
 
 
 class FireRESTAuthRefreshException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
+
+
+class FireRESTRateLimitException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
@@ -129,6 +135,11 @@ class FireREST(object):
                 self.logger.error('API Authentication to {} failed.'.format(self.hostname))
                 raise FireRESTAuthException('API Authentication to {} failed.'.format(self.hostname))
 
+            if response.status_code == 429:
+                msg = 'API Authentication to {} failed due to FMC rate limiting. Backing off for 10 seconds.'\
+                    .format(self.hostname)
+                raise FireRESTRateLimitException(msg)
+
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
@@ -147,6 +158,9 @@ class FireREST(object):
             self.logger.error('Could not connect to {}. Max retries exceeded with url: {}'
                               .format(self.hostname, request))
             raise
+        except FireRESTRateLimitException:
+            sleep(10)
+            self._login()
 
     def _refresh(self):
         """
@@ -164,6 +178,11 @@ class FireREST(object):
             self.refresh_counter += 1
             response = requests.post(request, headers=self.headers, verify=self.verify_cert)
 
+            if response.status_code == 429:
+                msg = 'API Refresh to {} failed due to FMC rate limiting. Backing off for 10 seconds.'\
+                    .format(self.hostname)
+                raise FireRESTRateLimitException(msg)
+
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
@@ -175,30 +194,41 @@ class FireREST(object):
         except ConnectionError:
             self.logger.error('Could not connect to {}. Max retries exceeded with url: {}'
                               .format(self.hostname, request))
+        except FireRESTRateLimitException:
+            sleep(10)
+            self._login()
         except FireRESTApiException as exc:
             self.logger.error(str(exc))
+
         self.logger.debug('Successfully refreshed authorization token for {}'.format(self.hostname))
 
     @RequestDebugDecorator('DELETE')
-    def _delete(self,
-                request: str,
-                params=None):
+    def _delete(self, request: str, params=None):
         """
         DELETE Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.delete(request, headers=self.headers, params=params, verify=self.verify_cert,
-                                   timeout=self.timeout)
-        if response.status_code == 401:
-            if 'Access token invalid' in str(response.json()):
-                self._refresh()
-                return self._delete(request, params)
+        if params is None:
+            params = dict()
+        try:
+            response = requests.delete(request, headers=self.headers, params=params, verify=self.verify_cert,
+                                       timeout=self.timeout)
+            if response.status_code == 401:
+                if 'Access token invalid' in str(response.json()):
+                    self._refresh()
+                    return self._delete(request, params)
+            if response.status_code == 429:
+                msg = 'DELETE operation {} failed due to FMC rate limiting. Backing off for 10 seconds.'.format(request)
+                raise FireRESTRateLimitException(msg)
+        except FireRESTRateLimitException:
+            sleep(10)
+            return self._delete(request, params)
         return response
 
     @RequestDebugDecorator('GET')
-    def _get_request(self, request: str, params=dict(), limit=int()):
+    def _get_request(self, request: str, params=None, limit=25):
         """
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -206,17 +236,25 @@ class FireREST(object):
         :param limit: set custom limit for paging. If not set, api will default to 25
         :return: requests.Response object
         """
-        if limit:
-            params['limit'] = limit
-        response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
-                                timeout=self.timeout)
-        if response.status_code == 401:
-            if 'Access token invalid' in str(response.json()):
-                self._refresh()
-                return self._get_request(request, params, limit)
+        if params is None:
+            params = dict()
+        params['limit'] = limit
+        try:
+            response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
+                                    timeout=self.timeout)
+            if response.status_code == 401:
+                if 'Access token invalid' in str(response.json()):
+                    self._refresh()
+                    return self._get_request(request, params, limit)
+            if response.status_code == 429:
+                msg = 'GET operation {} failed due to FMC rate limiting. Backing off for 10 seconds.'.format(request)
+                raise FireRESTRateLimitException(msg)
+        except FireRESTRateLimitException:
+            sleep(10)
+            return self._get_request(request, params, limit)
         return response
 
-    def _get(self, request: str, params=dict(), limit=int()):
+    def _get(self, request: str, params=None, limit=25):
         """
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -224,6 +262,8 @@ class FireREST(object):
         :param limit: set custom limit for paging. If not set, api will default to 25
         :return: list of requests.Response objects
         """
+        if params is None:
+            params = dict()
         responses = list()
         response = self._get_request(request, params, limit)
         responses.append(response)
@@ -238,7 +278,7 @@ class FireREST(object):
         return responses
 
     @RequestDebugDecorator('PATCH')
-    def _patch(self, request: str, data: Dict, params=dict()):
+    def _patch(self, request: str, data: Dict, params=None):
         """
         PATCH Operation for FMC REST API. In case of authentication issues session will be refreshed
         As of FPR 6.2.3 this function is not in use because FMC API does not support PATCH operations
@@ -247,16 +287,26 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.patch(request, data=json.dumps(data), headers=self.headers, params=params,
-                                  verify=self.verify_cert, timeout=self.timeout)
-        if response.status_code == 401:
-            if 'Access token invalid' in str(response.json()):
-                self._refresh()
-                return self._patch(request, data, params)
+        if params is None:
+            params = dict()
+        try:
+            response = requests.patch(request, data=json.dumps(data), headers=self.headers, params=params,
+                                      verify=self.verify_cert, timeout=self.timeout)
+            if response.status_code == 401:
+                if 'Access token invalid' in str(response.json()):
+                    self._refresh()
+                    return self._patch(request, data, params)
+            if response.status_code == 429:
+                msg = 'PATCH operation {} failed due to FMC rate limiting. Backing off for 10 seconds.'\
+                    .format(request)
+                raise FireRESTRateLimitException(msg)
+        except FireRESTRateLimitException:
+            sleep(10)
+            return self._patch(request, data, params)
         return response
 
     @RequestDebugDecorator('POST')
-    def _post(self, request: str, data: Dict, params=dict()):
+    def _post(self, request: str, data: Dict, params=None):
         """
         POST Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -264,19 +314,26 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.post(request, data=json.dumps(data), headers=self.headers, params=params,
-                                 verify=self.verify_cert, timeout=self.timeout)
-        if response.status_code == 401:
-            if 'Access token invalid' in str(response.json()):
-                self._refresh()
-                return self._post(request, data, params)
+        if params is None:
+            params = dict()
+        try:
+            response = requests.post(request, data=json.dumps(data), headers=self.headers, params=params,
+                                     verify=self.verify_cert, timeout=self.timeout)
+            if response.status_code == 401:
+                if 'Access token invalid' in str(response.json()):
+                    self._refresh()
+                    return self._post(request, data, params)
+            if response.status_code == 429:
+                msg = 'POST operation {} failed due to FMC rate limiting. Backing off for 10 seconds.'\
+                    .format(request)
+                raise FireRESTRateLimitException(msg)
+        except FireRESTRateLimitException:
+            sleep(10)
+            return self._post(request, data, params)
         return response
 
     @RequestDebugDecorator('PUT')
-    def _put(self,
-             request: str,
-             data: Dict,
-             params=dict()):
+    def _put(self, request: str, data: Dict, params=None):
         """
         PUT Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
@@ -284,12 +341,22 @@ class FireREST(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         """
-        response = requests.put(request, data=json.dumps(data), headers=self.headers, params=params,
-                                verify=self.verify_cert, timeout=self.timeout)
-        if response.status_code == 401:
-            if 'Access token invalid' in response.text:
-                self._refresh()
-                return self._put(request, data, params)
+        if params is None:
+            params = dict()
+        try:
+            response = requests.put(request, data=json.dumps(data), headers=self.headers, params=params,
+                                    verify=self.verify_cert, timeout=self.timeout)
+            if response.status_code == 401:
+                if 'Access token invalid' in response.text:
+                    self._refresh()
+                    return self._put(request, data, params)
+            if response.status_code == 429:
+                msg = 'PUT operation {} failed due to FMC rate limiting. Backing off for 10 seconds.' \
+                    .format(request)
+                raise FireRESTRateLimitException(msg)
+        except FireRESTRateLimitException:
+            sleep(10)
+            return self._put(request, data, params)
         return response
 
     def prepare_json(self, operation: str, obj_type: str, data: Dict):
