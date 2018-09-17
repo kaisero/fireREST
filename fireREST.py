@@ -55,7 +55,7 @@ class FireREST(object):
     API_PLATFORM_URL = '/api/fmc_platform/v1'
     API_CONFIG_URL = '/api/fmc_config/v1'
 
-    def __init__(self, hostname=str(), username=str(), password=str(), session=dict(), protocol='https',
+    def __init__(self, hostname=str(), username=str(), password=str(), session=None, protocol='https',
                  verify_cert=False, logger=None, domain='Global', timeout=120):
         """
         Initialize FireREST object
@@ -228,44 +228,41 @@ class FireREST(object):
         return response
 
     @RequestDebugDecorator('GET')
-    def _get_request(self, request: str, params=None, limit=25):
+    def _get_request(self, request: str, params=None):
         """
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 25
         :return: requests.Response object
         """
         if params is None:
             params = dict()
-        params['limit'] = limit
         try:
             response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
                                     timeout=self.timeout)
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
                     self._refresh()
-                    return self._get_request(request, params, limit)
+                    return self._get_request(request, params)
             if response.status_code == 429:
                 msg = 'GET operation {} failed due to FMC rate limiting. Backing off for 10 seconds.'.format(request)
                 raise FireRESTRateLimitException(msg)
         except FireRESTRateLimitException:
             sleep(10)
-            return self._get_request(request, params, limit)
+            return self._get_request(request, params)
         return response
 
-    def _get(self, request: str, params=None, limit=25):
+    def _get(self, request: str, params=None):
         """
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 25
         :return: list of requests.Response objects
         """
         if params is None:
             params = dict()
         responses = list()
-        response = self._get_request(request, params, limit)
+        response = self._get_request(request, params)
         responses.append(response)
         payload = response.json()
         if 'paging' in payload.keys():
@@ -273,7 +270,7 @@ class FireREST(object):
             limit = int(payload['paging']['limit'])
             for i in range(1, pages, 1):
                 params['offset'] = str(int(i) * limit)
-                response_page = self._get_request(request, params, limit)
+                response_page = self._get_request(request, params)
                 responses.append(response_page)
         return responses
 
@@ -432,7 +429,7 @@ class FireREST(object):
         :return: policy id if nat policy is found, None otherwise
         """
         request = '/policy/ftdnatpolicies'
-        url = self._url(request)
+        url = self._url('config', request)
         response = self._get(url)
         for item in response:
             for nat_policy in item.json()['items']:
@@ -577,10 +574,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_devices(self):
+    def get_devices(self, expanded=False):
         request = '/devices/devicerecords'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_device(self, device_id: str):
         request = '/devices/devicerecords/{}'.format(device_id)
@@ -597,10 +597,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_device_hapairs(self):
+    def get_device_hapairs(self, expanded=False):
         request = '/devicehapairs/ftddevicehapairs'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def create_device_hapair(self, data: Dict):
         request = '/devicehapairs/ftddevicehapairs/{}'
@@ -622,11 +625,14 @@ class FireREST(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_ftd_physical_interfaces(self, device_id: str):
+    def get_ftd_physical_interfaces(self, device_id: str, expanded=False):
         request = '/devices/devicerecords/{}/physicalinterfaces'.format(
             device_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_physical_interface(self, device_id: str, interface_id: str):
         request = '/devices/devicerecords/{}/physicalinterfaces/{}'.format(device_id, interface_id)
@@ -643,10 +649,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_redundant_interfaces(self, device_id: str):
+    def get_ftd_redundant_interfaces(self, device_id: str, expanded=False):
         request = '/devices/devicerecords/{}/redundantinterfaces'.format(device_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, expanded)
 
     def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
         request = '/devices/devicerecords/{}/redundantinterfaces/{}'.format(device_id, interface_id)
@@ -668,10 +677,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_portchannel_interfaces(self, device_id: str):
+    def get_ftd_portchannel_interfaces(self, device_id: str, expanded=False):
         request = '/devices/devicerecords/{}/etherchannelinterfaces'.format(device_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
         request = '/devices/devicerecords/{}/etherchannelinterfaces/{}'.format(device_id, interface_id)
@@ -693,10 +705,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_sub_interfaces(self, device_id: str):
+    def get_ftd_sub_interfaces(self, device_id: str, expanded=False):
         request = '/devices/devicerecords/{}/subinterfaces'.format(device_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_sub_interface(self, device_id: str, interface_id: str):
         request = '/devices/devicerecords/{}/subinterfaces/{}'.format(device_id, interface_id)
@@ -718,10 +733,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv4_routes(self, device_id: str):
+    def get_ftd_ipv4_routes(self, device_id: str, expanded=False):
         request = '/devices/devicerecords/{}/ipv4staticroutes'.format(device_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_ipv4_route(self, device_id: str, route_id: str):
         request = '/devices/devicerecords/{}/ipv4staticroutes/{}'.format(device_id, route_id)
@@ -743,10 +761,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv6_routes(self, device_id: str):
+    def get_ftd_ipv6_routes(self, device_id: str, expanded=False):
         request = '/devices/devicerecords/{}/ipv6staticroutes'.format(device_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_ipv6_route(self, device_id: str, route_id: str):
         request = '/devices/devicerecords/{}/ipv6staticroutes/{}'.format(device_id, route_id)
@@ -778,10 +799,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policies(self, policy_type: str):
+    def get_policies(self, policy_type: str, expanded=False):
         request = '/policy/{}'.format(policy_type)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_policy(self, policy_id: str, policy_type: str, expanded=False):
         request = '/policy/{}/{}'.format(policy_type, policy_id)
@@ -832,10 +856,10 @@ class FireREST(object):
 
     def get_acp_rules(self, policy_id: str, expanded=False):
         request = '/policy/accesspolicies/{}/accessrules'.format(policy_id)
+        url = self._url('config', request)
         params = {
             'expanded': expanded
         }
-        url = self._url('config', request)
         return self._get(url, params)
 
     def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
@@ -858,10 +882,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_autonat_rules(self, policy_id: str):
+    def get_autonat_rules(self, policy_id: str, expanded=False):
         request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def update_autonat_rule(self, policy_id: str, data: Dict):
         request = '/policy/ftdnatpolicies/{}/autonatrules'.format(policy_id)
@@ -883,10 +910,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_manualnat_rules(self, policy_id: str):
+    def get_manualnat_rules(self, policy_id: str, expanded=False):
         request = '/policy/ftdnatpolicies/manualnatrules/{}'.format(policy_id)
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def update_manualnat_rule(self, policy_id: str, data: Dict):
         request = '/policy/ftdnatpolicies/{}/manualnatrules'.format(policy_id)
@@ -903,10 +933,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policy_assignments(self):
+    def get_policy_assignments(self, expanded=False):
         request = '/assignment/policyassignments'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_policy_assignment(self, policy_id: str):
         request = '/assignment/policyassignments/{}'.format(policy_id)
