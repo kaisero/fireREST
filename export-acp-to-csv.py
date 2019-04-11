@@ -7,6 +7,8 @@ from fireREST import FireREST
 device = '10.12.100.36'
 username = 'api-user'
 password = 'api-password'
+# With child domain (note the spacing):
+# domain = 'Global/ NAME-OF-CHILD'
 domain = 'Global'
 ac_policy = 'api-test-policy'
 
@@ -61,7 +63,7 @@ for response in acp_rules:
                 line['sourceZones'].append(item['name'])
         except KeyError:
             line['sourceZones'] = ['any']
-            
+
         # Destination Zones
         line['destZones'] = []
         try:

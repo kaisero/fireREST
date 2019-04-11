@@ -17,14 +17,18 @@ Afterwards, you can use the specific tool script you want.
 The basis for this script was to export all of the rules in a specific access policy to a CSV spreadsheet for use in analyzing the ruleset for consolidation, optimization, or otherwise. It could also be used as a form of version control / comparison over time. For example, this script could be run as a cron job and a diff run on two different iterations of the policy for troubleshooting purposes.
 ### Usage
 #### FMC Details
-In this script, just update the top of file variables with your FMC information and the access policy name you wish to export. The domain is normally `Global` in most cases: 
+In this script, just update the top of file variables with your FMC information and the access policy name you wish to export. The domain is normally `Global` in most cases:
 ```python
 device = 'fmc.domain.com'
 username = 'api-user'
 password = 'api-password'
+# With child domain (note the spacing):
+# domain = 'Global/ NAME-OF-CHILD'
 domain = 'Global'
 ac_policy = 'api-test-policy'
 ```
+
+**Note**: If using a child domain, add a `/ ` (note the space after the slash) between parent/child, e.g. `Global/ Child-Domain`. This is due to how the domains are formatted by the FMC
 
 ### Execution
 ```bash
@@ -53,7 +57,7 @@ When migrating a firewall to Firepower Threat Defense using the Firepower Manage
 This tool allows you to specify *already configured* intrusion policies, file policies, variable sets, and syslog alert objects as well as define when to log the connection (at beginning and/or end) and whether to log connection events to the FMC log viewer.
 ### Usage
 #### FMC Details
-In this script, just update the top of file variables with your FMC information. The domain is normally `Global` in most cases: 
+In this script, just update the top of file variables with your FMC information. The domain is normally `Global` in most cases:
 ```python
 device = 'fmc.domain.com'
 username = 'api-user'
