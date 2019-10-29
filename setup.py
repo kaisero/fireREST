@@ -9,9 +9,11 @@ ROOT = Path(__file__).parent
 with open(f'{ROOT}/README.md', 'r') as readme:
     long_description = readme.read()
 
+exec(open(f'{ROOT}/fireREST/version.py', 'r').read())
+
 setuptools.setup(
-    name='FireREST',
-    version='0.0.1',
+    name='fireREST',
+    version=__version__,  # noqa: F821
     author='Oliver Kaiser',
     author_email='oliver.kaiser@outlook.com',
     description='Python api client for Cisco Firepower Management Center REST API',
