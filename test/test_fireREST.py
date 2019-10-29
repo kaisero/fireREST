@@ -1,7 +1,8 @@
 import unittest
 
-from fireREST import FireREST
+from fireREST import Client
 from fireREST import FireRESTApiException, FireRESTAuthException, FireRESTAuthRefreshException
+from fireREST import API_AUTH_URL, API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
 from requests.auth import HTTPBasicAuth
 
 
@@ -11,10 +12,7 @@ class TestFireRESTAuth(unittest.TestCase):
         hostname = 'fmc.example.com'
         username = 'admin'
         password = 'Cisco123'
-
-        self.api = FireREST(hostname=hostname,
-                            username=username,
-                            password=password)
+        self.api = Client(hostname=hostname, username=username, password=password)
 
     def tearDown(self):
         return
@@ -69,9 +67,7 @@ class TestFireREST(unittest.TestCase):
         cls.username = 'admin'
         cls.password = 'Cisco123'
 
-        cls.api = FireREST(hostname=cls.hostname,
-                           username=cls.username,
-                           password=cls.password)
+        cls.api = Client(hostname=cls.hostname, username=cls.username, password=cls.password)
 
     def setUp(self):
         return
@@ -97,38 +93,28 @@ class TestFireREST(unittest.TestCase):
         self.assertEqual(self.api.domain, expected_domain)
 
     def test_default_url(self):
-        expected_url = '{}://{}{}'.format(self.api.protocol,
-                                          self.api.hostname, '/test')
+        expected_url = f'{self.api.protocol}://{self.api.hostname}/test'
         actual_url = self.api._url(path='/test')
-
         self.assertEqual(actual_url, expected_url)
 
     def test_config_url(self):
-        expected_url = '{}://{}{}/domain/{}{}'.format(self.api.protocol, self.api.hostname, FireREST.API_CONFIG_URL,
-                                                      self.api.domain, '/test')
+        expected_url = f'{self.api.protocol}://{self.api.hostname}{API_CONFIG_URL}/domain/{self.api.domain}/test'
         actual_url = self.api._url(namespace='config', path='/test')
-
         self.assertEqual(actual_url, expected_url)
 
     def test_platform_url(self):
-        expected_url = '{}://{}{}{}'.format(self.api.protocol,
-                                            self.api.hostname, FireREST.API_PLATFORM_URL, '/test')
+        expected_url = f'{self.api.protocol}://{self.api.hostname}{API_PLATFORM_URL}/test'
         actual_url = self.api._url(namespace='platform', path='/test')
-
         self.assertEqual(actual_url, expected_url)
 
     def test_auth_url(self):
-        expected_url = '{}://{}{}'.format(self.api.protocol,
-                                          self.api.hostname, FireREST.API_AUTH_URL)
+        expected_url = f'{self.api.protocol}://{self.api.hostname}{API_AUTH_URL}'
         actual_url = self.api._url(namespace='auth')
-
         self.assertEqual(actual_url, expected_url)
 
     def test_refresh_url(self):
-        expected_url = '{}://{}{}'.format(self.api.protocol,
-                                          self.api.hostname, FireREST.API_REFRESH_URL)
+        expected_url = f'{self.api.protocol}://{self.api.hostname}{API_REFRESH_URL}'
         actual_url = self.api._url(namespace='refresh', path='/test')
-
         self.assertEqual(actual_url, expected_url)
 
 

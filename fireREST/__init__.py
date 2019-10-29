@@ -9,6 +9,12 @@ from requests.auth import HTTPBasicAuth
 from urllib3.exceptions import ConnectionError
 
 
+API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
+API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
+API_PLATFORM_URL = '/api/fmc_platform/v1'
+API_CONFIG_URL = '/api/fmc_config/v1'
+
+
 class FireRESTApiException(Exception):
     def __init__(self, message):
         super().__init__(message)
@@ -49,20 +55,15 @@ class RequestDebugDecorator(object):
         return wrapped_f
 
 
-class FireREST(object):
-    API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
-    API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
-    API_PLATFORM_URL = '/api/fmc_platform/v1'
-    API_CONFIG_URL = '/api/fmc_config/v1'
-
+class Client(object):
     def __init__(self, hostname: str, username: str, password: str, session=dict(), protocol='https',
                  verify_cert=False, logger=None, domain='Global', timeout=120):
         '''
-        Initialize FireREST object
+        Initialize api client object
         :param hostname: ip address or dns name of fmc
         :param username: fmc username
         :param password: fmc password
-        :param session: authentication session (can be provided in case FireREST should not generate one at init).
+        :param session: authentication session (can be provided in case api client should not generate one at init).
                       Make sure to pass the headers of a successful authentication to the session variable,
                       otherwise this will fail
         :param protocol: protocol used to access fmc api. default = https
@@ -96,12 +97,12 @@ class FireREST(object):
     @staticmethod
     def _get_logger(logger: object):
         '''
-        Generate dummy logger in case FireREST has been initialized without a logger
+        Generate dummy logger in case api client has been initialized without a logger
         :param logger: logger instance
         :return: dummy logger instance if logger is None, otherwise return logger variable again
         '''
         if not logger:
-            dummy_logger = logging.getLogger('FireREST')
+            dummy_logger = logging.getLogger('FireREST.Client')
             dummy_logger.addHandler(logging.NullHandler())
             return dummy_logger
         return logger
@@ -114,13 +115,13 @@ class FireREST(object):
         :return: url in string format
         '''
         if namespace == 'config':
-            return f'{self.protocol}://{self.hostname}{self.API_CONFIG_URL}/domain/{self.domain}{path}'
+            return f'{self.protocol}://{self.hostname}{API_CONFIG_URL}/domain/{self.domain}{path}'
         if namespace == 'platform':
-            return f'{self.protocol}://{self.hostname}{self.API_PLATFORM_URL}{path}'
+            return f'{self.protocol}://{self.hostname}{API_PLATFORM_URL}{path}'
         if namespace == 'auth':
-            return f'{self.protocol}://{self.hostname}{self.API_AUTH_URL}'
+            return f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
         if namespace == 'refresh':
-            return f'{self.protocol}://{self.hostname}{self.API_REFRESH_URL}'
+            return f'{self.protocol}://{self.hostname}{API_REFRESH_URL}'
         return f'{self.protocol}://{self.hostname}{path}'
 
     def _login(self):
