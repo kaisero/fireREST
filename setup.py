@@ -10,11 +10,12 @@ with open(f'{ROOT}/README.md', 'r') as readme:
     long_description = readme.read()
 
 setuptools.setup(
-    name='fireREST',
+    name='FireREST',
     version='0.0.1',
     author='Oliver Kaiser',
     author_email='oliver.kaiser@outlook.com',
-    description='Wrapper for Cisco Firepower Management Center REST API',
+    description='Python api client for Cisco Firepower Management Center REST API',
+    keywords="cisco firepower fmc ftd fpr api rest python api",
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/kaisero/fireREST.git',
