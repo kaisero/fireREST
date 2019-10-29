@@ -505,12 +505,12 @@ class FireREST(object):
         return self._get(url)
 
     def get_syslogalerts(self):
-        request = 'policy/syslogalerts'
+        request = '/policy/syslogalerts'
         url = self._url('config', request)
         return self._get(url)
 
     def get_snmpalerts(self):
-        request = 'policy/snmpalerts'
+        request = '/policy/snmpalerts'
         url = self._url('config', request)
         return self._get(url)
 
