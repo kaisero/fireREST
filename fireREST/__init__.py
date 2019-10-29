@@ -537,10 +537,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_devices(self):
+    def get_devices(self, expanded=False):
         request = '/devices/devicerecords'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_device(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}'
@@ -557,10 +560,13 @@ class FireREST(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_device_hapairs(self):
+    def get_device_hapairs(self, expanded=False):
         request = '/devicehapairs/ftddevicehapairs'
+        params = {
+            'expanded': expanded
+        }
         url = self._url('config', request)
-        return self._get(url)
+        return self._get(url, params)
 
     def create_device_hapair(self, data: Dict):
         request = '/devicehapairs/ftddevicehapairs/{}'
