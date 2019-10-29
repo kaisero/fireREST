@@ -1,0 +1,23 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+requests = "*"
+PyYAML = "*"
+urllib3 = "*"
+
+[dev-packages]
+black = "*"
+pytest = "*"
+pytest-runner = "*"
+mypy = "*"
+pep8 = "*"
+pycodestyle = "*"
+flake8 = "*"
+autopep8 = "*"
+pre-commit = "*"
+
+[requires]
+python_version = "3.6"

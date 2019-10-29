@@ -3,25 +3,24 @@
 FireREST is a simple wrapper for Cisco Firepower Management Center REST API. It exposes various api calls
 as functions and takes care of authentication, token refresh and paging for large datasets.
 
-## Compatibility
+## Requirements 
 
-FireREST is compatible with Python3.
+* Python >= 3.6
 
 ## Features
 
-* API Authentication (incl. api token refresh & re-authentication after max refresh is reached)
-* POST, PUT, GET, DELETE operations for...
-** TBD
-
-* GET operations for...
-** TBD
+* API Authentication
+* Automatic Re-authentication if token expires
+* Paging
 
 ## Examples
 
-## TODO
+n/a
 
-* Support for api rate limiting
-* Provide json validation for implemented api functions
-* Test coverage for core functions
-* Test coverage for api calls exposed as functions
-* Pypi integration
+## Authors 
+
+Oliver Kaiser (oliver.kaiser@outlook.com)
+
+## License
+
+GNU General Public License v3.0
