@@ -337,16 +337,6 @@ class FireREST(object):
         '''
         return
 
-    def valid_json(self, operation: str, obj_type: str, data: Dict):
-        '''
-        Validate json object to verify
-        :param operation: PUT, POST
-        :param obj_type: see supported types in schema.py
-        :param data: json representing api object
-        :return: dictionary containing results of json evaluation
-        '''
-        return
-
     def get_object_id_by_name(self, obj_type: str, obj_name: str):
         '''
         helper function to retrieve object id by name
