@@ -18,6 +18,7 @@ pycodestyle = "*"
 flake8 = "*"
 autopep8 = "*"
 pre-commit = "*"
+twine = "*"
 
 [requires]
 python_version = "3.6"
