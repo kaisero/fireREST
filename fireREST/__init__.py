@@ -3,6 +3,8 @@ import requests
 import logging
 import urllib3
 
+from .version import __version__
+
 from time import sleep
 from typing import Dict
 from requests.auth import HTTPBasicAuth
@@ -75,7 +77,7 @@ class Client(object):
         self.headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'User-Agent': 'FireREST/0.0.1'
+            'User-Agent': f'FireREST/{__version__}'
         }
         self.refresh_counter = 0
         self.logger = self._get_logger(logger)
