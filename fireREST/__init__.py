@@ -234,25 +234,23 @@ class Client(object):
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 25
         :return: requests.Response object
         '''
         if params is None:
             params = dict()
-        params['limit'] = limit
         try:
             response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
                                     timeout=self.timeout)
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
                     self._refresh()
-                    return self._get_request(request, params, limit)
+                    return self._get_request(request, params)
             if response.status_code == 429:
                 msg = f'GET operation {request} failed due to FMC rate limiting. Backing off for 10 seconds.'
                 raise FireRESTRateLimitException(msg)
         except FireRESTRateLimitException:
             sleep(10)
-            return self._get_request(request, params, limit)
+            return self._get_request(request, params)
         return response
 
     def _get(self, request: str, params=None, limit=25):
@@ -260,13 +258,12 @@ class Client(object):
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 25
         :return: list of requests.Response objects
         '''
         if params is None:
             params = dict()
         responses = list()
-        response = self._get_request(request, params, limit)
+        response = self._get_request(request, params)
         responses.append(response)
         payload = response.json()
         if 'paging' in payload.keys():
@@ -274,7 +271,7 @@ class Client(object):
             limit = int(payload['paging']['limit'])
             for i in range(1, pages, 1):
                 params['offset'] = str(int(i) * limit)
-                response_page = self._get_request(request, params, limit)
+                response_page = self._get_request(request, params)
                 responses.append(response_page)
         return responses
 
@@ -393,7 +390,7 @@ class Client(object):
         :return: policy id if nat policy is found, None otherwise
         '''
         request = '/policy/ftdnatpolicies'
-        url = self._url(request)
+        url = self._url('config', request)
         response = self._get(url)
         for item in response:
             for nat_policy in item.json()['items']:
@@ -591,10 +588,13 @@ class Client(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_ftd_physical_interfaces(self, device_id: str):
+    def get_ftd_physical_interfaces(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_physical_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}'
@@ -611,10 +611,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_redundant_interfaces(self, device_id: str):
+    def get_ftd_redundant_interfaces(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
@@ -636,10 +639,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_portchannel_interfaces(self, device_id: str):
+    def get_ftd_portchannel_interfaces(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
@@ -661,10 +667,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_sub_interfaces(self, device_id: str):
+    def get_ftd_sub_interfaces(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/subinterfaces'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_sub_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
@@ -686,10 +695,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv4_routes(self, device_id: str):
+    def get_ftd_ipv4_routes(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/ipv4staticroutes'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_ipv4_route(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/ipv4staticroutes/{route_id}'
@@ -711,10 +723,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv6_routes(self, device_id: str):
+    def get_ftd_ipv6_routes(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/ipv6staticroutes'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_ftd_ipv6_route(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/ipv6staticroutes/{route_id}'
@@ -746,10 +761,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policies(self, policy_type: str):
+    def get_policies(self, policy_type: str, expanded=False):
         request = f'/policy/{policy_type}'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_policy(self, policy_id: str, policy_type: str, expanded=False):
         request = f'/policy/{policy_type}/{policy_id}'
@@ -800,10 +818,10 @@ class Client(object):
 
     def get_acp_rules(self, policy_id: str, expanded=False):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
+        url = self._url('config', request)
         params = {
             'expanded': expanded
         }
-        url = self._url('config', request)
         return self._get(url, params)
 
     def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
@@ -826,10 +844,13 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_autonat_rules(self, policy_id: str):
+    def get_autonat_rules(self, policy_id: str, expanded=False):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def update_autonat_rule(self, policy_id: str, data: Dict):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
@@ -851,10 +872,13 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_manualnat_rules(self, policy_id: str):
+    def get_manualnat_rules(self, policy_id: str, expanded=False):
         request = f'/policy/ftdnatpolicies/manualnatrules/{policy_id}'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def update_manualnat_rule(self, policy_id: str, data: Dict):
         request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules'
@@ -871,10 +895,13 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policy_assignments(self):
+    def get_policy_assignments(self, expanded=False):
         request = '/assignment/policyassignments'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def get_policy_assignment(self, policy_id: str):
         request = f'/assignment/policyassignments/{policy_id}'
