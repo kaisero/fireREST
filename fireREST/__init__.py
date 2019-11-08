@@ -230,12 +230,12 @@ class Client(object):
         return response
 
     @RequestDebugDecorator('GET')
-    def _get_request(self, request: str, params=None, limit=25):
+    def _get_request(self, request: str, params=None, limit=100):
         '''
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 25
+        :param limit: set custom limit for paging. If not set, api will default to 100 
         :return: requests.Response object
         '''
         if params is None:
@@ -256,12 +256,12 @@ class Client(object):
             return self._get_request(request, params, limit)
         return response
 
-    def _get(self, request: str, params=None, limit=25):
+    def _get(self, request: str, params=None, limit=100):
         '''
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 25
+        :param limit: set custom limit for paging. If not set, api will default to 100 
         :return: list of requests.Response objects
         '''
         if params is None:
