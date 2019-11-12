@@ -6,9 +6,9 @@ import urllib3
 from .version import __version__
 
 from requests.auth import HTTPBasicAuth
+from requests.exceptions import ConnectionError
 from time import sleep
 from typing import Dict
-from urllib3.exceptions import ConnectionError
 from uuid import UUID
 
 
@@ -95,6 +95,7 @@ class Client(object):
             self.domains = session['domains']
             self.headers['X-auth-access-token'] = session['X-auth-access-token']
             self.headers['X-auth-refresh-token'] = session['X-auth-refresh-token']
+        self.domain_name = domain
         self.domain = self.get_domain_id_by_name(domain)
 
     @staticmethod
@@ -161,11 +162,8 @@ class Client(object):
             self.domains = json.loads(response.headers.get('DOMAINS', default=None))
             self.refresh_counter = 0
             self.logger.debug(f'Successfully authenticated to {self.hostname}')
-        except ConnectionRefusedError:
-            self.logger.error(f'Could not login to {self.hostname}. Connection refused')
-            raise
-        except ConnectionError:
-            self.logger.error(f'Could not login to {self.hostname}. Max retries exceeded with url: {request}')
+        except ConnectionError as exc:
+            self.logger.error(exc, exc_info=True)
             raise
         except FireRESTRateLimitException:
             self.logger.debug(f'Could not login to {self.hostname}. Rate limit exceeded. Backing of for 10 seconds.')
@@ -199,9 +197,9 @@ class Client(object):
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
-        except ConnectionError:
-            msg = f'Could not connect to {self.hostname}. Max retries exceeded with url: {request}'
-            self.logger.error(msg)
+        except ConnectionError as exc:
+            self.logger.error(exc, exc_info=True)
+            raise
         except FireRESTRateLimitException:
             self.logger.debug(
                 f'API token refresh to {self.hostname} failed. Rate limit exceeded. Backing of for 10 seconds.')
@@ -209,6 +207,7 @@ class Client(object):
             self._login()
         except FireRESTApiException as exc:
             self.logger.error(str(exc))
+            raise
 
         self.logger.debug(f'Successfully refreshed authorization token for {self.hostname}')
 
@@ -611,6 +610,24 @@ class Client(object):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
         url = self._url('config', request)
         return self._delete(url)
+
+    def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str, expanded=False):
+        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces'
+        params = {
+            'expanded': expanded
+        }
+        url = self._url('config', request)
+        return self._get(url, params)
+
+    def get_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str):
+        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}'
+        url = self._url('config', request)
+        return self._get(url)
+
+    def update_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str, data: Dict):
+        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}'
+        url = self._url('config', request)
+        return self._put(url, data)
 
     def get_ftd_physical_interfaces(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
