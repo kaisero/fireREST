@@ -705,12 +705,12 @@ class Client(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_ftd_ipv4_route(self, device_id: str, data: Dict):
+    def create_ftd_ipv4staticroute(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv4_routes(self, device_id: str, expanded=False):
+    def get_ftd_ipv4staticroutes(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
         url = self._url('config', request)
         params = {
@@ -718,27 +718,27 @@ class Client(object):
         }
         return self._get(url, params)
 
-    def get_ftd_ipv4_route(self, device_id: str, route_id: str):
+    def get_ftd_ipv4staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_ipv4_route(self, device_id: str, route_id: str, data: Dict):
+    def update_ftd_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_ipv4_route(self, device_id: str, route_id: str):
+    def delete_ftd_ipv4staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_ftd_ipv6_route(self, device_id: str, data: Dict):
+    def create_ftd_ipv6staticroute(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv6_routes(self, device_id: str, expanded=False):
+    def get_ftd_ipv6staticroutes(self, device_id: str, expanded=False):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
         url = self._url('config', request)
         params = {
@@ -746,17 +746,17 @@ class Client(object):
         }
         return self._get(url, params)
 
-    def get_ftd_ipv6_route(self, device_id: str, route_id: str):
+    def get_ftd_ipv6staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_ipv6_route(self, device_id: str, route_id: str, data: Dict):
+    def update_ftd_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         url = self._url('config', request)
         return self._put(url, data)
 
-    def delete_ftd_ipv6_route(self, device_id: str, route_id: str):
+    def delete_ftd_ipv6staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         url = self._url('config', request)
         return self._delete(url)
