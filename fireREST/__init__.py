@@ -787,15 +787,18 @@ class Client(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def create_deployment(self, data: Dict):
+    def deploy(self, data: Dict):
         request = '/deployment/deploymentrequests'
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_deployment(self):
+    def get_deployable_devices(self, expanded=False):
         request = '/deployment/deployabledevices'
         url = self._url('config', request)
-        return self._get(url)
+        params = {
+            'expanded': expanded
+        }
+        return self._get(url, params)
 
     def create_policy(self, policy_type: str, data: Dict):
         request = f'/policy/{policy_type}'
