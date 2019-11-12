@@ -1,14 +1,15 @@
 import json
-import requests
 import logging
+import requests
 import urllib3
 
 from .version import __version__
 
+from requests.auth import HTTPBasicAuth
 from time import sleep
 from typing import Dict
-from requests.auth import HTTPBasicAuth
 from urllib3.exceptions import ConnectionError
+from uuid import UUID
 
 
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
@@ -108,6 +109,13 @@ class Client(object):
             dummy_logger.addHandler(logging.NullHandler())
             return dummy_logger
         return logger
+
+    def _is_getbyid_operation(self, request):
+        try:
+            val = UUID(request.split('/')[-1])  # noqa: F841
+            return True
+        except ValueError:
+            return False
 
     def _url(self, namespace='base', path=str()):
         '''
@@ -235,12 +243,13 @@ class Client(object):
         GET Operation for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 100 
+        :param limit: set custom limit for paging. If not set, api will default to 100
         :return: requests.Response object
         '''
         if params is None:
             params = dict()
-        params['limit'] = limit
+        if not self._is_getbyid_operation(request):
+            params['limit'] = limit
         try:
             response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
                                     timeout=self.timeout)
@@ -261,7 +270,7 @@ class Client(object):
         GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
         :param request: URL of request that should be performed
         :param params: dict of parameters for http request
-        :param limit: set custom limit for paging. If not set, api will default to 100 
+        :param limit: set custom limit for paging. If not set, api will default to 100
         :return: list of requests.Response objects
         '''
         if params is None:
