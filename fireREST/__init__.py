@@ -721,8 +721,8 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def update_ftd_sub_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/subinterfaces'
+    def update_ftd_sub_interface(self, device_id: str, interface_id: str, data: Dict):
+        request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._put(url, data)
 
