@@ -869,7 +869,7 @@ class Client(object):
         return self._get(url, params)
 
     def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
-        request = '/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
+        request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
         url = self._url('config', request)
         return self._put(url, data)
 
