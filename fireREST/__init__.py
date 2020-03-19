@@ -155,7 +155,6 @@ class Client(object):
             if response.status_code == 429:
                 msg = f'API Authentication to {self.hostname} failed due to FMC rate limiting. Backing off for 10 seconds.'
                 raise FireRESTRateLimitException(msg)
-
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
@@ -252,7 +251,7 @@ class Client(object):
         '''
         if params is None:
             params = dict()
-        if not self._is_getbyid_operation(request):
+        if not self._is_getbyid_operation(request) and 'limit' not in params:
             params['limit'] = limit
         try:
             response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
@@ -537,13 +536,14 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_objects(self, object_type: str, expanded=API_EXPANSION_MODE):
+    def get_objects(self, object_type: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT, limit=API_PAGING_LIMIT):
         request = f'/object/{object_type}'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
-        return self._get(url, params)
+        return self._get(url, params, limit)
 
     def get_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
@@ -565,11 +565,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_devices(self, expanded=API_EXPANSION_MODE):
+    def get_devices(self, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = '/devices/devicerecords'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -588,10 +589,11 @@ class Client(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_device_hapairs(self, expanded=API_EXPANSION_MODE):
+    def get_device_hapairs(self, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = '/devicehapairs/ftddevicehapairs'
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         url = self._url('config', request)
         return self._get(url, params)
@@ -616,10 +618,11 @@ class Client(object):
         url = self._url('config', request)
         return self._delete(url)
 
-    def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str, expanded=API_EXPANSION_MODE):
+    def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces'
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         url = self._url('config', request)
         return self._get(url, params)
@@ -634,11 +637,12 @@ class Client(object):
         url = self._url('config', request)
         return self._put(url, data)
 
-    def get_ftd_physical_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_physical_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -657,11 +661,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_redundant_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_redundant_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -685,11 +690,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_portchannel_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_portchannel_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -713,11 +719,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_sub_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_sub_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devices/devicerecords/{device_id}/subinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -741,11 +748,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv4staticroutes(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_ipv4staticroutes(self, device_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -769,11 +777,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_ftd_ipv6staticroutes(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_ipv6staticroutes(self, device_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -797,11 +806,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_deployable_devices(self, expanded=API_EXPANSION_MODE):
+    def get_deployable_devices(self, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = '/deployment/deployabledevices'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -810,18 +820,20 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policies(self, policy_type: str, expanded=API_EXPANSION_MODE):
+    def get_policies(self, policy_type: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/policy/{policy_type}'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
-    def get_policy(self, policy_id: str, policy_type: str, expanded=API_EXPANSION_MODE):
+    def get_policy(self, policy_id: str, policy_type: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/policy/{policy_type}/{policy_id}'
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         url = self._url('config', request)
         return self._get(url, params)
@@ -865,11 +877,12 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_acp_rules(self, policy_id: str, expanded=API_EXPANSION_MODE):
+    def get_acp_rules(self, policy_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -893,11 +906,12 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_autonat_rules(self, policy_id: str, expanded=API_EXPANSION_MODE):
+    def get_autonat_rules(self, policy_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -921,11 +935,12 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    def get_manualnat_rules(self, policy_id: str, expanded=API_EXPANSION_MODE):
+    def get_manualnat_rules(self, policy_id: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/policy/ftdnatpolicies/manualnatrules/{policy_id}'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
@@ -944,11 +959,12 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_policy_assignments(self, expanded=API_EXPANSION_MODE):
+    def get_policy_assignments(self, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = '/assignment/policyassignments'
         url = self._url('config', request)
         params = {
-            'expanded': expanded
+            'expanded': expanded,
+            'limit': limit
         }
         return self._get(url, params)
 
