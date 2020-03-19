@@ -4,9 +4,9 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-requests = "*"
-PyYAML = "*"
-urllib3 = "*"
+requests = "==2.23.0"
+PyYAML = "==5.3"
+urllib3 = "==1.25.8"
 
 [dev-packages]
 black = "*"
@@ -21,4 +21,4 @@ pre-commit = "*"
 twine = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
