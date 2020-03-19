@@ -117,7 +117,10 @@ obj_name = 'NetObjViaAPI
 obj_id = client.get_object_id_by_name('networks', 'NetObjViaAPI')
 response = client.delete_object('networks', obj_id)
 ```
+## Development
 
+Cisco provides a sandbox for Firepower Management Center. To checkout FireREST you can go ahead and enroll a
+development lab using this [link](https://devnetsandbox.cisco.com/RM/Diagram/Index/1228cb22-b2ba-48d3-a70a-86a53f4eecc0?diagramType=Topology)
 
 ## Authors 
 
