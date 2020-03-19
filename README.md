@@ -53,7 +53,7 @@ to find pre-existing objects by the name defined in FMC UI.
 
 ```python
 name = 'NET_OBJ'
-uuid = client.get_object_id_by_name('network', name)
+uuid = client.get_object_id_by_name('networks', name)
 ```
 
 #### Access Control Policy Name to ID
