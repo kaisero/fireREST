@@ -536,7 +536,7 @@ class Client(object):
         url = self._url('config', request)
         return self._post(url, data)
 
-    def get_objects(self, object_type: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT, limit=API_PAGING_LIMIT):
+    def get_objects(self, object_type: str, expanded=API_EXPANSION_MODE, limit=API_PAGING_LIMIT):
         request = f'/object/{object_type}'
         url = self._url('config', request)
         params = {
