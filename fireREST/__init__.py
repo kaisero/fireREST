@@ -170,6 +170,28 @@ class Client(object):
             return dummy_logger
         return logger
 
+    def _squash_responses(self, responses: List):
+        if len(responses) == 1:
+            payload = responses[0].json()
+
+            # get request did not yield any results
+            if not payload['links']:
+                return list()
+
+            # get request contains multiple results without paging
+            if 'items' in payload:
+                return payload['items']
+
+            # get request returned single item
+            return responses[0].json()
+        items = list()
+        for response in responses:
+            if 'items' in response:
+                items.extend(response.json()['items'])
+            else:
+                self.logger.debug('Response {response.url} did not contain any items. Skipping...')
+        return items
+
     def _is_getbyid_operation(self, request: str):
         '''
         Verify if a get request contains multiple items
@@ -349,7 +371,8 @@ class Client(object):
                 params['offset'] = i * params['limit']
                 response_page = self._get_request(request, params)
                 responses.append(response_page)
-        return responses
+        print(self._squash_responses(responses))
+        return self._squash_responses(responses)
 
     @RequestDebugDecorator('POST')
     def _post(self, request: str, data: Dict, params=None):
