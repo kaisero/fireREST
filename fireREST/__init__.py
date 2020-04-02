@@ -5,46 +5,91 @@ import urllib3
 
 from .version import __version__
 
+from http.client import responses as http_responses
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import ConnectionError
 from time import sleep
 from typing import Dict, List
-from uuid import UUID
+from uuid import uuid4, UUID
 
+#: protocol used to connect to api
+API_PROTOCOL = 'https'
 
-API_USER_AGENT = 'FireREST'
+#: user agent sent to fmc
+API_USER_AGENT = f'FireREST/{__version__}'
+
+#: url used to generate token for api authorization
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
+
+#: url used to refresh existing authorization token
 API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
+
+#: url used to access platform related api calls
 API_PLATFORM_URL = '/api/fmc_platform/v1'
+
+#: url used to access configuration related api calls
 API_CONFIG_URL = '/api/fmc_config/v1'
+
+#: content type. as of 6.5.0 FMC only supports json
+API_CONTENT_TYPE = 'application/json'
+
+#: paging limit for get requests that contain multiple items
 API_PAGING_LIMIT = 1000
+
+#: expansion mode for get requests
 API_EXPANSION_MODE = True
+
+#: http request timeout
 API_REQUEST_TIMEOUT = 120
+
+#: name of fmc default domain for api requests
 API_DEFAULT_DOMAIN = 'Global'
+
+#: retry timer in seconds for repeating failed api calls
 API_RETRY_TIMER = 10
 
 
 class FireRESTApiException(Exception):
+    '''
+    generic api error exception
+    '''
+
     def __init__(self, message):
         super().__init__(message)
 
 
 class FireRESTAuthException(Exception):
+    '''
+    generic api authentication failure exception
+    '''
+
     def __init__(self, message):
         super().__init__(message)
 
 
 class FireRESTAuthRefreshException(Exception):
+    '''
+    exception used when api token refresh fails
+    '''
+
     def __init__(self, message):
         super().__init__(message)
 
 
 class FireRESTRateLimitException(Exception):
+    '''
+    exception used when fmc rate limiter kicks in
+    '''
+
     def __init__(self, message):
         super().__init__(message)
 
 
 class RequestDebugDecorator(object):
+    '''
+    decorator that adds additional debug logging for api requests
+    '''
+
     def __init__(self, action):
         self.action = action
 
@@ -53,38 +98,46 @@ class RequestDebugDecorator(object):
             action = self.action
             logger = args[0].logger
             request = args[1]
-            logger.debug(f'{action}: {request}')
+            request_id = str(uuid4())[:8]
+            try:
+                data = args[3]
+            except IndexError:
+                data = None
+            logger.debug(f'[{request_id}] [{action}] {request}')
+            if data:
+                logger.debug(f'[{request_id}] [Data] {data}')
             result = f(*args)
             status_code = result.status_code
-            logger.debug(f'Response Code: {status_code}')
-            if status_code >= 400:
-                logger.debug(f'Error: {result.content}')
+            status_code_name = http_responses[status_code]
+            logger.debug(f'[{request_id}] [Response] {status_code_name} ({status_code})')
+            if status_code >= 299:
+                logger.debug(f'[{request_id}] [Message] {result.content}')
             return result
 
         return wrapped_f
 
 
 class Client(object):
-    def __init__(self, hostname: str, username: str, password: str, session=dict(), protocol='https',
+    def __init__(self, hostname: str, username: str, password: str, session=None, protocol=API_PROTOCOL,
                  verify_cert=False, logger=None, domain=API_DEFAULT_DOMAIN, timeout=API_REQUEST_TIMEOUT):
         '''
-        Initialize api client object
+        Initialize api client object (make sure to use a dedicated api user!)
         :param hostname: ip address or dns name of fmc
         :param username: fmc username
         :param password: fmc password
         :param session: authentication session (can be provided in case api client should not generate one at init).
                       Make sure to pass the headers of a successful authentication to the session variable,
                       otherwise this will fail
-        :param protocol: protocol used to access fmc api. default = https
-        :param verify_cert: check fmc certificate for vailidity. default = False
+        :param protocol: protocol used to access fmc api
+        :param verify_cert: check fmc certificate for vailidity
         :param logger: optional logger instance, in case debug logging is needed
-        :param domain: name of the fmc domain. default = Global
-        :param timeout: timeout value for http requests. default = 120
+        :param domain: name of the fmc domain
+        :param timeout: timeout value for http requests
         '''
         self.headers = {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': f'{API_USER_AGENT}/{__version__}'
+            'Content-Type': API_CONTENT_TYPE,
+            'Accept': API_CONTENT_TYPE,
+            'User-Agent': API_USER_AGENT,
         }
         self.refresh_counter = 0
         self.logger = self._get_logger(logger)
@@ -117,7 +170,12 @@ class Client(object):
             return dummy_logger
         return logger
 
-    def _is_getbyid_operation(self, request):
+    def _is_getbyid_operation(self, request: str):
+        '''
+        Verify if a get request contains multiple items
+        :param request: request url
+        :return: True if operation returns a single item, False if it contains multiple items
+        '''
         try:
             val = UUID(request.split('/')[-1])  # noqa: F841
             return True
@@ -133,21 +191,21 @@ class Client(object):
         :param path: the url path for which a full url should be created
         :return: url in string format
         '''
-        if namespace == 'config':
-            return f'{self.protocol}://{self.hostname}{API_CONFIG_URL}/domain/{self.domain}{path}'
-        if namespace == 'platform':
-            return f'{self.protocol}://{self.hostname}{API_PLATFORM_URL}{path}'
-        if namespace == 'auth':
-            return f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
-        if namespace == 'refresh':
-            return f'{self.protocol}://{self.hostname}{API_REFRESH_URL}'
-        return f'{self.protocol}://{self.hostname}{path}'
+        options = {
+            'base': f'{self.protocol}://{self.hostname}{path}',
+            'config': f'{self.protocol}://{self.hostname}{API_CONFIG_URL}/domain/{self.domain}{path}',
+            'platform': f'{self.protocol}://{self.hostname}{API_PLATFORM_URL}{path}',
+            'refresh': f'{self.protocol}://{self.hostname}{API_REFRESH_URL}',
+        }
+        if namespace not in options.keys():
+            raise ValueError(f'Invalid namespace "{namespace}" provided. Valid namespaces: {options.keys()}')
+        return options[namespace]
 
     def _login(self):
         '''
         Login to fmc api and save X-auth-access-token, X-auth-refresh-token and DOMAINS to variables
         '''
-        request = self._url('auth')
+        request = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
         try:
             response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
 
