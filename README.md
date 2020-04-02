@@ -81,7 +81,7 @@ net_obj = {
     'value': '198.18.1.0/24',
 }
 
-response = client.create_object('networks', net_obj)
+objects = client.create_object('networks', net_obj)
 ```
 
 #### Get Network Object
@@ -91,9 +91,6 @@ obj_name = 'NetObjViaAPI'
 obj_id = client.get_object_id_by_name('networks', 'NetObjViaAPI')
 obj_payload = client.get_object('networks', obj_id)[0].json()
 ```
-
-Note: FireREST always return a list of requests responses, even if a single item is retrieved. This
-was an intentional decision to make handling of api responses consistent
 
 #### Update Network Object
 
