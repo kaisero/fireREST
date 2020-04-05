@@ -445,11 +445,10 @@ class Client(object):
         '''
         request = f'/object/{obj_type}'
         url = self._url('config', request)
-        response = self._get(url)
-        for item in response:
-            for obj in item.json()['items']:
-                if obj['name'] == obj_name:
-                    return obj['id']
+        objects = self._get(url)
+        for item in objects:
+            if obj['name'] == obj_name:
+                return obj['id']
         return None
 
     def get_device_id_by_name(self, device_name: str):
@@ -460,11 +459,10 @@ class Client(object):
         '''
         request = '/devices/devicerecords'
         url = self._url('config', request)
-        response = self._get(url)
-        for item in response:
-            for device in item.json()['items']:
-                if device['name'] == device_name:
-                    return device['id']
+        devices = self._get(url)
+        for device in devices:
+            if device['name'] == device_name:
+                return device['id']
         return None
 
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
@@ -475,11 +473,10 @@ class Client(object):
         '''
         request = '/devicehapairs/ftddevicehapairs'
         url = self._url('config', request)
-        response = self._get(url)
-        for item in response:
-            for ha_pair in item.json()['items']:
-                if ha_pair['name'] == device_hapair_name:
-                    return ha_pair['id']
+        ha_pairs = self._get(url)
+        for ha_pair in ha_pairs:
+            if ha_pair['name'] == device_hapair_name:
+                return ha_pair['id']
         return None
 
     def get_device_id_from_hapair(self, device_hapair_id: str):
@@ -490,8 +487,8 @@ class Client(object):
         '''
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
         url = self._url('config', request)
-        response = self._get(url)
-        return response[0].json()['primary']['id']
+        ha_pair = self._get(url)
+        return ha_pair['primary']['id']
 
     def get_nat_policy_id_by_name(self, nat_policy_name: str):
         '''
@@ -501,11 +498,10 @@ class Client(object):
         '''
         request = '/policy/ftdnatpolicies'
         url = self._url('config', request)
-        response = self._get(url)
-        for item in response:
-            for nat_policy in item.json()['items']:
-                if nat_policy['name'] == nat_policy_name:
-                    return nat_policy['id']
+        nat_policies = self._get(url)
+        for nat_policy in nat_policies:
+            if nat_policy['name'] == nat_policy_name:
+                return nat_policy['id']
         return None
 
     def get_acp_id_by_name(self, policy_name: str):
@@ -516,11 +512,10 @@ class Client(object):
         '''
         request = '/policy/accesspolicies'
         url = self._url('config', request)
-        response = self._get(url)
-        for item in response:
-            for acp in item.json()['items']:
-                if acp['name'] == policy_name:
-                    return acp['id']
+        accesspolicies = self._get(url)
+        for accesspolicy in accesspolicies:
+            if accesspolicy['name'] == policy_name:
+                return accesspolicy['id']
         return None
 
     def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
@@ -533,11 +528,10 @@ class Client(object):
         policy_id = self.get_acp_id_by_name(policy_name)
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
-        response = self._get(url)
-        for item in response:
-            for acp_rule in item.json()['items']:
-                if acp_rule['name'] == rule_name:
-                    return acp_rule['id']
+        acp_rules = self._get(url)
+        for acp_rule in acp_rules:
+            if acp_rule['name'] == rule_name:
+                return acp_rule['id']
         return None
 
     def get_syslog_alert_id_by_name(self, syslog_alert_name: str):
@@ -546,11 +540,10 @@ class Client(object):
         :param syslog_alert_name: name of syslog alert object
         :return: syslogalert id if syslog alert is found, None otherwise
         '''
-        response = self.get_syslogalerts()
-        for item in response:
-            for syslog_alert in item.json()['items']:
-                if syslog_alert['name'] == syslog_alert_name:
-                    return syslog_alert['id']
+        syslogalerts = self.get_syslogalerts()
+        for syslog_alert in syslogalerts:
+            if syslog_alert['name'] == syslog_alert_name:
+                return syslog_alert['id']
         return None
 
     def get_snmp_alert_id_by_name(self, snmp_alert_name: str):
@@ -559,11 +552,10 @@ class Client(object):
         :param snmp_alert_name: name of snmp alert object
         :return: snmpalert id if snmp alert is found, None otherwise
         '''
-        response = self.get_snmpalerts()
-        for item in response:
-            for snmp_alert in item.json()['items']:
-                if snmp_alert['name'] == snmp_alert_name:
-                    return snmp_alert['id']
+        snmp_alerts = self.get_snmpalerts()
+        for snmp_alert in snmp_alerts:
+            if snmp_alert['name'] == snmp_alert_name:
+                return snmp_alert['id']
         return None
 
     def get_domain_id_by_name(self, domain_name: str):
