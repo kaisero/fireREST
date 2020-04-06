@@ -5,6 +5,7 @@ import urllib3
 
 from .version import __version__
 
+from copy import deepcopy
 from http.client import responses as http_responses
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import ConnectionError
@@ -382,6 +383,7 @@ class Client(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         '''
+        data = self._sanitize(data)
         if params is None:
             params = dict()
         try:
@@ -408,6 +410,7 @@ class Client(object):
         :param params: dict of parameters for http request
         :return: requests.Response object
         '''
+        data = self._sanitize(data)
         if params is None:
             params = dict()
         try:
@@ -425,15 +428,19 @@ class Client(object):
             return self._put(request, data, params)
         return response
 
-    def prepare_json(self, operation: str, obj_type: str, data: Dict):
+    def _sanitize(self, payload: Dict):
         '''
         Prepare json object for api operation
-        :param operation: PUT, POST
-        :param obj_type: see supported types in schema.py
-        :param data: json representing api object
-        :return: sanatized api object
+        This is neccesarry since fmc api cannot handle json objects with some
+        fields received via GET (e.g. metadata dictionary)
+        :param payload: json representing api object
+        :return: sanitized api object
         '''
-        return
+        sanitized_payload = deepcopy(payload)
+        sanitized_payload.pop('metadata', None)
+        sanitized_payload.pop('links', None)
+        sanitized_payload.pop('id', None)
+        return sanitized_payload
 
     def get_object_id_by_name(self, obj_type: str, obj_name: str):
         '''
