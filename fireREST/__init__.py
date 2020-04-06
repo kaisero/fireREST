@@ -189,7 +189,7 @@ class Client(object):
             if 'items' in response:
                 items.extend(response.json()['items'])
             else:
-                self.logger.debug('Response {response.url} did not contain any items. Skipping...')
+                self.logger.debug(f'Response {response.url} did not contain any items. Skipping...')
         return items
 
     def _is_getbyid_operation(self, request: str):
@@ -371,7 +371,6 @@ class Client(object):
                 params['offset'] = i * params['limit']
                 response_page = self._get_request(request, params)
                 responses.append(response_page)
-        print(self._squash_responses(responses))
         return self._squash_responses(responses)
 
     @RequestDebugDecorator('POST')
