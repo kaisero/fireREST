@@ -5,20 +5,20 @@ name = "pypi"
 
 [packages]
 requests = "==2.23.0"
-PyYAML = "==5.3"
+PyYAML = "==5.3.1"
 urllib3 = "==1.25.8"
 
 [dev-packages]
-black = "*"
-pytest = "*"
-pytest-runner = "*"
-mypy = "*"
-pep8 = "*"
-pycodestyle = "*"
-flake8 = "*"
-autopep8 = "*"
-pre-commit = "*"
-twine = "*"
+black = "19.10b0"
+pytest = "5.4.1"
+pytest-runner = "5.2"
+mypy = "0.770"
+pep8 = "1.7.1"
+pycodestyle = "2.5.0"
+flake8 = "3.7.9"
+autopep8 = "1.5.1"
+pre-commit = "2.2.0"
+twine = "3.1.1"
 
 [requires]
 python_version = "3.7"
