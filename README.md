@@ -1,7 +1,10 @@
+[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST)
+
 # What is FireREST
 
-FireREST is a simple wrapper for Cisco Firepower Management Center REST API. It exposes various api calls
-as functions and takes care of authentication, token refresh and paging for large datasets.
+FireREST is a simple wrapper for firepower management center. It exposes various api calls
+as functions and takes care of authentication, automatic token refreshment, payload sanitizitation
+and pagination automatically.
 
 ## Requirements 
 
@@ -10,7 +13,7 @@ as functions and takes care of authentication, token refresh and paging for larg
 ## Installation
 
 ```bash
-$ pip install fireREST
+pip install fireREST
 ```
 
 ## Usage
@@ -23,7 +26,7 @@ from fireREST import Client
 
 ### Authentication
 
-FireREST uses basic authentication to authenticate to FMC. You may also provide a session dictionary
+FireREST uses basic authentication to authenticate with fmc. You may also provide a session dictionary
 to re-use an existing authentication token. In case your authentication token times out the api client
 will automatically try to re-authenticate 3 times and handle any intermediate authentication exceptions.
 
@@ -46,8 +49,8 @@ client = Client(hostname='fmc.example.com', session=auth_session)
 
 ### Helper
 
-A variety of helper functions can be used to translate object names to their respective UUID values. Since FMC REST API uses UUID values this is neccessary
-to find pre-existing objects by the name defined in FMC UI.
+A variety of helper functions can be used to translate object names to their respective UUID values. Since fmc rest api uses uuid values this is neccessary
+to find pre-existing objects by the name defined in fmc.
 
 #### Object Name to ID
 
@@ -89,11 +92,8 @@ response = client.create_object('networks', net_obj)
 ```python
 obj_name = 'NetObjViaAPI'
 obj_id = client.get_object_id_by_name('networks', 'NetObjViaAPI')
-obj_payload = client.get_object('networks', obj_id)[0].json()
+obj_payload = client.get_object('networks', obj_id)
 ```
-
-Note: FireREST always return a list of requests responses, even if a single item is retrieved. This
-was an intentional decision to make handling of api responses consistent
 
 #### Update Network Object
 
