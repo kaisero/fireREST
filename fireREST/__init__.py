@@ -172,6 +172,11 @@ class Client(object):
         return logger
 
     def _squash_responses(self, responses: List):
+        '''
+        extract data from get requests into json format
+        :param responses: list of requests response objects from _get() operation
+        :return: api payload in json format
+        '''
         if len(responses) == 1:
             payload = responses[0].json()
 
@@ -205,14 +210,14 @@ class Client(object):
         except ValueError:
             if 'overrides' in request:
                 return True
-            return False
+             return False
 
     def _url(self, namespace='base', path=str()):
         '''
-        Generate URLs on the fly for requests to firepower api
-        :param namespace: name of the url namespace that should be used. options: base, config, auth. default = base
-        :param path: the url path for which a full url should be created
-        :return: url in string format
+        Generate url on the for requests to fmc rest api
+        : param namespace: name of the url namespace that should be used. options: base, config, auth. default = base
+        : param path: the url path for which a full url should be created
+        : return: url in string format
         '''
         options = {
             'base': f'{self.protocol}://{self.hostname}{path}',
@@ -226,7 +231,7 @@ class Client(object):
 
     def _login(self):
         '''
-        Login to fmc api and save X-auth-access-token, X-auth-refresh-token and DOMAINS to variables
+        Login to fmc rest api
         '''
         request = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
         try:
@@ -263,8 +268,8 @@ class Client(object):
 
     def _refresh(self):
         '''
-        Refresh X-auth-access-token using X-auth-refresh-token. This operation is performed for up to three
-        times, afterwards a re-authentication using _login will be performed
+        Refresh authorization token. This operation is performed for up to three
+        times, afterwards a re-authentication using _login() will be performed
         '''
         if self.refresh_counter > 2:
             self.logger.info(f'Authentication token expired. Re-authenticating to {self.hostname}')
@@ -305,10 +310,10 @@ class Client(object):
     @RequestDebugDecorator('DELETE')
     def _delete(self, request: str, params=None):
         '''
-        DELETE Operation for FMC REST API. In case of authentication issues session will be refreshed
-        :param request: URL of request that should be performed
-        :param params: dict of parameters for http request
-        :return: requests.Response object
+        DELETE operation
+        : param request: url of request that should be performed
+        : param params: dict of parameters for http request
+        : return: requests.Response object
         '''
         if params is None:
             params = dict()
@@ -330,10 +335,10 @@ class Client(object):
     @RequestDebugDecorator('GET')
     def _get_request(self, request: str, params=None):
         '''
-        GET Operation for FMC REST API. In case of authentication issues session will be refreshed
-        :param request: URL of request that should be performed
-        :param params: dict of parameters for http request
-        :return: requests.Response object
+        GET operation without paging support
+        : param request: url of request that should be performed
+        : param params: dict of parameters for http request
+        : return: requests.Response object
         '''
         if params is None:
             params = dict()
@@ -356,10 +361,10 @@ class Client(object):
 
     def _get(self, request: str, params=None):
         '''
-        GET Operation that supports paging for FMC REST API. In case of authentication issues session will be refreshed
-        :param request: URL of request that should be performed
-        :param params: dict of parameters for http request
-        :return: list of requests.Response objects
+        GET operation with paging support
+        : param request: url of request that should be performed
+        : param params: dict of parameters for http request
+        : return: list of requests.Response objects
         '''
         if params is None:
             params = dict()
@@ -379,11 +384,11 @@ class Client(object):
     @RequestDebugDecorator('POST')
     def _post(self, request: str, data: Dict, params=None):
         '''
-        POST Operation for FMC REST API. In case of authentication issues session will be refreshed
-        :param request: URL of request that should be performed
-        :param data: dictionary of data that will be sent to the api
-        :param params: dict of parameters for http request
-        :return: requests.Response object
+        POST operation
+        : param request: url of request that should be performed
+        : param data: dictionary of data that will be sent to the api
+        : param params: dict of parameters for http request
+        : return: requests.Response object
         '''
         data = self._sanitize(data)
         if params is None:
@@ -406,11 +411,11 @@ class Client(object):
     @RequestDebugDecorator('PUT')
     def _put(self, request: str, data: Dict, params=None):
         '''
-        PUT Operation for FMC REST API. In case of authentication issues session will be refreshed
-        :param request: URL of request that should be performed
-        :param data: dictionary of data that will be sent to the api
-        :param params: dict of parameters for http request
-        :return: requests.Response object
+        PUT operation
+        : param request: url of request that should be performed
+        : param data: dictionary of data that will be sent to the api
+        : param params: dict of parameters for http request
+        : return: requests.Response object
         '''
         data = self._sanitize(data)
         if params is None:
@@ -434,9 +439,9 @@ class Client(object):
         '''
         Prepare json object for api operation
         This is neccesarry since fmc api cannot handle json objects with some
-        fields received via GET (e.g. metadata dictionary)
-        :param payload: json representing api object
-        :return: sanitized api object
+        fields set in GET (e.g. metadata dictionary)
+        : param payload: api object in json format
+        : return: sanitized api object in json format
         '''
         sanitized_payload = deepcopy(payload)
         sanitized_payload.pop('metadata', None)
@@ -447,9 +452,9 @@ class Client(object):
     def get_object_id_by_name(self, obj_type: str, obj_name: str):
         '''
         helper function to retrieve object id by name
-        :param obj_type: object types that will be queried
-        :param obj_name:  name of the object
-        :return: object id if object is found, None otherwise
+        : param obj_type: object types that will be queried
+        : param obj_name: name of the object
+        : return: object id if object is found, None otherwise
         '''
         request = f'/object/{obj_type}'
         url = self._url('config', request)
@@ -462,8 +467,8 @@ class Client(object):
     def get_device_id_by_name(self, device_name: str):
         '''
         helper function to retrieve device id by name
-        :param device_name:  name of the device
-        :return: device id if device is found, None otherwise
+        : param device_name: name of the device
+        : return: device id if device is found, None otherwise
         '''
         request = '/devices/devicerecords'
         url = self._url('config', request)
@@ -475,9 +480,9 @@ class Client(object):
 
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
         '''
-        helper function to retrieve device ha-pair id by name
-        :param device_hapair_name: name of the ha-pair
-        :return: id if ha-pair is found, None otherwise
+        helper function to retrieve device ha - pair id by name
+        : param device_hapair_name: name of the ha - pair
+        : return: id if ha - pair is found, None otherwise
         '''
         request = '/devicehapairs/ftddevicehapairs'
         url = self._url('config', request)
@@ -489,9 +494,9 @@ class Client(object):
 
     def get_device_id_from_hapair(self, device_hapair_id: str):
         '''
-        helper function to retrieve device id from ha-pair
-        :param device_hapar_id: id of ha-pair
-        :return: id if device is found, None otherwise
+        helper function to retrieve device id from ha - pair
+        : param device_hapar_id: id of ha - pair
+        : return: id if device is found, None otherwise
         '''
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
         url = self._url('config', request)
@@ -501,8 +506,8 @@ class Client(object):
     def get_nat_policy_id_by_name(self, nat_policy_name: str):
         '''
         helper function to retrieve nat policy id by name
-        :param nat_policy_name: name of nat policy
-        :return: policy id if nat policy is found, None otherwise
+        : param nat_policy_name: name of nat policy
+        : return: policy id if nat policy is found, None otherwise
         '''
         request = '/policy/ftdnatpolicies'
         url = self._url('config', request)
@@ -515,8 +520,8 @@ class Client(object):
     def get_acp_id_by_name(self, policy_name: str):
         '''
         helper function to retrieve access control policy id by name
-        :param policy_name:  name of the access control policy
-        :return: acp id if access control policy is found, None otherwise
+        : param policy_name: name of the access control policy
+        : return: acp id if access control policy is found, None otherwise
         '''
         request = '/policy/accesspolicies'
         url = self._url('config', request)
@@ -529,9 +534,9 @@ class Client(object):
     def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
         '''
         helper function to retrieve access control policy rule id by name
-        :param policy_name: name of the access control policy that will be queried
-        :param rule_name:  name of the access control policy rule
-        :return: acp rule id if access control policy rule is found, None otherwise
+        : param policy_name: name of the access control policy that will be queried
+        : param rule_name: name of the access control policy rule
+        : return: acp rule id if access control policy rule is found, None otherwise
         '''
         policy_id = self.get_acp_id_by_name(policy_name)
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
@@ -545,8 +550,8 @@ class Client(object):
     def get_syslog_alert_id_by_name(self, syslog_alert_name: str):
         '''
         helper function to retrieve syslog alert object id by name
-        :param syslog_alert_name: name of syslog alert object
-        :return: syslogalert id if syslog alert is found, None otherwise
+        : param syslog_alert_name: name of syslog alert object
+        : return: syslogalert id if syslog alert is found, None otherwise
         '''
         syslogalerts = self.get_syslogalerts()
         for syslog_alert in syslogalerts:
@@ -557,8 +562,8 @@ class Client(object):
     def get_snmp_alert_id_by_name(self, snmp_alert_name: str):
         '''
         helper function to retrieve snmp alert object id by name
-        :param snmp_alert_name: name of snmp alert object
-        :return: snmpalert id if snmp alert is found, None otherwise
+        : param snmp_alert_name: name of snmp alert object
+        : return: snmpalert id if snmp alert is found, None otherwise
         '''
         snmp_alerts = self.get_snmpalerts()
         for snmp_alert in snmp_alerts:
@@ -569,8 +574,8 @@ class Client(object):
     def get_domain_id_by_name(self, domain_name: str):
         '''
         helper function to retrieve domain id from list of domains
-        :param domain_name: name of the domain
-        :return: did if domain is found, None otherwise
+        : param domain_name: name of the domain
+        : return: did if domain is found, None otherwise
         '''
         for domain in self.domains:
             if domain['name'] == domain_name:
@@ -583,8 +588,8 @@ class Client(object):
     def get_domain_name_by_id(self, domain_id: str):
         '''
         helper function to retrieve domain name by id
-        :param domain_id: id of the domain
-        :return: name if domain is found, None otherwise
+        : param domain_id: id of the domain
+        : return: name if domain is found, None otherwise
         '''
         for domain in self.domains:
             if domain['uuid'] == domain_id:
