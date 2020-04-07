@@ -176,7 +176,7 @@ class Client(object):
             payload = responses[0].json()
 
             # get request did not yield any results
-            if not payload['links']:
+            if 'links' not in payload:
                 return list()
 
             # get request contains multiple results without paging
