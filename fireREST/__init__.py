@@ -231,16 +231,18 @@ class Client(object):
         request = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
         try:
             response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
-
-            if response.status_code in (401, 403):
+            print(response.status_code)
+            if response.status_code in (401, 403) or (response.status_code == 500 and 'Unauthorized' in response.text):
                 self.logger.error(f'API Authentication to {self.hostname} failed.')
                 raise FireRESTAuthException(f'API Authentication to {self.hostname} failed.')
 
             if response.status_code == 429:
                 msg = f'API Authentication to {self.hostname} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
                 raise FireRESTRateLimitException(msg)
+
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
+
             if not access_token or not refresh_token:
                 self.logger.error(f'Could not retrieve tokens from {request}.')
                 raise FireRESTApiException(f'Could not retrieve tokens from {request}.')
