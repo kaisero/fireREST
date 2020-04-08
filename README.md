@@ -9,6 +9,7 @@ and pagination automatically.
 ## Requirements 
 
 * Python >= 3.7
+* FMC >= 6.1.0
 
 ## Installation
 
@@ -69,9 +70,9 @@ uuid = client.get_acp_id_by_name(name)
 #### Access Control Policy Rule Name to ID
 
 ```python
-policy_name = 'DEV-ACCESS-CONTROL-POLICY'
-rule_name = 'PERMIT-INTERNET-ACCESS'
-uuid = client.get_object_id_by_name(policy_name, rule_name)
+acp = 'DEV-ACCESS-CONTROL-POLICY'
+acp_rule = 'PERMIT-INTERNET-ACCESS'
+uuid = client.get_object_id_by_name(acp, acp_rule)
 ```
 
 ### Objects
@@ -84,22 +85,22 @@ net_obj = {
     'value': '198.18.1.0/24',
 }
 
-response = client.create_object('networks', net_obj)
+response = client.create_object('network', net_obj)
 ```
 
 #### Get Network Object
 
 ```python
 obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('networks', 'NetObjViaAPI')
-obj_payload = client.get_object('networks', obj_id)
+obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
+obj_payload = client.get_object('network', obj_id)
 ```
 
 #### Update Network Object
 
 ```python
 obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('networks', 'NetObjViaAPI')
+obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
 
 net_obj = {
     'id': obj_id,
@@ -107,15 +108,15 @@ net_obj = {
     'value': '198.18.2.0/24',
 }
 
-response = client.update_object('networks', obj_id, net_obj)
+response = client.update_object('network', obj_id, net_obj)
 ```
 
 #### Delete Network Object
 
 ```python
-obj_name = 'NetObjViaAPI
-obj_id = client.get_object_id_by_name('networks', 'NetObjViaAPI')
-response = client.delete_object('networks', obj_id)
+obj_name = 'NetObjViaAPI'
+obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
+response = client.delete_object('network', obj_id)
 ```
 
 

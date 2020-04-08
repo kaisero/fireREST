@@ -1,8 +1,6 @@
 import pytest
 
 from fireREST import Client
-from fireREST import FireRESTApiException, FireRESTAuthException, FireRESTAuthRefreshException
-from fireREST import API_AUTH_URL, API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
 from requests.auth import HTTPBasicAuth
 
 

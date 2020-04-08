@@ -1,8 +1,7 @@
 import pytest
 
 from fireREST import Client
-from fireREST import FireRESTApiException, FireRESTAuthException, FireRESTAuthRefreshException
-from fireREST import API_AUTH_URL, API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
+from fireREST import GenericApiError, AuthError, AuthRefreshError
 from requests.auth import HTTPBasicAuth
 
 
@@ -24,7 +23,7 @@ def test_authentication(api):
 
 def test_authentication_with_incorrect_credentials(api):
     api.cred = HTTPBasicAuth('firerest', 'incorrect-password')
-    with pytest.raises(FireRESTAuthException):
+    with pytest.raises(AuthError):
         api._login()
 
 

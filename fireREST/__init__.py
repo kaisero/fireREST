@@ -3,6 +3,7 @@ import logging
 import requests
 import urllib3
 
+from .mapping import OBJECT_TYPE
 from .version import __version__
 
 from copy import deepcopy
@@ -52,7 +53,7 @@ API_DEFAULT_DOMAIN = 'Global'
 API_RETRY_TIMER = 10
 
 
-class FireRESTApiException(Exception):
+class GenericApiError(Exception):
     '''
     generic api error exception
     '''
@@ -61,7 +62,16 @@ class FireRESTApiException(Exception):
         super().__init__(message)
 
 
-class FireRESTAuthException(Exception):
+class InvalidNamespaceError(Exception):
+    '''
+    exeption thrown when invalid namespace is being passed to api
+    '''
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
+class AuthError(Exception):
     '''
     generic api authentication failure exception
     '''
@@ -70,7 +80,7 @@ class FireRESTAuthException(Exception):
         super().__init__(message)
 
 
-class FireRESTAuthRefreshException(Exception):
+class AuthRefreshError(Exception):
     '''
     exception used when api token refresh fails
     '''
@@ -79,7 +89,7 @@ class FireRESTAuthRefreshException(Exception):
         super().__init__(message)
 
 
-class FireRESTRateLimitException(Exception):
+class RateLimitException(Exception):
     '''
     exception used when fmc rate limiter kicks in
     '''
@@ -88,7 +98,7 @@ class FireRESTRateLimitException(Exception):
         super().__init__(message)
 
 
-class FireRESTUnsupportedOperationException(Exception):
+class UnsupportedOperationError(Exception):
     '''
     exception used when unsupported operation is being performed
     '''
@@ -97,7 +107,16 @@ class FireRESTUnsupportedOperationException(Exception):
         super().__init__(message)
 
 
-class RequestDebugDecorator(object):
+class UnsupportedObjectTypeError(Exception):
+    '''
+    exception used when unsupported object type is being used
+    '''
+
+    def __init__(self, message):
+        super().__init__(message)
+
+
+class LogRequest(object):
     '''
     decorator that adds additional debug logging for api requests
     '''
@@ -125,7 +144,6 @@ class RequestDebugDecorator(object):
             if status_code >= 299:
                 logger.debug(f'[{request_id}] [Message] {result.content}')
             return result
-
         return wrapped_f
 
 
@@ -138,17 +156,16 @@ class MinimumVersionRequired(object):
         self.minimum_version = version.parse(minimum_version)
 
     def __call__(self, f):
-        def wrapped_f(*args):
+        def wrapped_f(*args, **kwargs):
             minimum_version = self.minimum_version
             try:
                 installed_version = args[0].version
             except AttributeError:
-                return f(*args)
+                return f(*args, **kwargs)
             if installed_version < minimum_version:
-                raise FireRESTUnsupportedOperationException(
+                raise UnsupportedOperationError(
                     f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}')
-            return f(*args)
-
+            return f(*args, **kwargs)
         return wrapped_f
 
 
@@ -164,6 +181,28 @@ def CacheResult(f):
             def cached_wrapper():
                 return f(*args, **kwargs)
             return cached_wrapper
+        return f(*args, **kwargs)
+    return wrapper
+
+
+def ValidateObjectType(f):
+    '''
+    decorator that validates object type and transforms input if neccessary
+    '''
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        try:
+            object_type = kwargs.get('object_type', None)
+            if object_type:
+                kwargs['object_type'] = OBJECT_TYPE[object_type]
+            else:
+                args = list(args)
+                object_type = args[1]
+                args[1] = OBJECT_TYPE[object_type]
+        except KeyError:
+            if object_type in OBJECT_TYPE.values():
+                return f(*args, **kwargs)
+            raise UnsupportedObjectTypeError(f'{object_type} is not a valid object type')
         return f(*args, **kwargs)
     return wrapper
 
@@ -288,7 +327,7 @@ class Client(object):
             'refresh': f'{self.protocol}://{self.hostname}{API_REFRESH_URL}',
         }
         if namespace not in options.keys():
-            raise ValueError(f'Invalid namespace "{namespace}" provided. Valid namespaces: {options.keys()}')
+            raise InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
         return options[namespace]
 
     def _login(self):
@@ -300,18 +339,18 @@ class Client(object):
             response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
             if response.status_code in (401, 403) or (response.status_code == 500 and 'Unauthorized' in response.text):
                 self.logger.error(f'API Authentication to {self.hostname} failed.')
-                raise FireRESTAuthException(f'API Authentication to {self.hostname} failed.')
+                raise AuthError(f'API Authentication to {self.hostname} failed.')
 
             if response.status_code == 429:
                 msg = f'API Authentication to {self.hostname} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise FireRESTRateLimitException(msg)
+                raise RateLimitException(msg)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
 
             if not access_token or not refresh_token:
                 self.logger.error(f'Could not retrieve tokens from {request}.')
-                raise FireRESTApiException(f'Could not retrieve tokens from {request}.')
+                raise GenericApiError(f'Could not retrieve tokens from {request}.')
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
@@ -321,7 +360,7 @@ class Client(object):
         except ConnectionError as exc:
             self.logger.error(exc, exc_info=True)
             raise
-        except FireRESTRateLimitException:
+        except RateLimitException:
             self.logger.debug(
                 f'Could not login to {self.hostname}. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.')
             sleep(API_RETRY_TIMER)
@@ -344,31 +383,31 @@ class Client(object):
 
             if response.status_code == 429:
                 msg = f'API token refresh to {self.hostname} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise FireRESTRateLimitException(msg)
+                raise RateLimitException(msg)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
                 msg = f'API token refresh to {self.hostname} failed. Response Code: {response.status_code}'
-                raise FireRESTAuthRefreshException(msg)
+                raise AuthRefreshError(msg)
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
         except ConnectionError as exc:
             self.logger.error(exc, exc_info=True)
             raise
-        except FireRESTRateLimitException:
+        except RateLimitException:
             self.logger.debug(
                 f'API token refresh to {self.hostname} failed. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.')
             sleep(API_RETRY_TIMER)
             self._login()
-        except FireRESTApiException as exc:
+        except GenericApiError as exc:
             self.logger.error(str(exc))
             raise
 
         self.logger.debug(f'Successfully refreshed authorization token for {self.hostname}')
 
-    @RequestDebugDecorator('DELETE')
+    @LogRequest('DELETE')
     def _delete(self, request: str, params=None):
         '''
         DELETE operation
@@ -387,13 +426,13 @@ class Client(object):
                     return self._delete(request, params)
             if response.status_code == 429:
                 msg = f'DELETE operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise FireRESTRateLimitException(msg)
-        except FireRESTRateLimitException:
+                raise RateLimitException(msg)
+        except RateLimitException:
             sleep(API_RETRY_TIMER)
             return self._delete(request, params)
         return response
 
-    @RequestDebugDecorator('GET')
+    @LogRequest('GET')
     def _get_request(self, request: str, params=None):
         '''
         GET operation without paging support
@@ -414,8 +453,8 @@ class Client(object):
                     return self._get_request(request, params)
             if response.status_code == 429:
                 msg = f'GET operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise FireRESTRateLimitException(msg)
-        except FireRESTRateLimitException:
+                raise RateLimitException(msg)
+        except RateLimitException:
             sleep(API_RETRY_TIMER)
             return self._get_request(request, params)
         return response
@@ -442,7 +481,7 @@ class Client(object):
                 responses.append(response_page)
         return self._squash_responses(responses)
 
-    @RequestDebugDecorator('POST')
+    @LogRequest('POST')
     def _post(self, request: str, data: Dict, params=None):
         '''
         POST operation
@@ -463,13 +502,13 @@ class Client(object):
                     return self._post(request, data, params)
             if response.status_code == 429:
                 msg = f'POST operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise FireRESTRateLimitException(msg)
-        except FireRESTRateLimitException:
+                raise RateLimitException(msg)
+        except RateLimitException:
             sleep(API_RETRY_TIMER)
             return self._post(request, data, params)
         return response
 
-    @RequestDebugDecorator('PUT')
+    @LogRequest('PUT')
     def _put(self, request: str, data: Dict, params=None):
         '''
         PUT operation
@@ -490,8 +529,8 @@ class Client(object):
                     return self._put(request, data, params)
             if response.status_code == 429:
                 msg = f'PUT operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise FireRESTRateLimitException(msg)
-        except FireRESTRateLimitException:
+                raise RateLimitException(msg)
+        except RateLimitException:
             sleep(API_RETRY_TIMER)
             return self._put(request, data, params)
         return response
@@ -511,18 +550,18 @@ class Client(object):
         return sanitized_payload
 
     @MinimumVersionRequired('6.1.0')
-    def get_object_id_by_name(self, obj_type: str, obj_name: str):
+    def get_object_id_by_name(self, object_type: str, object_name: str):
         '''
         helper function to retrieve object id by name
-        : param obj_type: object types that will be queried
-        : param obj_name: name of the object
+        : param object_type: object type that will be queried
+        : param object_name: name of the object
         : return: object id if object is found, None otherwise
         '''
-        request = f'/object/{obj_type}'
+        request = f'/object/{object_type}'
         url = self._url('config', request)
         objects = self._get(url)
         for obj in objects:
-            if obj['name'] == obj_name:
+            if obj['name'] == object_name:
                 return obj['id']
         return None
 
@@ -541,7 +580,6 @@ class Client(object):
                 return device['id']
         return None
 
-    # @CacheResult
     @MinimumVersionRequired('6.2.3')
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
         '''
@@ -695,49 +733,58 @@ class Client(object):
         return self._get(url)
 
     @MinimumVersionRequired('6.1.0')
+    @ValidateObjectType
     def create_object(self, object_type: str, data: Dict):
         request = f'/object/{object_type}'
         url = self._url('config', request)
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_objects(self, object_type: str, expanded=API_EXPANSION_MODE):
+    @ValidateObjectType
+    def get_objects(self, object_type: str):
         request = f'/object/{object_type}'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
-    def get_objects_override(self, objects: List, object_type: str, expanded=API_EXPANSION_MODE):
+    @MinimumVersionRequired('6.4.0')
+    @ValidateObjectType
+    def get_objects_override(self, object_type: str, objects: List):
         overrides = list()
         for obj in objects:
             if obj['overridable']:
-                responses = self.get_object_override(object_type, obj['id'], expanded=expanded)
+                responses = self.get_object_override(object_type, obj['id'], expanded=API_EXPANSION_MODE)
                 overrides.extend(responses)
         return overrides
 
     @MinimumVersionRequired('6.1.0')
+    @ValidateObjectType
     def get_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    def get_object_override(self, object_type: str, object_id: str, expanded=API_EXPANSION_MODE):
+    @MinimumVersionRequired('6.4.0')
+    @ValidateObjectType
+    def get_object_override(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}/overrides'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
     @MinimumVersionRequired('6.1.0')
+    @ValidateObjectType
     def update_object(self, object_type: str, object_id: str, data: Dict):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
         return self._put(url, data)
 
     @MinimumVersionRequired('6.1.0')
+    @ValidateObjectType
     def delete_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
@@ -750,11 +797,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_devices(self, expanded=API_EXPANSION_MODE):
+    def get_devices(self):
         request = '/devices/devicerecords'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -777,10 +824,10 @@ class Client(object):
         return self._delete(url)
 
     @MinimumVersionRequired('6.2.3')
-    def get_device_hapairs(self, expanded=API_EXPANSION_MODE):
+    def get_device_hapairs(self):
         request = '/devicehapairs/ftddevicehapairs'
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         url = self._url('config', request)
         return self._get(url, params)
@@ -810,10 +857,10 @@ class Client(object):
         return self._delete(url)
 
     @MinimumVersionRequired('6.3.0')
-    def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str, expanded=API_EXPANSION_MODE):
+    def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces'
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         url = self._url('config', request)
         return self._get(url, params)
@@ -831,11 +878,11 @@ class Client(object):
         return self._put(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_ftd_physical_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_physical_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -858,11 +905,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_ftd_redundant_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_redundant_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -891,11 +938,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_ftd_portchannel_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_portchannel_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -924,11 +971,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_ftd_sub_interfaces(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_sub_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/subinterfaces'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -957,11 +1004,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.3.0')
-    def get_ftd_ipv4staticroutes(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_ipv4staticroutes(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -990,11 +1037,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.3.0')
-    def get_ftd_ipv6staticroutes(self, device_id: str, expanded=API_EXPANSION_MODE):
+    def get_ftd_ipv6staticroutes(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -1023,11 +1070,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_deployable_devices(self, expanded=API_EXPANSION_MODE):
+    def get_deployable_devices(self):
         request = '/deployment/deployabledevices'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -1038,19 +1085,19 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_policies(self, policy_type: str, expanded=API_EXPANSION_MODE):
+    def get_policies(self, policy_type: str):
         request = f'/policy/{policy_type}'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
     @MinimumVersionRequired('6.1.0')
-    def get_policy(self, policy_id: str, policy_type: str, expanded=API_EXPANSION_MODE):
+    def get_policy(self, policy_id: str, policy_type: str):
         request = f'/policy/{policy_type}/{policy_id}'
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         url = self._url('config', request)
         return self._get(url, params)
@@ -1100,11 +1147,11 @@ class Client(object):
         return self._get(url)
 
     @MinimumVersionRequired('6.1.0')
-    def get_acp_rules(self, policy_id: str, expanded=API_EXPANSION_MODE):
+    def get_acp_rules(self, policy_id: str):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -1133,11 +1180,11 @@ class Client(object):
         return self._get(url)
 
     @MinimumVersionRequired('6.2.3')
-    def get_autonat_rules(self, policy_id: str, expanded=API_EXPANSION_MODE):
+    def get_autonat_rules(self, policy_id: str):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -1166,11 +1213,11 @@ class Client(object):
         return self._get(url)
 
     @MinimumVersionRequired('6.2.3')
-    def get_manualnat_rules(self, policy_id: str, expanded=API_EXPANSION_MODE):
+    def get_manualnat_rules(self, policy_id: str):
         request = f'/policy/ftdnatpolicies/manualnatrules/{policy_id}'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
@@ -1193,11 +1240,11 @@ class Client(object):
         return self._post(url, data)
 
     @MinimumVersionRequired('6.1.0')
-    def get_policy_assignments(self, expanded=API_EXPANSION_MODE):
+    def get_policy_assignments(self):
         request = '/assignment/policyassignments'
         url = self._url('config', request)
         params = {
-            'expanded': expanded,
+            'expanded': API_EXPANSION_MODE,
         }
         return self._get(url, params)
 
