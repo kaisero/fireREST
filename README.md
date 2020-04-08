@@ -1,7 +1,4 @@
-[![pypi](https://img.shields.io/pypi/v/fireREST)]
-(https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST)
-[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)]
-(https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST)
+[![pypi](https://img.shields.io/pypi/v/fireREST)](https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST)[![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST)
 
 
 # What is FireREST
