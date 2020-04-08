@@ -407,6 +407,7 @@ class Client(object):
         sanitized_payload.pop('id', None)
         return sanitized_payload
 
+    @cache_result
     @minimum_version_required('6.1.0')
     def get_object_id_by_name(self, object_type: str, object_name: str):
         '''
@@ -423,6 +424,7 @@ class Client(object):
                 return obj['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.1.0')
     def get_device_id_by_name(self, device_name: str):
         '''
@@ -438,6 +440,7 @@ class Client(object):
                 return device['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.2.3')
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
         '''
@@ -453,6 +456,7 @@ class Client(object):
                 return ha_pair['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.2.3')
     def get_device_id_from_hapair(self, device_hapair_id: str):
         '''
@@ -465,6 +469,7 @@ class Client(object):
         ha_pair = self._get(url)
         return ha_pair['primary']['id']
 
+    @cache_result
     @minimum_version_required('6.2.3')
     def get_nat_policy_id_by_name(self, nat_policy_name: str):
         '''
@@ -480,6 +485,7 @@ class Client(object):
                 return nat_policy['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.1.0')
     def get_acp_id_by_name(self, policy_name: str):
         '''
@@ -495,6 +501,7 @@ class Client(object):
                 return accesspolicy['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.1.0')
     def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
         '''
@@ -512,6 +519,7 @@ class Client(object):
                 return acp_rule['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.1.0')
     def get_syslog_alert_id_by_name(self, syslog_alert_name: str):
         '''
@@ -525,6 +533,7 @@ class Client(object):
                 return syslog_alert['id']
         return None
 
+    @cache_result
     @minimum_version_required('6.1.0')
     def get_snmp_alert_id_by_name(self, snmp_alert_name: str):
         '''
@@ -590,15 +599,15 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
     @validate_object_type
+    @minimum_version_required('6.1.0')
     def create_object(self, object_type: str, data: Dict):
         request = f'/object/{object_type}'
         url = self._url('config', request)
         return self._post(url, data)
 
-    @minimum_version_required('6.1.0')
     @validate_object_type
+    @minimum_version_required('6.1.0')
     def get_objects(self, object_type: str):
         request = f'/object/{object_type}'
         url = self._url('config', request)
@@ -607,8 +616,8 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.4.0')
     @validate_object_type
+    @minimum_version_required('6.4.0')
     def get_objects_override(self, object_type: str, objects: List):
         overrides = list()
         for obj in objects:
@@ -617,15 +626,15 @@ class Client(object):
                 overrides.extend(responses)
         return overrides
 
-    @minimum_version_required('6.1.0')
     @validate_object_type
+    @minimum_version_required('6.1.0')
     def get_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.4.0')
     @validate_object_type
+    @minimum_version_required('6.4.0')
     def get_object_override(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}/overrides'
         url = self._url('config', request)
@@ -634,15 +643,15 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
     @validate_object_type
+    @minimum_version_required('6.1.0')
     def update_object(self, object_type: str, object_id: str, data: Dict):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
         return self._put(url, data)
 
-    @minimum_version_required('6.1.0')
     @validate_object_type
+    @minimum_version_required('6.1.0')
     def delete_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)

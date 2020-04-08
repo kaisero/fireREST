@@ -13,16 +13,15 @@ def cache_result(f):
     '''
     decorator that applies functools lru_cache if cache is enabled in Client object
     '''
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        enabled = args[0].cache
-        if enabled:
-            @lru_cache(maxsize=256)
-            def cached_wrapper():
-                return f(*args, **kwargs)
-            return cached_wrapper
-        return f(*args, **kwargs)
-    return wrapper
+    def enabled(*args, **kwargs):
+        return args[0].cache
+    if enabled:
+        @wraps(f)
+        @lru_cache(maxsize=256)
+        def wrapper(*args, **kwargs):
+            return f(*args, **kwargs)
+        return wrapper
+    return f
 
 
 def log_request(action):
