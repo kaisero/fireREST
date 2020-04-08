@@ -260,7 +260,7 @@ OBJECT_TYPE = {
     'urlgroup': 'urlgroups',
     'variableset': 'variablesets',
     'vlangrouptag': 'vlangrouptags',
-    'vlantag': 'vlantags'
+    'vlantag': 'vlantags',
 }
 
 STATE = {

@@ -6,7 +6,7 @@ FireREST is a simple wrapper for firepower management center. It exposes various
 as functions and takes care of authentication, automatic token refreshment, payload sanitizitation
 and pagination automatically.
 
-## Requirements 
+## Requirements
 
 * Python >= 3.7
 * FMC >= 6.1.0
@@ -80,7 +80,7 @@ uuid = client.get_object_id_by_name(acp, acp_rule)
 #### Create Network Object
 
 ```python
-net_obj = { 
+net_obj = {
     'name': 'NetObjViaAPI',
     'value': '198.18.1.0/24',
 }
@@ -120,7 +120,7 @@ response = client.delete_object('network', obj_id)
 ```
 
 
-## Authors 
+## Authors
 
 Oliver Kaiser (oliver.kaiser@outlook.com)
 

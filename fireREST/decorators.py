@@ -13,13 +13,17 @@ def cache_result(f):
     '''
     decorator that applies functools lru_cache if cache is enabled in Client object
     '''
+
     def enabled(*args, **kwargs):
         return args[0].cache
+
     if enabled:
+
         @wraps(f)
         @lru_cache(maxsize=256)
         def wrapper(*args, **kwargs):
             return f(*args, **kwargs)
+
         return wrapper
     return f
 
@@ -28,6 +32,7 @@ def log_request(action):
     '''
     decorator that adds additional debug logging for api requests
     '''
+
     def inner_function(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
@@ -48,7 +53,9 @@ def log_request(action):
             if status_code >= 299:
                 logger.debug(f'[{request_id}] [Message] {result.content}')
             return result
+
         return wrapper
+
     return inner_function
 
 
@@ -67,9 +74,12 @@ def minimum_version_required(minimum_version):
                 return f(*args, **kwargs)
             if installed_version < minimum_version:
                 raise UnsupportedOperationError(
-                    f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}')
+                    f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}'
+                )
             return f(*args, **kwargs)
+
         return wrapper
+
     return inner_function
 
 
@@ -77,6 +87,7 @@ def validate_object_type(f):
     '''
     decorator that validates object type and transforms input if neccessary
     '''
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
@@ -92,4 +103,5 @@ def validate_object_type(f):
                 return f(*args, **kwargs)
             raise UnsupportedObjectTypeError(f'{object_type} is not a valid object type')
         return f(*args, **kwargs)
+
     return wrapper

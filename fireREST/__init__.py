@@ -66,17 +66,19 @@ API_RETRY_TIMER = 10
 
 
 class Client(object):
-    def __init__(self,
-                 hostname: str,
-                 username: str,
-                 password: str,
-                 session=None,
-                 protocol=API_PROTOCOL,
-                 verify_cert=False,
-                 cache=False,
-                 logger=None,
-                 domain=API_DEFAULT_DOMAIN,
-                 timeout=API_REQUEST_TIMEOUT):
+    def __init__(
+        self,
+        hostname: str,
+        username: str,
+        password: str,
+        session=None,
+        protocol=API_PROTOCOL,
+        verify_cert=False,
+        cache=False,
+        logger=None,
+        domain=API_DEFAULT_DOMAIN,
+        timeout=API_REQUEST_TIMEOUT,
+    ):
         '''
         Initialize api client object (make sure to use a dedicated api user!)
         :param hostname: ip address or dns name of fmc
@@ -220,7 +222,8 @@ class Client(object):
             raise
         except RateLimitException:
             self.logger.debug(
-                f'Could not login to {self.hostname}. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.')
+                f'Could not login to {self.hostname}. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.'
+            )
             sleep(API_RETRY_TIMER)
             self._login()
 
@@ -256,7 +259,8 @@ class Client(object):
             raise
         except RateLimitException:
             self.logger.debug(
-                f'API token refresh to {self.hostname} failed. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.')
+                f'API token refresh to {self.hostname} failed. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.'
+            )
             sleep(API_RETRY_TIMER)
             self._login()
         except GenericApiError as exc:
@@ -276,8 +280,9 @@ class Client(object):
         if params is None:
             params = dict()
         try:
-            response = requests.delete(request, headers=self.headers, params=params, verify=self.verify_cert,
-                                       timeout=self.timeout)
+            response = requests.delete(
+                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout
+            )
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
                     self._refresh()
@@ -303,8 +308,9 @@ class Client(object):
         if not self._is_getbyid_operation(request) and 'limit' not in params:
             params['limit'] = API_PAGING_LIMIT
         try:
-            response = requests.get(request, headers=self.headers, params=params, verify=self.verify_cert,
-                                    timeout=self.timeout)
+            response = requests.get(
+                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout
+            )
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
                     self._refresh()
@@ -352,14 +358,22 @@ class Client(object):
         if params is None:
             params = dict()
         try:
-            response = requests.post(request, data=json.dumps(data), headers=self.headers, params=params,
-                                     verify=self.verify_cert, timeout=self.timeout)
+            response = requests.post(
+                request,
+                data=json.dumps(data),
+                headers=self.headers,
+                params=params,
+                verify=self.verify_cert,
+                timeout=self.timeout,
+            )
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
                     self._refresh()
                     return self._post(request, data, params)
             if response.status_code == 429:
-                msg = f'POST operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
+                msg = (
+                    f'POST operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
+                )
                 raise RateLimitException(msg)
         except RateLimitException:
             sleep(API_RETRY_TIMER)
@@ -379,8 +393,14 @@ class Client(object):
         if params is None:
             params = dict()
         try:
-            response = requests.put(request, data=json.dumps(data), headers=self.headers, params=params,
-                                    verify=self.verify_cert, timeout=self.timeout)
+            response = requests.put(
+                request,
+                data=json.dumps(data),
+                headers=self.headers,
+                params=params,
+                verify=self.verify_cert,
+                timeout=self.timeout,
+            )
             if response.status_code == 401:
                 if 'Access token invalid' in response.text:
                     self._refresh()
@@ -982,28 +1002,30 @@ class Client(object):
         return self._delete(url)
 
     @minimum_version_required('6.2.1')
-    def create_acp_rule(self, policy_id: str, data: Dict, section=str(), category=str(),
-                        insert_before=int(), insert_after=int()):
+    def create_acp_rule(
+        self, policy_id: str, data: Dict, section=str(), category=str(), insert_before=int(), insert_after=int()
+    ):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
         params = {
             'category': category,
             'section': section,
             'insert_before': insert_before,
-            'insert_after': insert_after
+            'insert_after': insert_after,
         }
         return self._post(url, data, params)
 
     @minimum_version_required('6.2.1')
-    def create_acp_rules(self, policy_id: str, data: Dict, section=str(), category=str(),
-                         insert_before=int(), insert_after=int()):
+    def create_acp_rules(
+        self, policy_id: str, data: Dict, section=str(), category=str(), insert_before=int(), insert_after=int()
+    ):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
         params = {
             'category': category,
             'section': section,
             'insert_before': insert_before,
-            'insert_after': insert_after
+            'insert_after': insert_after,
         }
         return self._post(url, data, params)
 
