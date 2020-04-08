@@ -6,6 +6,7 @@ import urllib3
 from .version import __version__
 
 from copy import deepcopy
+from functools import lru_cache, wraps
 from http.client import responses as http_responses
 from packaging import version
 from requests.auth import HTTPBasicAuth
@@ -139,19 +140,46 @@ class MinimumVersionRequired(object):
     def __call__(self, f):
         def wrapped_f(*args):
             minimum_version = self.minimum_version
-            installed_version = args[0].version
+            try:
+                installed_version = args[0].version
+            except AttributeError:
+                return f(*args)
             if installed_version < minimum_version:
                 raise FireRESTUnsupportedOperationException(
                     f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}')
-            result = f(*args)
-            return result
+            return f(*args)
 
         return wrapped_f
 
 
+def CacheResult(f):
+    '''
+    decorator that applies functools lru_cache if cache is enabled in Client object
+    '''
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        enabled = args[0].cache
+        if enabled:
+            @lru_cache(maxsize=256)
+            def cached_wrapper():
+                return f(*args, **kwargs)
+            return cached_wrapper
+        return f(*args, **kwargs)
+    return wrapper
+
+
 class Client(object):
-    def __init__(self, hostname: str, username: str, password: str, session=None, protocol=API_PROTOCOL,
-                 verify_cert=False, logger=None, domain=API_DEFAULT_DOMAIN, timeout=API_REQUEST_TIMEOUT):
+    def __init__(self,
+                 hostname: str,
+                 username: str,
+                 password: str,
+                 session=None,
+                 protocol=API_PROTOCOL,
+                 verify_cert=False,
+                 cache=False,
+                 logger=None,
+                 domain=API_DEFAULT_DOMAIN,
+                 timeout=API_REQUEST_TIMEOUT):
         '''
         Initialize api client object (make sure to use a dedicated api user!)
         :param hostname: ip address or dns name of fmc
@@ -162,6 +190,7 @@ class Client(object):
                       otherwise this will fail
         :param protocol: protocol used to access fmc api
         :param verify_cert: check fmc certificate for vailidity
+        :param cache: enables result caching for get operations
         :param logger: optional logger instance, in case debug logging is needed
         :param domain: name of the fmc domain
         :param timeout: timeout value for http requests
@@ -171,13 +200,14 @@ class Client(object):
             'Accept': API_CONTENT_TYPE,
             'User-Agent': API_USER_AGENT,
         }
+        self.cache = cache
         self.refresh_counter = 0
         self.logger = self._get_logger(logger)
         self.hostname = hostname
+        self.cred = HTTPBasicAuth(username, password)
         self.protocol = protocol
         self.verify_cert = verify_cert
         self.timeout = timeout
-        self.cred = HTTPBasicAuth(username, password)
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         if not session:
@@ -496,7 +526,7 @@ class Client(object):
                 return obj['id']
         return None
 
-    @MinimumVersionRequired('6.6.0')
+    @MinimumVersionRequired('6.1.0')
     def get_device_id_by_name(self, device_name: str):
         '''
         helper function to retrieve device id by name
@@ -511,6 +541,7 @@ class Client(object):
                 return device['id']
         return None
 
+    # @CacheResult
     @MinimumVersionRequired('6.2.3')
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
         '''
@@ -611,7 +642,6 @@ class Client(object):
                 return snmp_alert['id']
         return None
 
-    @MinimumVersionRequired('6.1.0')
     def get_domain_id_by_name(self, domain_name: str):
         '''
         helper function to retrieve domain id from list of domains
@@ -626,7 +656,6 @@ class Client(object):
         self.logger.debug(f'Available Domains: {available_domains}')
         return None
 
-    @MinimumVersionRequired('6.1.0')
     def get_domain_name_by_id(self, domain_id: str):
         '''
         helper function to retrieve domain name by id
