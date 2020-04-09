@@ -43,15 +43,15 @@ def log_request(action):
                 data = args[3]
             except IndexError:
                 data = None
-            logger.debug(f'[{request_id}] [{action}] {request}')
+            logger.debug('[%s] [%s] %s', request_id, action, request)
             if data:
-                logger.debug(f'[{request_id}] [Data] {data}')
+                logger.debug('[%s] [Data] %s', request_id, data)
             result = f(*args)
             status_code = result.status_code
             status_code_name = http_responses[status_code]
-            logger.debug(f'[{request_id}] [Response] {status_code_name} ({status_code})')
+            logger.debug('[%s] [Response] %s (%s)', request_id, status_code_name, status_code)
             if status_code >= 299:
-                logger.debug(f'[{request_id}] [Message] {result.content}')
+                logger.debug('[%s] [Message] %s', request_id, result.content)
             return result
 
         return wrapper
@@ -74,7 +74,7 @@ def minimum_version_required(minimum_version):
                 return f(*args, **kwargs)
             if installed_version < minimum_version:
                 raise UnsupportedOperationError(
-                    f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}'
+                    f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}',
                 )
             return f(*args, **kwargs)
 

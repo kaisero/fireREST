@@ -143,7 +143,7 @@ class Client(object):
 
             # get request did not yield any results
             if 'links' not in payload:
-                return list()
+                return []
 
             # get request contains multiple results without paging
             if 'items' in payload:
@@ -151,12 +151,12 @@ class Client(object):
 
             # get request returned single item
             return responses[0].json()
-        items = list()
+        items = []
         for response in responses:
             if 'items' in response:
                 items.extend(response.json()['items'])
             else:
-                self.logger.debug(f'Response {response.url} did not contain any items. Skipping...')
+                self.logger.debug('Response {response.url} did not contain any items. Skipping...')
         return items
 
     def _is_getbyid_operation(self, request: str):
@@ -173,7 +173,7 @@ class Client(object):
                 return True
             return False
 
-    def _url(self, namespace='base', path=str()):
+    def _url(self, namespace='base', path=''):
         '''
         Generate url on the for requests to fmc rest api
         : param namespace: name of the url namespace that should be used. options: base, config, auth. default = base
@@ -198,31 +198,34 @@ class Client(object):
         try:
             response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
             if response.status_code in (401, 403) or (response.status_code == 500 and 'Unauthorized' in response.text):
-                self.logger.error(f'API Authentication to {self.hostname} failed.')
+                self.logger.error('API Authentication to %s failed.', self.hostname)
                 raise AuthError(f'API Authentication to {self.hostname} failed.')
 
             if response.status_code == 429:
-                msg = f'API Authentication to {self.hostname} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
+                msg = (
+                    f'API Authentication to {self.hostname} failed due to FMC rate limiting.',
+                    f'Retrying in {API_RETRY_TIMER} seconds.',
+                )
                 raise RateLimitException(msg)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
 
             if not access_token or not refresh_token:
-                self.logger.error(f'Could not retrieve tokens from {request}.')
+                self.logger.error('Could not retrieve tokens from %s.', request)
                 raise GenericApiError(f'Could not retrieve tokens from {request}.')
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
             self.domains = json.loads(response.headers.get('DOMAINS', default=None))
             self.refresh_counter = 0
-            self.logger.debug(f'Successfully authenticated to {self.hostname}')
-        except ConnectionError as exc:
-            self.logger.error(exc, exc_info=True)
+            self.logger.debug('Successfully authenticated to %s', self.hostname)
+        except ConnectionError:
+            self.logger.exception('Could not connect to %s', self.hostname)
             raise
         except RateLimitException:
             self.logger.debug(
-                f'Could not login to {self.hostname}. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.'
+                'Could not login to %s. Rate limit exceeded. Retrying in %s seconds.', self.hostname, API_RETRY_TIMER,
             )
             sleep(API_RETRY_TIMER)
             self._login()
@@ -233,7 +236,7 @@ class Client(object):
         times, afterwards a re-authentication using _login() will be performed
         '''
         if self.refresh_counter > 2:
-            self.logger.info(f'Authentication token expired. Re-authenticating to {self.hostname}')
+            self.logger.info('Authentication token expired. Re-authenticating to %s', self.hostname)
             self._login()
             return
 
@@ -243,7 +246,10 @@ class Client(object):
             response = requests.post(request, headers=self.headers, verify=self.verify_cert)
 
             if response.status_code == 429:
-                msg = f'API token refresh to {self.hostname} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
+                msg = (
+                    f'API token refresh to {self.hostname} failed due to FMC rate limiting.',
+                    f'Retrying in {API_RETRY_TIMER} seconds.',
+                )
                 raise RateLimitException(msg)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
@@ -254,12 +260,14 @@ class Client(object):
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
-        except ConnectionError as exc:
-            self.logger.error(exc, exc_info=True)
+        except ConnectionError:
+            self.logger.exception('Could not connect to %s', self.hostname)
             raise
         except RateLimitException:
             self.logger.debug(
-                f'API token refresh to {self.hostname} failed. Rate limit exceeded. Retrying in {API_RETRY_TIMER} seconds.'
+                'API token refresh to %s failed. Rate limit exceeded. Retrying in %s seconds.',
+                self.hostname,
+                API_RETRY_TIMER,
             )
             sleep(API_RETRY_TIMER)
             self._login()
@@ -267,7 +275,7 @@ class Client(object):
             self.logger.error(str(exc))
             raise
 
-        self.logger.debug(f'Successfully refreshed authorization token for {self.hostname}')
+        self.logger.debug('Successfully refreshed authorization token for %s', self.hostname)
 
     @log_request('DELETE')
     def _delete(self, request: str, params=None):
@@ -278,10 +286,10 @@ class Client(object):
         : return: requests.Response object
         '''
         if params is None:
-            params = dict()
+            params = {}
         try:
             response = requests.delete(
-                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout
+                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout,
             )
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
@@ -304,12 +312,12 @@ class Client(object):
         : return: requests.Response object
         '''
         if params is None:
-            params = dict()
+            params = {}
         if not self._is_getbyid_operation(request) and 'limit' not in params:
             params['limit'] = API_PAGING_LIMIT
         try:
             response = requests.get(
-                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout
+                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout,
             )
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
@@ -331,8 +339,8 @@ class Client(object):
         : return: list of requests.Response objects
         '''
         if params is None:
-            params = dict()
-        responses = list()
+            params = {}
+        responses = []
         response = self._get_request(request, params)
         responses.append(response)
         payload = response.json()
@@ -356,7 +364,7 @@ class Client(object):
         '''
         data = self._sanitize(data)
         if params is None:
-            params = dict()
+            params = {}
         try:
             response = requests.post(
                 request,
@@ -391,7 +399,7 @@ class Client(object):
         '''
         data = self._sanitize(data)
         if params is None:
-            params = dict()
+            params = {}
         try:
             response = requests.put(
                 request,
@@ -576,9 +584,9 @@ class Client(object):
         for domain in self.domains:
             if domain['name'] == domain_name:
                 return domain['uuid']
-        self.logger.error(f'Could not find domain with name {domain_name}. Make sure full path is provided')
+        self.logger.error('Could not find domain with name %s. Make sure full path is provided', domain_name)
         available_domains = ', '.join((domain['name'] for domain in self.domains))
-        self.logger.debug(f'Available Domains: {available_domains}')
+        self.logger.debug('Available Domains: %s', available_domains)
         return None
 
     def get_domain_name_by_id(self, domain_id: str):
@@ -590,9 +598,9 @@ class Client(object):
         for domain in self.domains:
             if domain['uuid'] == domain_id:
                 return domain['name']
-        self.logger.error(f'Could not find domain with id {domain_id}. Make sure full path is provided')
+        self.logger.error('Could not find domain with id %s. Make sure full path is provided', domain_id)
         available_domains = ', '.join((domain['uuid'] for domain in self.domains))
-        self.logger.debug(f'Available Domains: {available_domains}')
+        self.logger.debug('Available Domains: %s', available_domains)
         return None
 
     @minimum_version_required('6.1.0')
@@ -639,7 +647,7 @@ class Client(object):
     @validate_object_type
     @minimum_version_required('6.4.0')
     def get_objects_override(self, object_type: str, objects: List):
-        overrides = list()
+        overrides = []
         for obj in objects:
             if obj['overridable']:
                 responses = self.get_object_override(object_type, obj['id'], expanded=API_EXPANSION_MODE)
@@ -1003,7 +1011,7 @@ class Client(object):
 
     @minimum_version_required('6.2.1')
     def create_acp_rule(
-        self, policy_id: str, data: Dict, section=str(), category=str(), insert_before=int(), insert_after=int()
+        self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
@@ -1017,7 +1025,7 @@ class Client(object):
 
     @minimum_version_required('6.2.1')
     def create_acp_rules(
-        self, policy_id: str, data: Dict, section=str(), category=str(), insert_before=int(), insert_after=int()
+        self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
