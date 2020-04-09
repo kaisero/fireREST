@@ -22,6 +22,7 @@ pre-commit = "==2.2.0"
 pytest = "==5.4.1"
 pytest-cov = "==2.8.1"
 pytest-runner = "==5.2"
+tox = "==3.14.6"
 twine = "==3.1.1"
 
 [requires]
