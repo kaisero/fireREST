@@ -1,26 +1,32 @@
 [![pypi](https://img.shields.io/pypi/v/fireREST)](https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST) [![published](https://static.production.devnetcloud.com/codeexchange/assets/images/devnet-published.svg)](https://developer.cisco.com/codeexchange/github/repo/kaisero/fireREST) [![license](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](https://github.com/kaisero/fireREST/blob/master/LICENSE)
 
 
-# What is FireREST
+# FireREST
 
-FireREST is a simple wrapper for firepower management center. It exposes various api calls
-as functions and takes care of authentication, automatic token refreshment, payload sanitizitation
-and pagination automatically.
+A simple wrapper for firepower management center restful api.
+
+## Features
+
+* Authentication and automatic session refresh
+* Rate-limit handling with automatic retry operation
+* Automatic squashing of paginated api payloads
+* Sanitization of api payloads received via GET operations and used for PUT/POST operations
+* Debug logging for api calls using logger module
+* Result caching for various operations
 
 ## Requirements
 
 * Python >= 3.7
-* FMC >= 6.1.0
 
-## Installation
+## Quickstart
+
+### Installation
 
 ```bash
 pip install fireREST
 ```
 
-## Usage
-
-### Import API Client
+### Import api client
 
 ```python
 from fireREST import Client
@@ -127,4 +133,6 @@ Oliver Kaiser (oliver.kaiser@outlook.com)
 
 ## License
 
-GNU General Public License v3.0
+GNU General Public License v3.0 or later.
+
+See [LICENSE](LICENSE) for the full text.
