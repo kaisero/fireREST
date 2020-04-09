@@ -5,19 +5,8 @@ import logging
 import requests
 import urllib3
 
-from .decorators import (
-    cache_result,
-    log_request,
-    minimum_version_required,
-    validate_object_type,
-)
-from .exceptions import (
-    GenericApiError,
-    InvalidNamespaceError,
-    AuthError,
-    AuthRefreshError,
-    RateLimitException,
-)
+from . import exceptions as exc
+from . import utils
 from .version import __version__
 
 from copy import deepcopy
@@ -46,7 +35,7 @@ API_PLATFORM_URL = '/api/fmc_platform/v1'
 #: url used to access configuration related api calls
 API_CONFIG_URL = '/api/fmc_config/v1'
 
-#: content type. as of 6.5.0 FMC only supports json
+#: content type. as of 6.6.0 FMC only supports json
 API_CONTENT_TYPE = 'application/json'
 
 #: paging limit for get requests that contain multiple items
@@ -132,47 +121,6 @@ class Client(object):
             return dummy_logger
         return logger
 
-    def _squash_responses(self, responses: List):
-        '''
-        extract data from get requests into json format
-        :param responses: list of requests response objects from _get() operation
-        :return: api payload in json format
-        '''
-        if len(responses) == 1:
-            payload = responses[0].json()
-
-            # get request did not yield any results
-            if 'links' not in payload:
-                return []
-
-            # get request contains multiple results without paging
-            if 'items' in payload:
-                return payload['items']
-
-            # get request returned single item
-            return responses[0].json()
-        items = []
-        for response in responses:
-            if 'items' in response:
-                items.extend(response.json()['items'])
-            else:
-                self.logger.debug('Response {response.url} did not contain any items. Skipping...')
-        return items
-
-    def _is_getbyid_operation(self, request: str):
-        '''
-        Verify if a get request contains multiple items
-        :param request: request url
-        :return: True if operation returns a single item, False if it contains multiple items
-        '''
-        try:
-            val = UUID(request.split('/')[-1])  # noqa: F841
-            return True
-        except ValueError:
-            if 'overrides' in request:
-                return True
-            return False
-
     def _url(self, namespace='base', path=''):
         '''
         Generate url on the for requests to fmc rest api
@@ -187,33 +135,45 @@ class Client(object):
             'refresh': f'{self.protocol}://{self.hostname}{API_REFRESH_URL}',
         }
         if namespace not in options.keys():
-            raise InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
+            raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
         return options[namespace]
+
+    def _request(self, method: str, url: str, params=None, auth=None, json=None):
+        return requests.request(
+            method=method,
+            url=url,
+            params=params,
+            json=json,
+            auth=auth,
+            headers=self.headers,
+            timeout=self.timeout,
+            verify=self.verify_cert,
+        )
 
     def _login(self):
         '''
         Login to fmc rest api
         '''
-        request = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
+        url = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
         try:
-            response = requests.post(request, headers=self.headers, auth=self.cred, verify=self.verify_cert)
+            response = self._request('post', url, auth=self.cred)
             if response.status_code in (401, 403) or (response.status_code == 500 and 'Unauthorized' in response.text):
                 self.logger.error('API Authentication to %s failed.', self.hostname)
-                raise AuthError(f'API Authentication to {self.hostname} failed.')
+                raise exc.AuthError(f'API Authentication to {self.hostname} failed.')
 
             if response.status_code == 429:
                 msg = (
                     f'API Authentication to {self.hostname} failed due to FMC rate limiting.',
                     f'Retrying in {API_RETRY_TIMER} seconds.',
                 )
-                raise RateLimitException(msg)
+                raise exc.RateLimitException(msg)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
 
             if not access_token or not refresh_token:
-                self.logger.error('Could not retrieve tokens from %s.', request)
-                raise GenericApiError(f'Could not retrieve tokens from {request}.')
+                self.logger.error('Could not retrieve tokens from %s.', url)
+                raise exc.GenericApiError(f'Could not retrieve tokens from {url}.')
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
@@ -223,7 +183,7 @@ class Client(object):
         except ConnectionError:
             self.logger.exception('Could not connect to %s', self.hostname)
             raise
-        except RateLimitException:
+        except exc.RateLimitException:
             self.logger.debug(
                 'Could not login to %s. Rate limit exceeded. Retrying in %s seconds.', self.hostname, API_RETRY_TIMER,
             )
@@ -240,30 +200,30 @@ class Client(object):
             self._login()
             return
 
-        request = self._url('refresh')
+        url = self._url('refresh')
         try:
             self.refresh_counter += 1
-            response = requests.post(request, headers=self.headers, verify=self.verify_cert)
+            response = self._request('post', url)
 
             if response.status_code == 429:
                 msg = (
                     f'API token refresh to {self.hostname} failed due to FMC rate limiting.',
                     f'Retrying in {API_RETRY_TIMER} seconds.',
                 )
-                raise RateLimitException(msg)
+                raise exc.RateLimitException(msg)
 
             access_token = response.headers.get('X-auth-access-token', default=None)
             refresh_token = response.headers.get('X-auth-refresh-token', default=None)
             if not access_token or not refresh_token:
                 msg = f'API token refresh to {self.hostname} failed. Response Code: {response.status_code}'
-                raise AuthRefreshError(msg)
+                raise exc.AuthRefreshError(msg)
 
             self.headers['X-auth-access-token'] = access_token
             self.headers['X-auth-refresh-token'] = refresh_token
         except ConnectionError:
             self.logger.exception('Could not connect to %s', self.hostname)
             raise
-        except RateLimitException:
+        except exc.RateLimitException:
             self.logger.debug(
                 'API token refresh to %s failed. Rate limit exceeded. Retrying in %s seconds.',
                 self.hostname,
@@ -271,13 +231,12 @@ class Client(object):
             )
             sleep(API_RETRY_TIMER)
             self._login()
-        except GenericApiError as exc:
-            self.logger.error(str(exc))
+        except exc.GenericApiError as error:
+            self.logger.error(str(error))
             raise
 
         self.logger.debug('Successfully refreshed authorization token for %s', self.hostname)
 
-    @log_request('DELETE')
     def _delete(self, request: str, params=None):
         '''
         DELETE operation
@@ -297,128 +256,84 @@ class Client(object):
                     return self._delete(request, params)
             if response.status_code == 429:
                 msg = f'DELETE operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise RateLimitException(msg)
-        except RateLimitException:
+                raise exc.RateLimitException(msg)
+        except exc.RateLimitException:
             sleep(API_RETRY_TIMER)
             return self._delete(request, params)
         return response
 
-    @log_request('GET')
-    def _get_request(self, request: str, params=None):
-        '''
-        GET operation without paging support
-        : param request: url of request that should be performed
-        : param params: dict of parameters for http request
-        : return: requests.Response object
-        '''
-        if params is None:
-            params = {}
-        if not self._is_getbyid_operation(request) and 'limit' not in params:
-            params['limit'] = API_PAGING_LIMIT
-        try:
-            response = requests.get(
-                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout,
-            )
-            if response.status_code == 401:
-                if 'Access token invalid' in str(response.json()):
-                    self._refresh()
-                    return self._get_request(request, params)
-            if response.status_code == 429:
-                msg = f'GET operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise RateLimitException(msg)
-        except RateLimitException:
-            sleep(API_RETRY_TIMER)
-            return self._get_request(request, params)
-        return response
-
-    def _get(self, request: str, params=None):
+    def _get(self, url: str, params=None, items=None):
         '''
         GET operation with paging support
-        : param request: url of request that should be performed
+        : param url: request that should be performed
         : param params: dict of parameters for http request
         : return: list of requests.Response objects
         '''
-        if params is None:
-            params = {}
-        responses = []
-        response = self._get_request(request, params)
-        responses.append(response)
-        payload = response.json()
-        if 'paging' in payload.keys():
-            pages = int(payload['paging']['pages'])
-            params['limit'] = int(payload['paging']['limit'])
-            for i in range(1, pages, 1):
-                params['offset'] = i * params['limit']
-                response_page = self._get_request(request, params)
-                responses.append(response_page)
-        return self._squash_responses(responses)
+        if not utils.is_getbyid_operation(url) and items is None:
+            if params is None:
+                params = {}
+            params['limit'] = API_PAGING_LIMIT
+            params['expanded'] = API_EXPANSION_MODE
 
-    @log_request('POST')
-    def _post(self, request: str, data: Dict, params=None):
+        response = self._request('get', url, params)
+        payload = response.json()
+        if 'paging' in payload:
+            if items is None:
+                items = []
+            items.extend(payload['items'])
+            if 'next' in payload['paging']:
+                items = self._get(payload['paging']['next'][0], params=None, items=items)
+            return items
+        return payload
+
+    def _create(self, url: str, json: Dict, params=None):
         '''
-        POST operation
-        : param request: url of request that should be performed
-        : param data: dictionary of data that will be sent to the api
+        CREATE operation
+        : param url: request that should be performed
+        : param json: dictionary of data that will be sent to the api
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        data = self._sanitize(data)
+        json = self._sanitize(json)
         if params is None:
             params = {}
         try:
-            response = requests.post(
-                request,
-                data=json.dumps(data),
-                headers=self.headers,
-                params=params,
-                verify=self.verify_cert,
-                timeout=self.timeout,
-            )
+            response = self._request('post', url, params, json)
             if response.status_code == 401:
                 if 'Access token invalid' in str(response.json()):
                     self._refresh()
-                    return self._post(request, data, params)
+                    return self._create(url, json, params)
             if response.status_code == 429:
-                msg = (
-                    f'POST operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                )
-                raise RateLimitException(msg)
-        except RateLimitException:
+                msg = f'POST operation {url} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
+                raise exc.RateLimitException(msg)
+        except exc.RateLimitException:
             sleep(API_RETRY_TIMER)
-            return self._post(request, data, params)
+            return self._create(url, json, params)
         return response
 
-    @log_request('PUT')
-    def _put(self, request: str, data: Dict, params=None):
+    def _update(self, url: str, json: Dict, params=None):
         '''
-        PUT operation
-        : param request: url of request that should be performed
-        : param data: dictionary of data that will be sent to the api
+        UPDATE operation
+        : param url: request that should be performed
+        : param json: dictionary of data that will be sent to the api
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        data = self._sanitize(data)
+        json = self._sanitize(json)
         if params is None:
             params = {}
         try:
-            response = requests.put(
-                request,
-                data=json.dumps(data),
-                headers=self.headers,
-                params=params,
-                verify=self.verify_cert,
-                timeout=self.timeout,
-            )
+            response = self._request(url, params, json=json)
             if response.status_code == 401:
                 if 'Access token invalid' in response.text:
                     self._refresh()
-                    return self._put(request, data, params)
+                    return self._update(url, json, params)
             if response.status_code == 429:
-                msg = f'PUT operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise RateLimitException(msg)
-        except RateLimitException:
+                msg = f'PUT operation {url} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
+                raise exc.RateLimitException(msg)
+        except exc.RateLimitException:
             sleep(API_RETRY_TIMER)
-            return self._put(request, data, params)
+            return self._update(url, json, params)
         return response
 
     def _sanitize(self, payload: Dict):
@@ -435,8 +350,8 @@ class Client(object):
         sanitized_payload.pop('id', None)
         return sanitized_payload
 
-    @cache_result
-    @minimum_version_required('6.1.0')
+    @utils.cache_result
+    @utils.minimum_version_required('6.1.0')
     def get_object_id_by_name(self, object_type: str, object_name: str):
         '''
         helper function to retrieve object id by name
@@ -452,8 +367,8 @@ class Client(object):
                 return obj['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.1.0')
+    @utils.cache_result
+    @utils.minimum_version_required('6.1.0')
     def get_device_id_by_name(self, device_name: str):
         '''
         helper function to retrieve device id by name
@@ -468,8 +383,8 @@ class Client(object):
                 return device['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.2.3')
+    @utils.cache_result
+    @utils.minimum_version_required('6.2.3')
     def get_device_hapair_id_by_name(self, device_hapair_name: str):
         '''
         helper function to retrieve device ha - pair id by name
@@ -484,8 +399,8 @@ class Client(object):
                 return ha_pair['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.2.3')
+    @utils.cache_result
+    @utils.minimum_version_required('6.2.3')
     def get_device_id_from_hapair(self, device_hapair_id: str):
         '''
         helper function to retrieve device id from ha - pair
@@ -497,8 +412,8 @@ class Client(object):
         ha_pair = self._get(url)
         return ha_pair['primary']['id']
 
-    @cache_result
-    @minimum_version_required('6.2.3')
+    @utils.cache_result
+    @utils.minimum_version_required('6.2.3')
     def get_nat_policy_id_by_name(self, nat_policy_name: str):
         '''
         helper function to retrieve nat policy id by name
@@ -513,8 +428,8 @@ class Client(object):
                 return nat_policy['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.1.0')
+    @utils.cache_result
+    @utils.minimum_version_required('6.1.0')
     def get_acp_id_by_name(self, policy_name: str):
         '''
         helper function to retrieve access control policy id by name
@@ -529,8 +444,8 @@ class Client(object):
                 return accesspolicy['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.1.0')
+    @utils.cache_result
+    @utils.minimum_version_required('6.1.0')
     def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
         '''
         helper function to retrieve access control policy rule id by name
@@ -547,8 +462,8 @@ class Client(object):
                 return acp_rule['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.1.0')
+    @utils.cache_result
+    @utils.minimum_version_required('6.1.0')
     def get_syslog_alert_id_by_name(self, syslog_alert_name: str):
         '''
         helper function to retrieve syslog alert object id by name
@@ -561,8 +476,8 @@ class Client(object):
                 return syslog_alert['id']
         return None
 
-    @cache_result
-    @minimum_version_required('6.1.0')
+    @utils.cache_result
+    @utils.minimum_version_required('6.1.0')
     def get_snmp_alert_id_by_name(self, snmp_alert_name: str):
         '''
         helper function to retrieve snmp alert object id by name
@@ -603,39 +518,39 @@ class Client(object):
         self.logger.debug('Available Domains: %s', available_domains)
         return None
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_system_version(self):
         request = '/info/serverversion'
         url = self._url('platform', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_audit_records(self):
         request = '/audit/auditrecords'
         url = self._url('platform', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_syslogalerts(self):
         request = '/policy/syslogalerts'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_snmpalerts(self):
         request = '/policy/snmpalerts'
         url = self._url('config', request)
         return self._get(url)
 
-    @validate_object_type
-    @minimum_version_required('6.1.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.1.0')
     def create_object(self, object_type: str, data: Dict):
         request = f'/object/{object_type}'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @validate_object_type
-    @minimum_version_required('6.1.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.1.0')
     def get_objects(self, object_type: str):
         request = f'/object/{object_type}'
         url = self._url('config', request)
@@ -644,8 +559,8 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @validate_object_type
-    @minimum_version_required('6.4.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.4.0')
     def get_objects_override(self, object_type: str, objects: List):
         overrides = []
         for obj in objects:
@@ -654,15 +569,15 @@ class Client(object):
                 overrides.extend(responses)
         return overrides
 
-    @validate_object_type
-    @minimum_version_required('6.1.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.1.0')
     def get_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @validate_object_type
-    @minimum_version_required('6.4.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.4.0')
     def get_object_override(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}/overrides'
         url = self._url('config', request)
@@ -671,27 +586,27 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @validate_object_type
-    @minimum_version_required('6.1.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.1.0')
     def update_object(self, object_type: str, object_id: str, data: Dict):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @validate_object_type
-    @minimum_version_required('6.1.0')
+    @utils.validate_object_type
+    @utils.minimum_version_required('6.1.0')
     def delete_object(self, object_type: str, object_id: str):
         request = f'/object/{object_type}/{object_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def create_device(self, data: Dict):
         request = '/devices/devicerecords'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_devices(self):
         request = '/devices/devicerecords'
         url = self._url('config', request)
@@ -700,25 +615,25 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_device(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_device(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def delete_device(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def get_device_hapairs(self):
         request = '/devicehapairs/ftddevicehapairs'
         params = {
@@ -727,31 +642,31 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def create_device_hapair(self, data: Dict):
         request = '/devicehapairs/ftddevicehapairs/{}'
         url = self._url('config', request)
         return self._get(url, data)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def get_device_hapair(self, device_hapair_id: str):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def update_device_hapair(self, data: Dict, device_hapair_id: str):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def delete_device_hapair(self, device_hapair_id: str):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces'
         params = {
@@ -760,19 +675,19 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def update_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str, data: Dict):
         request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
         url = self._url('config', request)
@@ -781,25 +696,25 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_ftd_physical_interface(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def create_ftd_redundant_interface(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
         url = self._url('config', request)
@@ -808,31 +723,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_ftd_redundant_interface(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def delete_ftd_redundant_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def create_ftd_portchannel_interface(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
         url = self._url('config', request)
@@ -841,31 +756,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_ftd_portchannel_interface(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def delete_ftd_portchannel_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def create_ftd_sub_interface(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/subinterfaces'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_sub_interfaces(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/subinterfaces'
         url = self._url('config', request)
@@ -874,31 +789,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_ftd_sub_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_ftd_sub_interface(self, device_id: str, interface_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def delete_ftd_sub_interface(self, device_id: str, interface_id: str):
         request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def create_ftd_ipv4staticroute(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroutes(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
         url = self._url('config', request)
@@ -907,31 +822,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def update_ftd_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def delete_ftd_ipv4staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def create_ftd_ipv6staticroute(self, device_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroutes(self, device_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
         url = self._url('config', request)
@@ -940,31 +855,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def update_ftd_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.3.0')
+    @utils.minimum_version_required('6.3.0')
     def delete_ftd_ipv6staticroute(self, device_id: str, route_id: str):
         request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def deploy(self, data: Dict):
         request = '/deployment/deploymentrequests'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_deployable_devices(self):
         request = '/deployment/deployabledevices'
         url = self._url('config', request)
@@ -973,13 +888,13 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def create_policy(self, policy_type: str, data: Dict):
         request = f'/policy/{policy_type}'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_policies(self, policy_type: str):
         request = f'/policy/{policy_type}'
         url = self._url('config', request)
@@ -988,7 +903,7 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_policy(self, policy_id: str, policy_type: str):
         request = f'/policy/{policy_type}/{policy_id}'
         params = {
@@ -997,19 +912,19 @@ class Client(object):
         url = self._url('config', request)
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_policy(self, policy_id: str, policy_type: str, data: Dict):
         request = f'/policy/{policy_type}/{policy_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def delete_policy(self, policy_id: str, policy_type: str):
         request = f'/policy/{policy_type}/{policy_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.2.1')
+    @utils.minimum_version_required('6.2.1')
     def create_acp_rule(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
@@ -1021,9 +936,9 @@ class Client(object):
             'insert_before': insert_before,
             'insert_after': insert_after,
         }
-        return self._post(url, data, params)
+        return self._create(url, data, params)
 
-    @minimum_version_required('6.2.1')
+    @utils.minimum_version_required('6.2.1')
     def create_acp_rules(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
@@ -1035,15 +950,15 @@ class Client(object):
             'insert_before': insert_before,
             'insert_after': insert_after,
         }
-        return self._post(url, data, params)
+        return self._create(url, data, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_acp_rule(self, policy_id: str, rule_id: str):
         request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_acp_rules(self, policy_id: str):
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
@@ -1052,31 +967,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
         request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def delete_acp_rule(self, policy_id: str, rule_id: str):
         request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def create_autonat_rule(self, policy_id: str, data: Dict):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def get_autonat_rule(self, policy_id: str, rule_id: str):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def get_autonat_rules(self, policy_id: str):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
         url = self._url('config', request)
@@ -1085,31 +1000,31 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def update_autonat_rule(self, policy_id: str, data: Dict):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def delete_autonat_rule(self, policy_id: str, rule_id: str):
         request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def create_manualnat_rule(self, policy_id: str, data: Dict):
         request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def get_manualnat_rule(self, policy_id: str, rule_id: str):
         request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def get_manualnat_rules(self, policy_id: str):
         request = f'/policy/ftdnatpolicies/manualnatrules/{policy_id}'
         url = self._url('config', request)
@@ -1118,25 +1033,25 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def update_manualnat_rule(self, policy_id: str, data: Dict):
         request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
 
-    @minimum_version_required('6.2.3')
+    @utils.minimum_version_required('6.2.3')
     def delete_manualnat_rule(self, policy_id: str, rule_id: str):
         request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}'
         url = self._url('config', request)
         return self._delete(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def create_policy_assignment(self, data: Dict):
         request = '/assignment/policyassignments'
         url = self._url('config', request)
-        return self._post(url, data)
+        return self._create(url, data)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_policy_assignments(self):
         request = '/assignment/policyassignments'
         url = self._url('config', request)
@@ -1145,14 +1060,14 @@ class Client(object):
         }
         return self._get(url, params)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def get_policy_assignment(self, policy_id: str):
         request = f'/assignment/policyassignments/{policy_id}'
         url = self._url('config', request)
         return self._get(url)
 
-    @minimum_version_required('6.1.0')
+    @utils.minimum_version_required('6.1.0')
     def update_policy_assignment(self, policy_id: str, data: Dict):
         request = f'/assignment/policyassignments/{policy_id}'
         url = self._url('config', request)
-        return self._put(url, data)
+        return self._update(url, data)
