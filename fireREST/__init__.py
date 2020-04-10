@@ -50,8 +50,14 @@ API_REQUEST_TIMEOUT = 120
 #: name of fmc default domain for api requests
 API_DEFAULT_DOMAIN = 'Global'
 
-#: retry timer in seconds for repeating failed api calls
-API_RETRY_TIMER = 10
+#: intial authorization token refresh counter
+API_REFRESH_COUNTER_INIT = 0
+
+#: max no. of authorization token refresh operations
+API_REFRESH_COUNTER_MAX = 3
+
+#: max size of api payload in bytes
+API_PAYLOAD_SIZE_MAX = 2048000
 
 
 class Client(object):
@@ -89,7 +95,7 @@ class Client(object):
             'User-Agent': API_USER_AGENT,
         }
         self.cache = cache
-        self.refresh_counter = 0
+        self.refresh_counter = API_REFRESH_COUNTER_INIT
         self.logger = self._get_logger(logger)
         self.hostname = hostname
         self.cred = HTTPBasicAuth(username, password)
@@ -138,12 +144,13 @@ class Client(object):
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
         return options[namespace]
 
-    def _request(self, method: str, url: str, params=None, auth=None, json=None):
+    @utils.handle_errors
+    def _request(self, method: str, url: str, params=None, auth=None, data=None):
         return requests.request(
             method=method,
             url=url,
             params=params,
-            json=json,
+            data=data,
             auth=auth,
             headers=self.headers,
             timeout=self.timeout,
@@ -155,119 +162,43 @@ class Client(object):
         Login to fmc rest api
         '''
         url = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
-        try:
-            response = self._request('post', url, auth=self.cred)
-            if response.status_code in (401, 403) or (response.status_code == 500 and 'Unauthorized' in response.text):
-                self.logger.error('API Authentication to %s failed.', self.hostname)
-                raise exc.AuthError(f'API Authentication to {self.hostname} failed.')
-
-            if response.status_code == 429:
-                msg = (
-                    f'API Authentication to {self.hostname} failed due to FMC rate limiting.',
-                    f'Retrying in {API_RETRY_TIMER} seconds.',
-                )
-                raise exc.RateLimitException(msg)
-
-            access_token = response.headers.get('X-auth-access-token', default=None)
-            refresh_token = response.headers.get('X-auth-refresh-token', default=None)
-
-            if not access_token or not refresh_token:
-                self.logger.error('Could not retrieve tokens from %s.', url)
-                raise exc.GenericApiError(f'Could not retrieve tokens from {url}.')
-
-            self.headers['X-auth-access-token'] = access_token
-            self.headers['X-auth-refresh-token'] = refresh_token
-            self.domains = json.loads(response.headers.get('DOMAINS', default=None))
-            self.refresh_counter = 0
-            self.logger.debug('Successfully authenticated to %s', self.hostname)
-        except ConnectionError:
-            self.logger.exception('Could not connect to %s', self.hostname)
-            raise
-        except exc.RateLimitException:
-            self.logger.debug(
-                'Could not login to %s. Rate limit exceeded. Retrying in %s seconds.', self.hostname, API_RETRY_TIMER,
-            )
-            sleep(API_RETRY_TIMER)
-            self._login()
+        response = self._request('post', url, auth=self.cred)
+        self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+        self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+        self.domains = json.loads(response.headers['DOMAINS'])
+        self.logger.debug('Successfully authenticated to %s', self.hostname)
+        self.refresh_counter = API_REFRESH_COUNTER_INIT
 
     def _refresh(self):
         '''
         Refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using _login() will be performed
         '''
-        if self.refresh_counter > 2:
+        if self.refresh_counter < API_REFRESH_COUNTER_MAX:
+            url = self._url('refresh')
+            response = self._request('post', url)
+            self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+            self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            self.refresh_counter += 1
+        else:
             self.logger.info('Authentication token expired. Re-authenticating to %s', self.hostname)
             self._login()
-            return
 
-        url = self._url('refresh')
-        try:
-            self.refresh_counter += 1
-            response = self._request('post', url)
-
-            if response.status_code == 429:
-                msg = (
-                    f'API token refresh to {self.hostname} failed due to FMC rate limiting.',
-                    f'Retrying in {API_RETRY_TIMER} seconds.',
-                )
-                raise exc.RateLimitException(msg)
-
-            access_token = response.headers.get('X-auth-access-token', default=None)
-            refresh_token = response.headers.get('X-auth-refresh-token', default=None)
-            if not access_token or not refresh_token:
-                msg = f'API token refresh to {self.hostname} failed. Response Code: {response.status_code}'
-                raise exc.AuthRefreshError(msg)
-
-            self.headers['X-auth-access-token'] = access_token
-            self.headers['X-auth-refresh-token'] = refresh_token
-        except ConnectionError:
-            self.logger.exception('Could not connect to %s', self.hostname)
-            raise
-        except exc.RateLimitException:
-            self.logger.debug(
-                'API token refresh to %s failed. Rate limit exceeded. Retrying in %s seconds.',
-                self.hostname,
-                API_RETRY_TIMER,
-            )
-            sleep(API_RETRY_TIMER)
-            self._login()
-        except exc.GenericApiError as error:
-            self.logger.error(str(error))
-            raise
-
-        self.logger.debug('Successfully refreshed authorization token for %s', self.hostname)
-
-    def _delete(self, request: str, params=None):
+    def _delete(self, url: str, params=None):
         '''
         DELETE operation
-        : param request: url of request that should be performed
+        : param url: request that should be performed
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        if params is None:
-            params = {}
-        try:
-            response = requests.delete(
-                request, headers=self.headers, params=params, verify=self.verify_cert, timeout=self.timeout,
-            )
-            if response.status_code == 401:
-                if 'Access token invalid' in str(response.json()):
-                    self._refresh()
-                    return self._delete(request, params)
-            if response.status_code == 429:
-                msg = f'DELETE operation {request} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise exc.RateLimitException(msg)
-        except exc.RateLimitException:
-            sleep(API_RETRY_TIMER)
-            return self._delete(request, params)
-        return response
+        return self._request('delete', url, params)
 
     def _get(self, url: str, params=None, items=None):
         '''
         GET operation with paging support
         : param url: request that should be performed
         : param params: dict of parameters for http request
-        : return: list of requests.Response objects
+        : return: dictionary or list containing api objects
         '''
         if not utils.is_getbyid_operation(url) and items is None:
             if params is None:
@@ -286,7 +217,7 @@ class Client(object):
             return items
         return payload
 
-    def _create(self, url: str, json: Dict, params=None):
+    def _create(self, url: str, data: Dict, params=None):
         '''
         CREATE operation
         : param url: request that should be performed
@@ -294,24 +225,10 @@ class Client(object):
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        json = self._sanitize(json)
-        if params is None:
-            params = {}
-        try:
-            response = self._request('post', url, params, json)
-            if response.status_code == 401:
-                if 'Access token invalid' in str(response.json()):
-                    self._refresh()
-                    return self._create(url, json, params)
-            if response.status_code == 429:
-                msg = f'POST operation {url} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise exc.RateLimitException(msg)
-        except exc.RateLimitException:
-            sleep(API_RETRY_TIMER)
-            return self._create(url, json, params)
-        return response
+        data = self._sanitize(data)
+        return self._request('post', url, params, json)
 
-    def _update(self, url: str, json: Dict, params=None):
+    def _update(self, url: str, data: Dict, params=None):
         '''
         UPDATE operation
         : param url: request that should be performed
@@ -319,22 +236,8 @@ class Client(object):
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        json = self._sanitize(json)
-        if params is None:
-            params = {}
-        try:
-            response = self._request(url, params, json=json)
-            if response.status_code == 401:
-                if 'Access token invalid' in response.text:
-                    self._refresh()
-                    return self._update(url, json, params)
-            if response.status_code == 429:
-                msg = f'PUT operation {url} failed due to FMC rate limiting. Retrying in {API_RETRY_TIMER} seconds.'
-                raise exc.RateLimitException(msg)
-        except exc.RateLimitException:
-            sleep(API_RETRY_TIMER)
-            return self._update(url, json, params)
-        return response
+        data = self._sanitize(data)
+        return self._update(url, json, params)
 
     def _sanitize(self, payload: Dict):
         '''
