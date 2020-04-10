@@ -663,28 +663,28 @@ class Client(object):
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def create_policy(self, policy_type: str, data: Dict):
-        url = self._url('config', f'/policy/{policy_type}')
+    def create_accesspolicy(self, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_policies(self, policy_type: str):
-        url = self._url('config', f'/policy/{policy_type}')
+    def get_accesspolicies(self):
+        url = self._url('config', f'/policy/accesspolicies')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_policy(self, policy_id: str, policy_type: str):
-        url = self._url('config', f'/policy/{policy_type}/{policy_id}')
+    def get_accesspolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_policy(self, policy_id: str, policy_type: str, data: Dict):
-        url = self._url('config', f'/policy/{policy_type}/{policy_id}')
+    def update_accesspolicy(self, policy_id: str, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_policy(self, policy_id: str, policy_type: str):
-        url = self._url('config', f'/policy/{policy_type}/{policy_id}')
+    def delete_accesspolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.1')
@@ -706,6 +706,7 @@ class Client(object):
     ):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
+            'bulk': True,
             'category': category,
             'section': section,
             'insert_before': insert_before,
@@ -731,6 +732,78 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def delete_accessrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def create_prefilterpolicy(self, data: Dict):
+        url = self._url('config', f'/policy/prefilterpolicies')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_prefilterpolicies(self):
+        url = self._url('config', f'/policy/prefilterpolicies')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_prefilterpolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def update_prefilterpolicy(self, policy_id: str, data: Dict):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def delete_prefilterpolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def create_prefilterrule(
+        self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
+    ):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
+        params = {
+            'category': category,
+            'section': section,
+            'insert_before': insert_before,
+            'insert_after': insert_after,
+        }
+        return self._create(url, data, params)
+
+    @utils.minimum_version_required('6.5.0')
+    def create_prefilterrules(
+        self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
+    ):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
+        params = {
+            'bulk': True,
+            'category': category,
+            'section': section,
+            'insert_before': insert_before,
+            'insert_after': insert_after,
+        }
+        return self._create(url, data, params)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_prefilterrule(self, policy_id: str, rule_id: str):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_prefilterrules(self, policy_id: str):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def update_prefilterrule(self, policy_id: str, rule_id: str, data: Dict):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def delete_prefilterrule(self, policy_id: str, rule_id: str):
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
