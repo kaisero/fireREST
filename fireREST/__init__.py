@@ -662,6 +662,11 @@ class Client(object):
         url = self._url('config', '/deployment/deployabledevices')
         return self._get(url)
 
+    @utils.minimum_version_required('6.6.0')
+    def get_pendingchanges(self, device_id: str):
+        url = self._url('config', f'/deployment/deployabledevices/{device_id}/pendingchanges')
+        return self._get(url)
+
     @utils.minimum_version_required('6.1.0')
     def create_accesspolicy(self, data: Dict):
         url = self._url('config', f'/policy/accesspolicies')
