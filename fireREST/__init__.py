@@ -423,40 +423,34 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_system_version(self):
-        request = '/info/serverversion'
-        url = self._url('platform', request)
+        url = self._url('platform', '/info/serverversion')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_audit_records(self):
-        request = '/audit/auditrecords'
-        url = self._url('platform', request)
+        url = self._url('platform', '/audit/auditrecords')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_syslogalerts(self):
-        request = '/policy/syslogalerts'
-        url = self._url('config', request)
+        url = self._url('config', '/policy/syslogalerts')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_snmpalerts(self):
-        request = '/policy/snmpalerts'
-        url = self._url('config', request)
+        url = self._url('config', '/policy/snmpalerts')
         return self._get(url)
 
     @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
     def create_object(self, object_type: str, data: Dict):
-        request = f'/object/{object_type}'
-        url = self._url('config', request)
+        url = self._url('config', f'/object/{object_type}')
         return self._create(url, data)
 
     @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
     def get_objects(self, object_type: str):
-        request = f'/object/{object_type}'
-        url = self._url('config', request)
+        url = self._url('config', f'/object/{object_type}')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -475,15 +469,13 @@ class Client(object):
     @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
     def get_object(self, object_type: str, object_id: str):
-        request = f'/object/{object_type}/{object_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/object/{object_type}/{object_id}')
         return self._get(url)
 
     @utils.validate_object_type
     @utils.minimum_version_required('6.4.0')
     def get_object_override(self, object_type: str, object_id: str):
-        request = f'/object/{object_type}/{object_id}/overrides'
-        url = self._url('config', request)
+        url = self._url('config', f'/object/{object_type}/{object_id}/overrides')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -492,27 +484,23 @@ class Client(object):
     @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
     def update_object(self, object_type: str, object_id: str, data: Dict):
-        request = f'/object/{object_type}/{object_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/object/{object_type}/{object_id}')
         return self._update(url, data)
 
     @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
     def delete_object(self, object_type: str, object_id: str):
-        request = f'/object/{object_type}/{object_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/object/{object_type}/{object_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
     def create_device(self, data: Dict):
-        request = '/devices/devicerecords'
-        url = self._url('config', request)
+        url = self._url('config', '/devices/devicerecords')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_devices(self):
-        request = '/devices/devicerecords'
-        url = self._url('config', request)
+        url = self._url('config', '/devices/devicerecords')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -520,80 +508,70 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_device(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_device(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def delete_device(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
     def get_device_hapairs(self):
-        request = '/devicehapairs/ftddevicehapairs'
         params = {
             'expanded': API_EXPANSION_MODE,
         }
-        url = self._url('config', request)
+        url = self._url('config', '/devicehapairs/ftddevicehapairs')
         return self._get(url, params)
 
     @utils.minimum_version_required('6.2.3')
     def create_device_hapair(self, data: Dict):
-        request = '/devicehapairs/ftddevicehapairs/{}'
-        url = self._url('config', request)
+        url = self._url('config', '/devicehapairs/ftddevicehapairs')
         return self._get(url, data)
 
     @utils.minimum_version_required('6.2.3')
     def get_device_hapair(self, device_hapair_id: str):
-        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
     def update_device_hapair(self, data: Dict, device_hapair_id: str):
-        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.2.3')
     def delete_device_hapair(self, device_hapair_id: str):
-        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str):
-        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces'
         params = {
             'expanded': API_EXPANSION_MODE,
         }
-        url = self._url('config', request)
+        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces')
         return self._get(url, params)
 
     @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str):
-        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}'
-        url = self._url('config', request)
+        url = self._url(
+            'config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def update_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str, data: Dict):
-        request = f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}'
-        url = self._url('config', request)
+        url = self._url(
+            'config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interfaces(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -601,26 +579,22 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_ftd_physical_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/physicalinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def create_ftd_redundant_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interfaces(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -628,32 +602,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_ftd_redundant_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/redundantinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def delete_ftd_redundant_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
     def create_ftd_portchannel_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interfaces(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -661,32 +630,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_ftd_portchannel_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def delete_ftd_portchannel_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
     def create_ftd_sub_interface(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/subinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_sub_interfaces(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}/subinterfaces'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -694,32 +658,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_sub_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_ftd_sub_interface(self, device_id: str, interface_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def delete_ftd_sub_interface(self, device_id: str, interface_id: str):
-        request = f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.3.0')
     def create_ftd_ipv4staticroute(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroutes(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -727,32 +686,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroute(self, device_id: str, route_id: str):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def update_ftd_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.3.0')
     def delete_ftd_ipv4staticroute(self, device_id: str, route_id: str):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.3.0')
     def create_ftd_ipv6staticroute(self, device_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroutes(self, device_id: str):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -760,32 +714,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroute(self, device_id: str, route_id: str):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def update_ftd_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.3.0')
     def delete_ftd_ipv6staticroute(self, device_id: str, route_id: str):
-        request = f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
     def deploy(self, data: Dict):
-        request = '/deployment/deploymentrequests'
-        url = self._url('config', request)
+        url = self._url('config', '/deployment/deploymentrequests')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_deployable_devices(self):
-        request = '/deployment/deployabledevices'
-        url = self._url('config', request)
+        url = self._url('config', '/deployment/deployabledevices')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -793,14 +742,12 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def create_policy(self, policy_type: str, data: Dict):
-        request = f'/policy/{policy_type}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/{policy_type}')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_policies(self, policy_type: str):
-        request = f'/policy/{policy_type}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/{policy_type}')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -808,31 +755,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_policy(self, policy_id: str, policy_type: str):
-        request = f'/policy/{policy_type}/{policy_id}'
         params = {
             'expanded': API_EXPANSION_MODE,
         }
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/{policy_type}/{policy_id}')
         return self._get(url, params)
 
     @utils.minimum_version_required('6.1.0')
     def update_policy(self, policy_id: str, policy_type: str, data: Dict):
-        request = f'/policy/{policy_type}/{policy_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/{policy_type}/{policy_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def delete_policy(self, policy_id: str, policy_type: str):
-        request = f'/policy/{policy_type}/{policy_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/{policy_type}/{policy_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.1')
     def create_acp_rule(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
-        request = f'/policy/accesspolicies/{policy_id}/accessrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
             'category': category,
             'section': section,
@@ -845,8 +788,7 @@ class Client(object):
     def create_acp_rules(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
-        request = f'/policy/accesspolicies/{policy_id}/accessrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
             'category': category,
             'section': section,
@@ -857,14 +799,12 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_acp_rule(self, policy_id: str, rule_id: str):
-        request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_acp_rules(self, policy_id: str):
-        request = f'/policy/accesspolicies/{policy_id}/accessrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -872,32 +812,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
-        request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def delete_acp_rule(self, policy_id: str, rule_id: str):
-        request = f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
     def create_autonat_rule(self, policy_id: str, data: Dict):
-        request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.2.3')
     def get_autonat_rule(self, policy_id: str, rule_id: str):
-        request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
     def get_autonat_rules(self, policy_id: str):
-        request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -905,32 +840,27 @@ class Client(object):
 
     @utils.minimum_version_required('6.2.3')
     def update_autonat_rule(self, policy_id: str, data: Dict):
-        request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.2.3')
     def delete_autonat_rule(self, policy_id: str, rule_id: str):
-        request = f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
     def create_manualnat_rule(self, policy_id: str, data: Dict):
-        request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.2.3')
     def get_manualnat_rule(self, policy_id: str, rule_id: str):
-        request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
     def get_manualnat_rules(self, policy_id: str):
-        request = f'/policy/ftdnatpolicies/manualnatrules/{policy_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/manualnatrules/{policy_id}')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -938,26 +868,22 @@ class Client(object):
 
     @utils.minimum_version_required('6.2.3')
     def update_manualnat_rule(self, policy_id: str, data: Dict):
-        request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.2.3')
     def delete_manualnat_rule(self, policy_id: str, rule_id: str):
-        request = f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
     def create_policy_assignment(self, data: Dict):
-        request = '/assignment/policyassignments'
-        url = self._url('config', request)
+        url = self._url('config', '/assignment/policyassignments')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_policy_assignments(self):
-        request = '/assignment/policyassignments'
-        url = self._url('config', request)
+        url = self._url('config', '/assignment/policyassignments')
         params = {
             'expanded': API_EXPANSION_MODE,
         }
@@ -965,12 +891,10 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_policy_assignment(self, policy_id: str):
-        request = f'/assignment/policyassignments/{policy_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/assignment/policyassignments/{policy_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_policy_assignment(self, policy_id: str, data: Dict):
-        request = f'/assignment/policyassignments/{policy_id}'
-        url = self._url('config', request)
+        url = self._url('config', f'/assignment/policyassignments/{policy_id}')
         return self._update(url, data)
