@@ -291,11 +291,11 @@ class Client(object):
 
     @utils.cache_result
     @utils.minimum_version_required('6.1.0')
-    def get_acp_id_by_name(self, policy_name: str):
+    def get_accesspolicy_id_by_name(self, policy_name: str):
         '''
         helper function to retrieve access control policy id by name
         : param policy_name: name of the access control policy
-        : return: acp id if access control policy is found, None otherwise
+        : return: accesspolicy id if access control policy is found, None otherwise
         '''
         request = '/policy/accesspolicies'
         url = self._url('config', request)
@@ -307,20 +307,20 @@ class Client(object):
 
     @utils.cache_result
     @utils.minimum_version_required('6.1.0')
-    def get_acp_rule_id_by_name(self, policy_name: str, rule_name: str):
+    def get_accessrule_id_by_name(self, policy_name: str, rule_name: str):
         '''
         helper function to retrieve access control policy rule id by name
         : param policy_name: name of the access control policy that will be queried
         : param rule_name: name of the access control policy rule
-        : return: acp rule id if access control policy rule is found, None otherwise
+        : return: accesspolicy rule id if access control policy rule is found, None otherwise
         '''
-        policy_id = self.get_acp_id_by_name(policy_name)
+        policy_id = self.get_accesspolicy_id_by_name(policy_name)
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url('config', request)
-        acp_rules = self._get(url)
-        for acp_rule in acp_rules:
-            if acp_rule['name'] == rule_name:
-                return acp_rule['id']
+        accessrules = self._get(url)
+        for accessrule in accessrules:
+            if accessrule['name'] == rule_name:
+                return accessrule['id']
         return None
 
     @utils.cache_result
@@ -688,7 +688,7 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.1')
-    def create_acp_rule(
+    def create_accessrule(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
@@ -701,7 +701,7 @@ class Client(object):
         return self._create(url, data, params)
 
     @utils.minimum_version_required('6.2.1')
-    def create_acp_rules(
+    def create_accessrules(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
@@ -714,22 +714,22 @@ class Client(object):
         return self._create(url, data, params)
 
     @utils.minimum_version_required('6.1.0')
-    def get_acp_rule(self, policy_id: str, rule_id: str):
+    def get_accessrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_acp_rules(self, policy_id: str):
+    def get_accessrules(self, policy_id: str):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
+    def update_accessrule(self, policy_id: str, rule_id: str, data: Dict):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_acp_rule(self, policy_id: str, rule_id: str):
+    def delete_accessrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._delete(url)
 
