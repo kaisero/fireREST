@@ -184,7 +184,7 @@ class Client(object):
         : return: requests.Response object
         '''
         data = self._sanitize(data)
-        return self._request('post', url, params, json)
+        return self._request('post', url, params, data)
 
     def _update(self, url: str, data: Dict, params=None):
         '''
@@ -195,7 +195,7 @@ class Client(object):
         : return: requests.Response object
         '''
         data = self._sanitize(data)
-        return self._update(url, json, params)
+        return self._update(url, data, params)
 
     def _sanitize(self, payload: Dict):
         '''
