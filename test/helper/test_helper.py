@@ -3,7 +3,7 @@
 import pytest
 
 from fireREST import Client
-from fireREST import API_AUTH_URL, API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
+from fireREST.defaults import API_AUTH_URL, API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
 
 
 def test_default_url(api):

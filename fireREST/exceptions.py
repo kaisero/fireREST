@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from . import defaults
+
 
 class GenericApiError(Exception):
     '''
@@ -80,6 +82,7 @@ class PayloadLimitExceededError(Exception):
     '''
     exception used when size limit of api payload is exceeded
     '''
+    MSG = f'Payload exceeds maximum size of {defaults.API_PAYLOAD_SIZE_MAX}'
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)

@@ -56,3 +56,12 @@ def test_is_getbyid_operation_with_invalid_getbyid_operation():
     actual_result = utils.is_getbyid_operation(valid_getbyid_operation)
 
     assert expected_result == actual_result
+
+
+# def test_rate_limit_retry(api):
+#    for i in range(1, 121, 1):
+#        response = api.get_system_version()
+#
+#    expected_result = 200
+#
+#    assert expected_result == response.status_code

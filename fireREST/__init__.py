@@ -5,9 +5,9 @@ import logging
 import requests
 import urllib3
 
+from . import defaults
 from . import exceptions as exc
 from . import utils
-from .version import __version__
 
 from copy import deepcopy
 from packaging import version
@@ -17,48 +17,6 @@ from time import sleep
 from typing import Dict, List
 from uuid import UUID
 
-#: protocol used to connect to api
-API_PROTOCOL = 'https'
-
-#: user agent sent to fmc
-API_USER_AGENT = f'FireREST/{__version__}'
-
-#: url used to generate token for api authorization
-API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
-
-#: url used to refresh existing authorization token
-API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
-
-#: url used to access platform related api calls
-API_PLATFORM_URL = '/api/fmc_platform/v1'
-
-#: url used to access configuration related api calls
-API_CONFIG_URL = '/api/fmc_config/v1'
-
-#: content type. as of 6.6.0 FMC only supports json
-API_CONTENT_TYPE = 'application/json'
-
-#: paging limit for get requests that contain multiple items
-API_PAGING_LIMIT = 1000
-
-#: expansion mode for get requests
-API_EXPANSION_MODE = True
-
-#: http request timeout
-API_REQUEST_TIMEOUT = 120
-
-#: name of fmc default domain for api requests
-API_DEFAULT_DOMAIN = 'Global'
-
-#: intial authorization token refresh counter
-API_REFRESH_COUNTER_INIT = 0
-
-#: max no. of authorization token refresh operations
-API_REFRESH_COUNTER_MAX = 3
-
-#: max size of api payload in bytes
-API_PAYLOAD_SIZE_MAX = 2048000
-
 
 class Client(object):
     def __init__(
@@ -67,12 +25,12 @@ class Client(object):
         username: str,
         password: str,
         session=None,
-        protocol=API_PROTOCOL,
+        protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         cache=False,
         logger=None,
-        domain=API_DEFAULT_DOMAIN,
-        timeout=API_REQUEST_TIMEOUT,
+        domain=defaults.API_DEFAULT_DOMAIN,
+        timeout=defaults.API_REQUEST_TIMEOUT,
     ):
         '''
         Initialize api client object (make sure to use a dedicated api user!)
@@ -90,12 +48,12 @@ class Client(object):
         :param timeout: timeout value for http requests
         '''
         self.headers = {
-            'Content-Type': API_CONTENT_TYPE,
-            'Accept': API_CONTENT_TYPE,
-            'User-Agent': API_USER_AGENT,
+            'Content-Type': defaults.API_CONTENT_TYPE,
+            'Accept': defaults.API_CONTENT_TYPE,
+            'User-Agent': defaults.API_USER_AGENT,
         }
         self.cache = cache
-        self.refresh_counter = API_REFRESH_COUNTER_INIT
+        self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
         self.logger = self._get_logger(logger)
         self.hostname = hostname
         self.cred = HTTPBasicAuth(username, password)
@@ -122,7 +80,7 @@ class Client(object):
         :return: dummy logger instance if logger is None, otherwise return logger variable again
         '''
         if not logger:
-            dummy_logger = logging.getLogger(f'{API_USER_AGENT}.Client')
+            dummy_logger = logging.getLogger(f'{defaults.API_USER_AGENT}.Client')
             dummy_logger.addHandler(logging.NullHandler())
             return dummy_logger
         return logger
@@ -136,9 +94,9 @@ class Client(object):
         '''
         options = {
             'base': f'{self.protocol}://{self.hostname}{path}',
-            'config': f'{self.protocol}://{self.hostname}{API_CONFIG_URL}/domain/{self.domain}{path}',
-            'platform': f'{self.protocol}://{self.hostname}{API_PLATFORM_URL}{path}',
-            'refresh': f'{self.protocol}://{self.hostname}{API_REFRESH_URL}',
+            'config': f'{self.protocol}://{self.hostname}{defaults.API_CONFIG_URL}/domain/{self.domain}{path}',
+            'platform': f'{self.protocol}://{self.hostname}{defaults.API_PLATFORM_URL}{path}',
+            'refresh': f'{self.protocol}://{self.hostname}{defaults.API_REFRESH_URL}',
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
@@ -161,20 +119,20 @@ class Client(object):
         '''
         Login to fmc rest api
         '''
-        url = f'{self.protocol}://{self.hostname}{API_AUTH_URL}'
+        url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
         response = self._request('post', url, auth=self.cred)
         self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
         self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
         self.domains = json.loads(response.headers['DOMAINS'])
         self.logger.debug('Successfully authenticated to %s', self.hostname)
-        self.refresh_counter = API_REFRESH_COUNTER_INIT
+        self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def _refresh(self):
         '''
         Refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using _login() will be performed
         '''
-        if self.refresh_counter < API_REFRESH_COUNTER_MAX:
+        if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
             url = self._url('refresh')
             response = self._request('post', url)
             self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
@@ -203,8 +161,8 @@ class Client(object):
         if not utils.is_getbyid_operation(url) and items is None:
             if params is None:
                 params = {}
-            params['limit'] = API_PAGING_LIMIT
-            params['expanded'] = API_EXPANSION_MODE
+            params['limit'] = defaults.API_PAGING_LIMIT
+            params['expanded'] = defaults.API_EXPANSION_MODE
 
         response = self._request('get', url, params)
         payload = response.json()
@@ -451,10 +409,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_objects(self, object_type: str):
         url = self._url('config', f'/object/{object_type}')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.validate_object_type
     @utils.minimum_version_required('6.4.0')
@@ -462,7 +417,7 @@ class Client(object):
         overrides = []
         for obj in objects:
             if obj['overridable']:
-                responses = self.get_object_override(object_type, obj['id'], expanded=API_EXPANSION_MODE)
+                responses = self.get_object_override(object_type, obj['id'], expanded=defaults.API_EXPANSION_MODE)
                 overrides.extend(responses)
         return overrides
 
@@ -476,10 +431,7 @@ class Client(object):
     @utils.minimum_version_required('6.4.0')
     def get_object_override(self, object_type: str, object_id: str):
         url = self._url('config', f'/object/{object_type}/{object_id}/overrides')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
@@ -501,10 +453,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_devices(self):
         url = self._url('config', '/devices/devicerecords')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_device(self, device_id: str):
@@ -523,11 +472,8 @@ class Client(object):
 
     @utils.minimum_version_required('6.2.3')
     def get_device_hapairs(self):
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
         url = self._url('config', '/devicehapairs/ftddevicehapairs')
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
     def create_device_hapair(self, data: Dict):
@@ -551,11 +497,8 @@ class Client(object):
 
     @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str):
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
         url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces')
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str):
@@ -572,10 +515,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interface(self, device_id: str, interface_id: str):
@@ -595,10 +535,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
@@ -623,10 +560,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
@@ -651,10 +585,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_ftd_sub_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_sub_interface(self, device_id: str, interface_id: str):
@@ -679,10 +610,7 @@ class Client(object):
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroutes(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroute(self, device_id: str, route_id: str):
@@ -707,10 +635,7 @@ class Client(object):
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroutes(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroute(self, device_id: str, route_id: str):
@@ -735,10 +660,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_deployable_devices(self):
         url = self._url('config', '/deployment/deployabledevices')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def create_policy(self, policy_type: str, data: Dict):
@@ -748,18 +670,12 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_policies(self, policy_type: str):
         url = self._url('config', f'/policy/{policy_type}')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_policy(self, policy_id: str, policy_type: str):
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
         url = self._url('config', f'/policy/{policy_type}/{policy_id}')
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_policy(self, policy_id: str, policy_type: str, data: Dict):
@@ -805,10 +721,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_acp_rules(self, policy_id: str):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def update_acp_rule(self, policy_id: str, rule_id: str, data: Dict):
@@ -833,10 +746,7 @@ class Client(object):
     @utils.minimum_version_required('6.2.3')
     def get_autonat_rules(self, policy_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
     def update_autonat_rule(self, policy_id: str, data: Dict):
@@ -861,10 +771,7 @@ class Client(object):
     @utils.minimum_version_required('6.2.3')
     def get_manualnat_rules(self, policy_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/manualnatrules/{policy_id}')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
     def update_manualnat_rule(self, policy_id: str, data: Dict):
@@ -884,10 +791,7 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def get_policy_assignments(self):
         url = self._url('config', '/assignment/policyassignments')
-        params = {
-            'expanded': API_EXPANSION_MODE,
-        }
-        return self._get(url, params)
+        return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
     def get_policy_assignment(self, policy_id: str):
