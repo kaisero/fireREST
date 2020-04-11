@@ -186,7 +186,7 @@ class Client(object):
             return responses[0].json()
         items = list()
         for response in responses:
-            if 'items' in response:
+            if 'items' in response.json():
                 items.extend(response.json()['items'])
             else:
                 self.logger.debug('Response {response.url} did not contain any items. Skipping...')
