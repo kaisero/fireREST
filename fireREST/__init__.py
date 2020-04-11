@@ -24,7 +24,6 @@ class Client(object):
         hostname: str,
         username: str,
         password: str,
-        session=None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         cache=False,
@@ -37,9 +36,6 @@ class Client(object):
         :param hostname: ip address or dns name of fmc
         :param username: fmc username
         :param password: fmc password
-        :param session: authentication session (can be provided in case api client should not generate one at init).
-                      Make sure to pass the headers of a successful authentication to the session variable,
-                      otherwise this will fail
         :param protocol: protocol used to access fmc api
         :param verify_cert: check fmc certificate for vailidity
         :param cache: enables result caching for get operations
@@ -47,6 +43,8 @@ class Client(object):
         :param domain: name of the fmc domain
         :param timeout: timeout value for http requests
         '''
+        if not verify_cert:
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
         self.headers = {
             'Content-Type': defaults.API_CONTENT_TYPE,
             'Accept': defaults.API_CONTENT_TYPE,
@@ -59,15 +57,9 @@ class Client(object):
         self.cred = HTTPBasicAuth(username, password)
         self.protocol = protocol
         self.verify_cert = verify_cert
+        self.session = requests.Session()
         self.timeout = timeout
-        if not verify_cert:
-            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        if not session:
-            self._login()
-        else:
-            self.domains = session['domains']
-            self.headers['X-auth-access-token'] = session['X-auth-access-token']
-            self.headers['X-auth-refresh-token'] = session['X-auth-refresh-token']
+        self._login()
         self.domain_name = domain
         self.domain = self.get_domain_id_by_name(domain)
         self.version = version.parse(self.get_system_version()[0]['serverVersion'].split(' ')[0])
@@ -104,7 +96,7 @@ class Client(object):
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
-        return requests.request(
+        return self.session.request(
             method=method,
             url=url,
             params=params,
