@@ -10,12 +10,17 @@ from . import exceptions as exc
 from . import utils
 
 from copy import deepcopy
+from http.client import responses as http_responses
 from packaging import version
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import ConnectionError
 from time import sleep
 from typing import Dict, List
+from urllib.parse import urlencode
 from uuid import UUID
+
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 
 class Client(object):
@@ -27,7 +32,6 @@ class Client(object):
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         cache=False,
-        logger=None,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
     ):
@@ -36,11 +40,11 @@ class Client(object):
         :param hostname: ip address or dns name of fmc
         :param username: fmc username
         :param password: fmc password
-        :param protocol: protocol used to access fmc api
-        :param verify_cert: check fmc certificate for vailidity
-        :param cache: enables result caching for get operations
-        :param logger: optional logger instance, in case debug logging is needed
-        :param domain: name of the fmc domain
+        :param protocol: protocol used to access fmc rest api
+        :param verify_cert: check https certificate for validity
+        :param cache: enable result caching for get operations
+        :param logger: optional logger instance
+        :param domain: name of the domain to access
         :param timeout: timeout value for http requests
         '''
         if not verify_cert:
@@ -51,31 +55,17 @@ class Client(object):
             'User-Agent': defaults.API_USER_AGENT,
         }
         self.cache = cache
-        self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
-        self.logger = self._get_logger(logger)
-        self.hostname = hostname
         self.cred = HTTPBasicAuth(username, password)
+        self.hostname = hostname
         self.protocol = protocol
-        self.verify_cert = verify_cert
+        self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
         self.session = requests.Session()
         self.timeout = timeout
+        self.verify_cert = verify_cert
         self._login()
         self.domain_name = domain
         self.domain = self.get_domain_id_by_name(domain)
         self.version = version.parse(self.get_system_version()[0]['serverVersion'].split(' ')[0])
-
-    @staticmethod
-    def _get_logger(logger: object):
-        '''
-        Generate dummy logger in case api client has been initialized without a logger
-        :param logger: logger instance
-        :return: dummy logger instance if logger is None, otherwise return logger variable again
-        '''
-        if not logger:
-            dummy_logger = logging.getLogger(f'{defaults.API_USER_AGENT}.Client')
-            dummy_logger.addHandler(logging.NullHandler())
-            return dummy_logger
-        return logger
 
     def _url(self, namespace='base', path=''):
         '''
@@ -96,7 +86,13 @@ class Client(object):
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
-        return self.session.request(
+        if params:
+            logger.info('[%s] %s?%s', method.upper(), url, urlencode(params))
+        else:
+            logger.info('[%s] %s', method.upper(), url)
+        if data:
+            logger.debug(data)
+        response = self.session.request(
             method=method,
             url=url,
             params=params,
@@ -106,17 +102,24 @@ class Client(object):
             timeout=self.timeout,
             verify=self.verify_cert,
         )
+        logger.info('[RESPONSE] %s (%s)', http_responses[response.status_code], response.status_code)
+        if response.text:
+            if method == 'get':
+                logger.debug('\n%s', json.dumps(response.json(), sort_keys=True, indent=4))
+            else:
+                logger.debug(response.text)
+        return response
 
     def _login(self):
         '''
         Login to fmc rest api
         '''
+        logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
         url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
         response = self._request('post', url, auth=self.cred)
         self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
         self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
         self.domains = json.loads(response.headers['DOMAINS'])
-        self.logger.debug('Successfully authenticated to %s', self.hostname)
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def _refresh(self):
@@ -125,13 +128,14 @@ class Client(object):
         times, afterwards a re-authentication using _login() will be performed
         '''
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
+            logger.info('Access token is invalid. Refreshing authentication token')
             url = self._url('refresh')
             response = self._request('post', url)
             self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
             self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
             self.refresh_counter += 1
         else:
-            self.logger.info('Authentication token expired. Re-authenticating to %s', self.hostname)
+            logger.info('Maximum number of authentication refresh operations reached', self.hostname)
             self._login()
 
     def _delete(self, url: str, params=None):
@@ -352,9 +356,11 @@ class Client(object):
         for domain in self.domains:
             if domain['name'] == domain_name:
                 return domain['uuid']
-        self.logger.error('Could not find domain with name %s. Make sure full path is provided', domain_name)
+        logger.error(
+            'Could not find domain with name %s. Make sure full path is provided', domain_name,
+        )
         available_domains = ', '.join((domain['name'] for domain in self.domains))
-        self.logger.debug('Available Domains: %s', available_domains)
+        logger.debug('Available Domains: %s', available_domains)
         return None
 
     def get_domain_name_by_id(self, domain_id: str):
@@ -366,9 +372,11 @@ class Client(object):
         for domain in self.domains:
             if domain['uuid'] == domain_id:
                 return domain['name']
-        self.logger.error('Could not find domain with id %s. Make sure full path is provided', domain_id)
+        logger.error(
+            'Could not find domain with id %s. Make sure full path is provided', domain_id,
+        )
         available_domains = ', '.join((domain['uuid'] for domain in self.domains))
-        self.logger.debug('Available Domains: %s', available_domains)
+        logger.debug('Available Domains: %s', available_domains)
         return None
 
     @utils.minimum_version_required('6.1.0')
@@ -489,19 +497,21 @@ class Client(object):
 
     @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterfaces(self, device_hapair_id: str):
-        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces')
+        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces',)
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def get_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str):
         url = self._url(
-            'config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}')
+            'config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}',
+        )
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def update_device_hapair_monitoredinterface(self, device_hapair_id: str, monitoredinterface_id: str, data: Dict):
         url = self._url(
-            'config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}')
+            'config', f'/devicehapairs/ftddevicehapairs/{device_hapair_id}/monitoredinterfaces/{monitoredinterface_id}',
+        )
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
@@ -511,7 +521,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_physical_interface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}',)
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -531,7 +541,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}',)
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -541,7 +551,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def delete_ftd_redundant_interface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}',)
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -556,7 +566,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}',)
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -566,7 +576,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def delete_ftd_portchannel_interface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}',)
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -606,17 +616,17 @@ class Client(object):
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv4staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}',)
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def update_ftd_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}',)
         return self._update(url, data)
 
     @utils.minimum_version_required('6.3.0')
     def delete_ftd_ipv4staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}',)
         return self._delete(url)
 
     @utils.minimum_version_required('6.3.0')
@@ -631,17 +641,17 @@ class Client(object):
 
     @utils.minimum_version_required('6.3.0')
     def get_ftd_ipv6staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}',)
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
     def update_ftd_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}',)
         return self._update(url, data)
 
     @utils.minimum_version_required('6.3.0')
     def delete_ftd_ipv6staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
+        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}',)
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')

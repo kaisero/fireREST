@@ -1,17 +1,19 @@
 import sys
 
-from uuid import UUID
 
 from http.client import responses as http_responses
 from functools import lru_cache, wraps
+from logging import getLogger
 from requests import HTTPError
 from retry import retry
 from packaging import version
 from time import sleep
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from . import exceptions as exc
 from .mapping import OBJECT_TYPE
+
+logger = getLogger(__name__)
 
 
 def is_uuid(val: str):
@@ -137,9 +139,10 @@ def validate_object_type(f):
     return wrapper
 
 
-@retry(exceptions=exc.RateLimitException, tries=6, delay=10)
+@retry(exceptions=exc.RateLimitException, tries=6, delay=10, logger=logger)
 def handle_errors(f):
     ''' decorator that handles common api errors automatically '''
+
     @wraps(f)
     def wrapper(*args, **kwargs):
         client = args[0]
@@ -154,6 +157,7 @@ def handle_errors(f):
             else:
                 raise_for_status(response)
         return response
+
     return wrapper
 
 
@@ -176,11 +180,7 @@ def raise_for_status(response):
         429: exc.RateLimitException,
         500: exc.GenericApiError,
     }
-    errors = {
-        500: [
-            {'msg': 'Unauthorized', 'exception': exc.AuthError},
-        ]
-    }
+    errors = {500: [{'msg': 'Unauthorized', 'exception': exc.AuthError}]}
     if status_code in errors:
         for error in errors[status_code]:
             if error['msg'] in response.text:
