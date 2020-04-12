@@ -34,25 +34,13 @@ from fireREST import Client
 
 ### Authentication
 
-FireREST uses basic authentication to authenticate with fmc. You may also provide a session dictionary
-to re-use an existing authentication token. In case your authentication token times out the api client
+FireREST uses basic authentication to authenticate with fmc. In case your authentication token times out the api client
 will automatically try to re-authenticate 3 times and handle any intermediate authentication exceptions.
 
 #### Basic Authentication
 
 ```python
 client = Client(hostname='fmc.example.com', username='firerest', password='Cisco123')
-```
-
-#### Re-using an existing session
-
-```python
-auth_session = {
-  'X-auth-access-token': 'c26c28a0-c871-454f-b8e0-18c60c00562e',
-  'X-auth-refresh-token': '9d381948-2fde-47d0-a28b-f4b0bb21fe81',
-  'DOMAINS': '[{"name":"Global","uuid":"e276abec-e0f2-11e3-8169-6d9ed49b625f"}, {"name":"Global/Devel","uuid":"61e913a3-4bd6-7bde-54b6-000000000000"}]',
-}
-client = Client(hostname='fmc.example.com', session=auth_session)
 ```
 
 ### Helper
