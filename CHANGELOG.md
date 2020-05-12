@@ -1,3 +1,9 @@
+# 0.1.1
+
+## Enhancements
+
+Changed dependency version pinning to minimum required software versions
+
 # 0.1.0
 
 ## Bugfixes
