@@ -1,3 +1,10 @@
+# 0.1.0
+
+## Bugfixes
+
+Fixed a KeyError that occured when get request was launched that yielded an empty result (no items)
+Fixed a incorrect function call that caused getter for obj overrides to fail
+
 # 0.0.9
 
 ## Bugfixes

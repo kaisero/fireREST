@@ -110,6 +110,32 @@ class Client(object):
                 logger.debug(response.text)
         return response
 
+    def _get(self, url: str, params=None, items=None):
+        '''
+        GET operation with paging support
+        : param url: request that should be performed
+        : param params: dict of parameters for http request
+        : return: dictionary or list containing api objects
+        '''
+        if not utils.is_getbyid_operation(url) and items is None:
+            if params is None:
+                params = {}
+            params['limit'] = defaults.API_PAGING_LIMIT
+            params['expanded'] = defaults.API_EXPANSION_MODE
+
+        response = self._request('get', url, params)
+        payload = response.json()
+
+        if 'paging' in payload:
+            if items is None:
+                items = []
+            if 'items' in payload:
+                items.extend(payload['items'])
+                if 'next' in payload['paging']:
+                    items = self._get(payload['paging']['next'][0], params=None, items=items)
+            return items
+        return payload
+
     def _login(self):
         '''
         Login to fmc rest api
@@ -146,30 +172,6 @@ class Client(object):
         : return: requests.Response object
         '''
         return self._request('delete', url, params)
-
-    def _get(self, url: str, params=None, items=None):
-        '''
-        GET operation with paging support
-        : param url: request that should be performed
-        : param params: dict of parameters for http request
-        : return: dictionary or list containing api objects
-        '''
-        if not utils.is_getbyid_operation(url) and items is None:
-            if params is None:
-                params = {}
-            params['limit'] = defaults.API_PAGING_LIMIT
-            params['expanded'] = defaults.API_EXPANSION_MODE
-
-        response = self._request('get', url, params)
-        payload = response.json()
-        if 'paging' in payload:
-            if items is None:
-                items = []
-            items.extend(payload['items'])
-            if 'next' in payload['paging']:
-                items = self._get(payload['paging']['next'][0], params=None, items=items)
-            return items
-        return payload
 
     def _create(self, url: str, data: Dict, params=None):
         '''
@@ -417,7 +419,7 @@ class Client(object):
         overrides = []
         for obj in objects:
             if obj['overridable']:
-                responses = self.get_object_override(object_type, obj['id'], expanded=defaults.API_EXPANSION_MODE)
+                responses = self.get_object_override(object_type, obj['id'])
                 overrides.extend(responses)
         return overrides
 
