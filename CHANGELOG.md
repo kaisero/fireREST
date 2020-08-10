@@ -1,3 +1,10 @@
+# 0.1.2
+
+## Bugfixes
+
+Corrected api call for getting audit records (#24)
+Corrected incorrect base api calls by removing positional args (#23)
+
 # 0.1.1
 
 ## Enhancements
