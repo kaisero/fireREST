@@ -96,7 +96,7 @@ class Client(object):
             method=method,
             url=url,
             params=params,
-            data=data,
+            data=json.dumps(data),
             auth=auth,
             headers=self.headers,
             timeout=self.timeout,

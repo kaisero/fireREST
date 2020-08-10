@@ -1,3 +1,9 @@
+# 0.1.3
+
+## Bugfixes
+
+Fixed missing conversion from dict to json in _request helper
+
 # 0.1.2
 
 ## Bugfixes
