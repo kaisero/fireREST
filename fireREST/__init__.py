@@ -96,7 +96,7 @@ class Client(object):
             method=method,
             url=url,
             params=params,
-            data=data,
+            data=json.dumps(data),
             auth=auth,
             headers=self.headers,
             timeout=self.timeout,
@@ -123,7 +123,7 @@ class Client(object):
             params['limit'] = defaults.API_PAGING_LIMIT
             params['expanded'] = defaults.API_EXPANSION_MODE
 
-        response = self._request('get', url, params)
+        response = self._request('get', url, params=params)
         payload = response.json()
 
         if 'paging' in payload:
@@ -171,7 +171,7 @@ class Client(object):
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        return self._request('delete', url, params)
+        return self._request('delete', url, params=params)
 
     def _create(self, url: str, data: Dict, params=None):
         '''
@@ -182,7 +182,7 @@ class Client(object):
         : return: requests.Response object
         '''
         data = self._sanitize(data)
-        return self._request('post', url, params, data)
+        return self._request('post', url, params=params, data=data)
 
     def _update(self, url: str, data: Dict, params=None):
         '''
@@ -193,7 +193,7 @@ class Client(object):
         : return: requests.Response object
         '''
         data = self._sanitize(data)
-        return self._update(url, data, params)
+        return self._request(url, data=data, params=params)
 
     def _sanitize(self, payload: Dict):
         '''
@@ -388,7 +388,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_audit_records(self):
-        url = self._url('platform', '/audit/auditrecords')
+        url = self._url('config', '/audit/auditrecords')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')

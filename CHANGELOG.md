@@ -1,3 +1,16 @@
+# 0.1.3
+
+## Bugfixes
+
+Fixed missing conversion from dict to json in _request helper
+
+# 0.1.2
+
+## Bugfixes
+
+Corrected api call for getting audit records (#24)
+Corrected incorrect base api calls by removing positional args (#23)
+
 # 0.1.1
 
 ## Enhancements
