@@ -388,7 +388,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_audit_records(self):
-        url = self._url('platform', '/audit/auditrecords')
+        url = self._url('config', '/audit/auditrecords')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
