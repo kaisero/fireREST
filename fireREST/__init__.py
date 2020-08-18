@@ -181,7 +181,7 @@ class Client(object):
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        data = self._sanitize(data)
+        data = self._sanitize('post', data)
         return self._request('post', url, params=params, data=data)
 
     def _update(self, url: str, data: Dict, params=None):
@@ -192,10 +192,10 @@ class Client(object):
         : param params: dict of parameters for http request
         : return: requests.Response object
         '''
-        data = self._sanitize(data)
-        return self._request(url, data=data, params=params)
+        data = self._sanitize('put', data)
+        return self._request('put', url, data=data, params=params)
 
-    def _sanitize(self, payload: Dict):
+    def _sanitize(self, method: str, payload: Dict):
         '''
         Prepare json object for api operation
         This is neccesarry since fmc api cannot handle json objects with some
@@ -206,10 +206,12 @@ class Client(object):
         sanitized_payload = deepcopy(payload)
         sanitized_payload.pop('metadata', None)
         sanitized_payload.pop('links', None)
-        sanitized_payload.pop('id', None)
+        if method == 'post':
+            sanitized_payload.pop('id', None)
         return sanitized_payload
 
-    @utils.cache_result
+    # @utils.cache_result
+    @utils.validate_object_type
     @utils.minimum_version_required('6.1.0')
     def get_object_id_by_name(self, object_type: str, object_name: str):
         '''
