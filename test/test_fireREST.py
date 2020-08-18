@@ -64,6 +64,20 @@ def test_create_object(api):
     assert expected_result == actual_result
 
 
+def test_get_object(api):
+    object_id = api.get_object_id_by_name('network', 'firerest_test_netobj')
+    expected_object = {
+        'id': object_id,
+        'name': 'firerest_test_netobj',
+        'value': '198.18.0.0/24',
+    }
+    actual_object = api.get_object('network', object_id)
+
+    assert expected_object['id'] == actual_object['id']
+    assert expected_object['name'] == actual_object['name']
+    assert expected_object['value'] == actual_object['value']
+
+
 def test_update_object(api):
     expected_response = 200
     expected_description = 'test_update_object'
