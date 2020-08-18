@@ -4,7 +4,7 @@ import pytest
 
 from uuid import uuid4
 
-from fireREST import utils
+from fireREST import exceptions, utils
 
 
 def test_is_uuid_with_valid_uuid():
@@ -17,7 +17,7 @@ def test_is_uuid_with_valid_uuid():
 
 
 def test_is_uuid_with_invalid_uuid():
-    invalid_uuid = str('override')
+    invalid_uuid = str('invalid-uuid')
     expected_result = False
 
     actual_result = utils.is_uuid(invalid_uuid)
@@ -26,9 +26,11 @@ def test_is_uuid_with_invalid_uuid():
 
 
 def test_is_getbyid_operation_with_valid_getbyid_operation():
-    valid_getbyid_operation = 'https://localhost' \
-                              '/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f' \
-                              '/object/networkgroups/A09351F4-691E-0ed3-0000-034359739130'
+    valid_getbyid_operation = (
+        'https://localhost'
+        '/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f'
+        '/object/networkgroups/A09351F4-691E-0ed3-0000-034359739130'
+    )
     expected_result = True
 
     actual_result = utils.is_getbyid_operation(valid_getbyid_operation)
@@ -37,9 +39,11 @@ def test_is_getbyid_operation_with_valid_getbyid_operation():
 
 
 def test_is_getbyid_operation_with_valid_getbyid_operation_with_params():
-    valid_getbyid_operation = 'https://localhost' \
-                              '/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f' \
-                              '/object/networkgroups/A09351F4-691E-0ed3-0000-034359739130?expanded=True'
+    valid_getbyid_operation = (
+        'https://localhost'
+        '/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f'
+        '/object/networkgroups/A09351F4-691E-0ed3-0000-034359739130?expanded=True'
+    )
     expected_result = True
 
     actual_result = utils.is_getbyid_operation(valid_getbyid_operation)
@@ -48,9 +52,11 @@ def test_is_getbyid_operation_with_valid_getbyid_operation_with_params():
 
 
 def test_is_getbyid_operation_with_invalid_getbyid_operation():
-    valid_getbyid_operation = 'https://localhost' \
-                              '/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f' \
-                              '/object/networkgroups/A09351F4-691E-0ed3-0000-034359739130/overrides'
+    valid_getbyid_operation = (
+        'https://localhost'
+        '/api/fmc_config/v1/domain/e276abec-e0f2-11e3-8169-6d9ed49b625f'
+        '/object/networkgroups/A09351F4-691E-0ed3-0000-034359739130/overrides'
+    )
     expected_result = False
 
     actual_result = utils.is_getbyid_operation(valid_getbyid_operation)
@@ -58,10 +64,28 @@ def test_is_getbyid_operation_with_invalid_getbyid_operation():
     assert expected_result == actual_result
 
 
-# def test_rate_limit_retry(api):
-#    for i in range(1, 121, 1):
-#        response = api.get_system_version()
-#
-#    expected_result = 200
-#
-#    assert expected_result == response.status_code
+def test_validate_data_with_supported_payload_size():
+    class ValidObject(object):
+        def __init__(self):
+            pass
+
+        def __sizeof__(self):
+            return 1024
+
+    expected_result = None
+    actual_result = utils.validate_data('post', ValidObject())
+
+    assert expected_result == actual_result
+
+
+def test_validate_data_with_unsupported_payload_size():
+    with pytest.raises(exceptions.PayloadLimitExceededError):
+
+        class ValidObject(object):
+            def __init__(self):
+                pass
+
+            def __sizeof__(self):
+                return 204800100
+
+        utils.validate_data('post', ValidObject())
