@@ -46,18 +46,21 @@ def cache_result(f):
     decorator that applies functools lru_cache if cache is enabled in Client object
     '''
 
-    def enabled(*args, **kwargs):
-        return args[0].cache
-
-    if enabled:
+    def inner_function(f):
+        @lru_cache(maxsize=256)
+        def cache(*args, **kwargs):
+            return f(*args, **kwargs)
 
         @wraps(f)
         @lru_cache(maxsize=256)
         def wrapper(*args, **kwargs):
+            if args[0].cache is True:
+                return cache
             return f(*args, **kwargs)
 
         return wrapper
-    return f
+
+    return inner_function
 
 
 def log_request(action):
