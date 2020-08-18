@@ -1,3 +1,15 @@
+# 0.1.4
+
+## Bugfixes
+
+Added a fix to correctly sanitize payloads for put operations
+Corrected cache_result condition that did not match correctly
+
+## Enhancements
+
+Added various tests for better qa
+
+
 # 0.1.3
 
 ## Bugfixes
