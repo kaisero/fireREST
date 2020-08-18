@@ -24,6 +24,34 @@ def test_initialization(api, constants):
     assert api.domain_name == expected_domain_name
 
 
+def test_get_domain_id_by_name_with_correct_name(api):
+    expected_result = api.domain
+    actual_result = api.get_domain_id_by_name(api.domain_name)
+
+    assert expected_result == actual_result
+
+
+def test_get_domain_id_by_name_with_incorrect_name(api):
+    expected_result = None
+    actual_result = api.get_domain_id_by_name('NON-EXISTING-DOMAIN')
+
+    assert expected_result == actual_result
+
+
+def test_get_domain_name_by_id_with_correct_id(api):
+    expected_result = 'Global'
+    actual_result = api.get_domain_name_by_id(api.domain)
+
+    assert expected_result == actual_result
+
+
+def test_get_domain_name_by_id_with_incorrect_id(api):
+    expected_result = None
+    actual_result = api.get_domain_name_by_id('NON-EXISTING-DOMAIN-ID')
+
+    assert expected_result == actual_result
+
+
 def test_create_object(api):
     payload = {
         'name': 'firerest_test_netobj',
