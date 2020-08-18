@@ -9,7 +9,6 @@ Corrected cache_result condition that did not match correctly
 
 Added various tests for better qa
 
-
 # 0.1.3
 
 ## Bugfixes
