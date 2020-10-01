@@ -886,3 +886,21 @@ class Client(object):
     def update_policy_assignment(self, policy_id: str, data: Dict):
         url = self._url('config', f'/assignment/policyassignments/{policy_id}')
         return self._update(url, data)
+      
+    @utils.minimum_version_required('6.1.0')
+    def get_hitcounts(self, policy_id: str, device_id:str, expanded=True):
+        params = {
+            'expanded': expanded,
+            'filter': "deviceId:{0}".format(device_id)
+        }
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
+        return self._get(url, params)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_hitcounts_by_id(self, policy_id: str, device_id:str, rule_id:str, expanded=True):
+        params = {
+            'expanded': expanded,
+            'filter': "deviceId:{0};ids:{1}".format(device_id, rule_id)
+        }
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
+        return self._get(url, params)
