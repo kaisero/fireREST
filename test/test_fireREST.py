@@ -13,7 +13,7 @@ def test_initialization(api, constants):
     expected_protocol = 'https'
     expected_verify_cert = False
     expected_timeout = 120
-    expected_domain_name = 'Global'
+    expected_domain_name = constants['domain']
 
     assert api.hostname == expected_hostname
     assert api.cred == expected_cred
@@ -38,8 +38,8 @@ def test_get_domain_id_by_name_with_incorrect_name(api):
     assert expected_result == actual_result
 
 
-def test_get_domain_name_by_id_with_correct_id(api):
-    expected_result = 'Global'
+def test_get_domain_name_by_id_with_correct_id(api, constants):
+    expected_result = constants['domain']
     actual_result = api.get_domain_name_by_id(api.domain)
 
     assert expected_result == actual_result
@@ -98,5 +98,117 @@ def test_delete_object(api):
 
     actual_result = api.delete_object('network', object_id).status_code
     expected_result = 200
+
+    assert expected_result == actual_result
+
+
+def test_get_device_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['device_id']
+    actual_result = api.get_device_id_by_name(constants['device'])
+
+    assert expected_result == actual_result
+
+
+def test_get_device_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_device_id_by_name('INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_devicehapair_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['devicehapair_id']
+    actual_result = api.get_devicehapair_id_by_name(constants['devicehapair'])
+
+    assert expected_result == actual_result
+
+
+def test_get_devicehapair_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_devicehapair_id_by_name('INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_accesspolicy_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['accesspolicy_id']
+    actual_result = api.get_accesspolicy_id_by_name(constants['accesspolicy'])
+
+    assert expected_result == actual_result
+
+
+def test_get_accesspolicy_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_accesspolicy_id_by_name('INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_prefilterpolicy_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['prefilterpolicy_id']
+    actual_result = api.get_prefilterpolicy_id_by_name(constants['prefilterpolicy'])
+
+    assert expected_result == actual_result
+
+
+def test_get_prefilterpolicy_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_prefilterpolicy_id_by_name('INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_accessrule_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['accessrule_id']
+    actual_result = api.get_accessrule_id_by_name(constants['accesspolicy_id'], constants['accessrule'])
+
+    assert expected_result == actual_result
+
+
+def test_get_accessrule_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_accessrule_id_by_name(constants['accesspolicy_id'], 'INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_natpolicy_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['natpolicy_id']
+    actual_result = api.get_natpolicy_id_by_name(constants['natpolicy'])
+
+    assert expected_result == actual_result
+
+
+def test_get_natpolicy_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_natpolicy_id_by_name('INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_syslogalert_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['syslogalert_id']
+    actual_result = api.get_syslogalert_id_by_name(constants['syslogalert'])
+
+    assert expected_result == actual_result
+
+
+def test_get_syslogalert_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_syslogalert_id_by_name('INCORRECT-NAME')
+
+    assert expected_result == actual_result
+
+
+def test_get_snmpalert_id_by_name_with_correct_name(api, constants):
+    expected_result = constants['snmpalert_id']
+    actual_result = api.get_snmpalert_id_by_name(constants['snmpalert'])
+
+    assert expected_result == actual_result
+
+
+def test_get_snmpalert_id_by_name_with_incorrect_name(api, constants):
+    expected_result = None
+    actual_result = api.get_snmpalert_id_by_name('INCORRECT-NAME')
 
     assert expected_result == actual_result
