@@ -1,3 +1,15 @@
+# 0.1.5
+
+## Bugfixes
+
+Fixed issue with id_by_name helper functions caused by incorrect cache impl (#28)
+Fixed missing interface_id param for interface PUT operations (#30)
+
+## Enhancements
+
+Added additional unit tests for id_by_name operations
+Merged and enhanced hitcount implementation by @arnydo (#29)
+
 # 0.1.4
 
 ## Bugfixes
