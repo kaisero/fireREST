@@ -6,6 +6,62 @@ from fireREST import Client
 from fireREST.defaults import API_AUTH_URL, API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
 
 
+def test_sanitize_with_valid_dict_payload(api):
+    method = 'PUT'
+    payload = {
+        'id': 'A-VALID-UUID',
+        'name': 'TEST-OBJ',
+        'metadata': {'domain': 'Global'},
+        'links': {'self': 'https://fmc.example.com'},
+    }
+    expected_result = {'id': 'A-VALID-UUID', 'name': 'TEST-OBJ'}
+    actual_result = api._sanitize(method, payload)
+    assert actual_result == expected_result
+
+
+def test_sanitize_with_valid_dict_payload_and_post_operation(api):
+    method = 'post'
+    payload = {
+        'id': 'A-VALID-UUID',
+        'name': 'TEST-OBJ',
+        'metadata': {'domain': 'Global'},
+        'links': {'self': 'https://fmc.example.com'},
+    }
+    expected_result = {'name': 'TEST-OBJ'}
+    actual_result = api._sanitize(method, payload)
+    assert actual_result == expected_result
+
+
+def test_sanitize_with_valid_list_payload(api):
+    method = 'PUT'
+    payload = [
+        {
+            'id': 'A-VALID-UUID',
+            'name': 'TEST-OBJ',
+            'metadata': {'domain': 'Global'},
+            'links': {'self': 'https://fmc.example.com'},
+        }
+    ]
+    expected_result = [{'id': 'A-VALID-UUID', 'name': 'TEST-OBJ'}]
+    actual_result = api._sanitize(method, payload)
+    assert actual_result == expected_result
+
+
+def test_sanitize_with_valid_list_payload_and_post_operation(api):
+    method = 'post'
+    payload = [
+        {
+            'id': 'A-VALID-UUID',
+            'name': 'TEST-OBJ',
+            'metadata': {'domain': 'Global'},
+            'links': {'self': 'https://fmc.example.com'},
+        }
+    ]
+    expected_result = [{'name': 'TEST-OBJ'}]
+    actual_result = api._sanitize(method, payload)
+    assert actual_result == expected_result
+
+
 def test_filter_with_single_item(api):
     expected_filter = 'deviceId:457d932a-3dfb-11ea-9b36-8a42de410c5c'
     actual_filter = api._filter(items={'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c'})

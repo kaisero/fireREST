@@ -211,17 +211,24 @@ class Client(object):
 
     def _sanitize(self, method: str, payload: Dict):
         '''
-        Prepare json object for api operation
+        Sanitize json object for api operation
         This is neccesarry since fmc api cannot handle json objects with some
-        fields set in GET (e.g. metadata dictionary)
+        fields that are received from GET (e.g. link, metadata)
         : param payload: api object in json format
         : return: sanitized api object in json format
         '''
         sanitized_payload = deepcopy(payload)
-        sanitized_payload.pop('metadata', None)
-        sanitized_payload.pop('links', None)
-        if method == 'post':
-            sanitized_payload.pop('id', None)
+        if not isinstance(payload, list):
+            sanitized_payload.pop('metadata', None)
+            sanitized_payload.pop('links', None)
+            if method.lower() == 'post':
+                sanitized_payload.pop('id', None)
+        else:
+            for item in sanitized_payload:
+                item.pop('metadata', None)
+                item.pop('links', None)
+                if method.lower() == 'post':
+                    item.pop('id', None)
         return sanitized_payload
 
     @utils.validate_object_type
