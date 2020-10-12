@@ -240,97 +240,111 @@ class Client(object):
         : param object_name: name of the object
         : return: object id if object is found, None otherwise
         '''
-        request = f'/object/{object_type}'
-        url = self._url('config', request)
-        objects = self._get(url)
+        objects = self.get_objects(object_type)
         for obj in objects:
             if obj['name'] == object_name:
                 return obj['id']
         return None
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_id_by_name(self, device_name: str):
+    def get_device_id_by_name(self, name: str):
         '''
         helper function to retrieve device id by name
-        : param device_name: name of the device
+        : param name: name of the device
         : return: device id if device is found, None otherwise
         '''
-        request = '/devices/devicerecords'
-        url = self._url('config', request)
-        devices = self._get(url)
+        devices = self.get_devices()
         for device in devices:
-            if device['name'] == device_name:
+            if device['name'] == name:
                 return device['id']
         return None
 
     @utils.minimum_version_required('6.2.3')
-    def get_devicehapair_id_by_name(self, hapair_name: str):
+    def get_devicehapair_id_by_name(self, name: str):
         '''
         helper function to retrieve device ha - pair id by name
-        : param hapair_name: name of the ha - pair
-        : return: id if ha - pair is found, None otherwise
+        : param name: name of the hapair
+        : return: id if hapair is found, None otherwise
         '''
         request = '/devicehapairs/ftddevicehapairs'
         url = self._url('config', request)
         ha_pairs = self._get(url)
         for ha_pair in ha_pairs:
-            if ha_pair['name'] == hapair_name:
+            if ha_pair['name'] == name:
                 return ha_pair['id']
         return None
 
     @utils.minimum_version_required('6.2.3')
     def get_device_id_from_hapair(self, hapair_id: str):
         '''
-        helper function to retrieve device id from ha - pair
-        : param hapair_id: id of ha - pair
+        helper function to retrieve device id from hapair
+        : param hapair_id: id of hapair
         : return: id if device is found, None otherwise
         '''
-        request = f'/devicehapairs/ftddevicehapairs/{hapair_id}'
-        url = self._url('config', request)
-        ha_pair = self._get(url)
+        ha_pair = self.get_devicehapair(hapair_id)
         return ha_pair['primary']['id']
 
     @utils.minimum_version_required('6.2.3')
-    def get_natpolicy_id_by_name(self, policy_name: str):
+    def get_natpolicy_id_by_name(self, name: str):
         '''
         helper function to retrieve nat policy id by name
-        : param policy_name: name of nat policy
+        : param name: name of nat policy
         : return: policy id if nat policy is found, None otherwise
         '''
-        request = '/policy/ftdnatpolicies'
-        url = self._url('config', request)
-        natpolicies = self._get(url)
-        for natpolicy in natpolicies:
-            if natpolicy['name'] == policy_name:
-                return natpolicy['id']
-        return None
-
-    @utils.minimum_version_required('6.1.0')
-    def get_accesspolicy_id_by_name(self, policy_name: str):
-        '''
-        helper function to retrieve access control policy id by name
-        : param policy_name: name of the access control policy
-        : return: accesspolicy id if access control policy is found, None otherwise
-        '''
-        request = '/policy/accesspolicies'
-        url = self._url('config', request)
-        policies = self._get(url)
+        policies = self.get_natpolicies()
         for policy in policies:
-            if policy['name'] == policy_name:
+            if policy['name'] == name:
                 return policy['id']
         return None
 
-    def get_prefilterpolicy_id_by_name(self, policy_name: str):
+    @utils.minimum_version_required('6.1.0')
+    def get_accesspolicy_id_by_name(self, name: str):
+        '''
+        helper function to retrieve access control policy id by name
+        : param name: name of the access control policy
+        : return: accesspolicy id if access control policy is found, None otherwise
+        '''
+        policies = self.get_accesspolicies()
+        for policy in policies:
+            if policy['name'] == name:
+                return policy['id']
+        return None
+
+    @utils.minimum_version_required('6.1.0')
+    def get_filepolicy_id_by_name(self, name: str):
+        '''
+        helper function to retrieve file policy id by name
+        : param name: name of the file policy
+        : return: policy id if file policy is found, None otherwise
+        '''
+        policies = self.get_filepolicies()
+        for policy in policies:
+            if policy['name'] == name:
+                return policy['id']
+        return None
+
+    @utils.minimum_version_required('6.1.0')
+    def get_intrusionpolicy_id_by_name(self, name: str):
+        '''
+        helper function to retrieve intrusion policy id by name
+        : param name: name of the intrusion policy
+        : return: policy id if intrusion policy is found, None otherwise
+        '''
+        policies = self.get_intrusionpolicies()
+        for policy in policies:
+            if policy['name'] == name:
+                return policy['id']
+        return None
+
+    def get_prefilterpolicy_id_by_name(self, name: str):
         '''
         helper function to retrieve prefilter policy id by name
-        : param policy_name: name of the prefilter policy
+        : param name: name of the prefilter policy
         : return: prefilter policy id if policy name is found, None otherwise
         '''
-        request = '/policy/prefilterpolicies'
-        url = self._url('config', request)
-        prefilterpolicies = self._get(url)
+        prefilterpolicies = self.get_prefilterpolicies()
         for policy in prefilterpolicies:
-            if policy['name'] == policy_name:
+            if policy['name'] == name:
                 return policy['id']
         return None
 
@@ -351,28 +365,28 @@ class Client(object):
         return None
 
     @utils.minimum_version_required('6.1.0')
-    def get_syslogalert_id_by_name(self, alert_name: str):
+    def get_syslogalert_id_by_name(self, name: str):
         '''
         helper function to retrieve syslog alert object id by name
-        : param alert_name: name of syslog alert object
+        : param name: name of syslog alert object
         : return: syslogalert id if syslog alert is found, None otherwise
         '''
         syslogalerts = self.get_syslogalerts()
         for syslogalert in syslogalerts:
-            if syslogalert['name'] == alert_name:
+            if syslogalert['name'] == name:
                 return syslogalert['id']
         return None
 
     @utils.minimum_version_required('6.1.0')
-    def get_snmpalert_id_by_name(self, alert_name: str):
+    def get_snmpalert_id_by_name(self, name: str):
         '''
         helper function to retrieve snmp alert object id by name
-        : param alert_name: name of snmp alert object
+        : param name: name of snmp alert object
         : return: snmpalert id if snmp alert is found, None otherwise
         '''
         snmpalerts = self.get_snmpalerts()
         for snmpalert in snmpalerts:
-            if snmpalert['name'] == alert_name:
+            if snmpalert['name'] == name:
                 return snmpalert['id']
         return None
 
@@ -729,6 +743,26 @@ class Client(object):
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
+    def get_filepolicies(self):
+        url = self._url('config', f'/policy/filepolicies')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_filepolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/filepolicies/{policy_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_intrusionpolicies(self):
+        url = self._url('config', f'/policy/intrusionpolicies')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_intrusionpolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/intrusionpolicies/{policy_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
     def create_accesspolicy(self, data: Dict):
         url = self._url('config', f'/policy/accesspolicies')
         return self._create(url, data)
@@ -870,6 +904,31 @@ class Client(object):
     @utils.minimum_version_required('6.5.0')
     def delete_prefilterrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.2.3')
+    def create_natpolicy(self, data: Dict):
+        url = self._url('config', '/policy/ftdnatpolicies')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.2.3')
+    def get_natpolicies(self):
+        url = self._url('config', '/policy/ftdnatpolicies')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.2.3')
+    def get_natpolicy(self, policy_id):
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.2.3')
+    def update_natpolicy(self, policy_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.2.3')
+    def delete_natpolicy(self, policy_id: str):
+        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
