@@ -943,7 +943,7 @@ class Client(object):
         return self._update(url, data)
 
     @utils.minimum_version_required('6.4.0')
-    def get_hitcounts(self, policy_id: str, device_id: str, rule_ids=None, fetch_zero_hitcount=True):
+    def get_accesspolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None, fetch_zero_hitcount=True):
         params = {
             'filter': self._filter({'deviceId': device_id, 'ids': rule_ids, 'fetchZeroHitCount': fetch_zero_hitcount})
         }
@@ -951,15 +951,35 @@ class Client(object):
         return self._get(url, params)
 
     @utils.minimum_version_required('6.4.0')
-    def update_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
+    def update_accesspolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
         return self._update(url, params)
 
     @utils.minimum_version_required('6.4.0')
-    def delete_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
+    def delete_accesspolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
+        return self._update(url, params)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_prefilterpolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None, fetch_zero_hitcount=True):
+        params = {
+            'filter': self._filter({'deviceId': device_id, 'ids': rule_ids, 'fetchZeroHitCount': fetch_zero_hitcount})
+        }
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
+        return self._get(url, params)
+
+    @utils.minimum_version_required('6.4.0')
+    def update_prefilterpolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
+        params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
+        return self._update(url, params)
+
+    @utils.minimum_version_required('6.4.0')
+    def delete_prefilterpolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
+        params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
+        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
         return self._update(url, params)
 
     @utils.minimum_version_required('6.1.0')
