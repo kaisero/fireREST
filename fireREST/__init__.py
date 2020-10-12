@@ -820,6 +820,21 @@ class Client(object):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
         return self._delete(url)
 
+    @utils.minimum_version_required('6.5.0')
+    def get_accesspolicy_inheritancesettings(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_accesspolicy_inheritancesetting(self, policy_id: str, object_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def update_accesspolicy_inheritancesetting(self, policy_id: str, object_id: str, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
+        return self._update(url, data)
+
     @utils.minimum_version_required('6.1.0')
     def get_accesspolicy_defaultactions(self, policy_id: str):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions')
