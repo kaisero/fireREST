@@ -967,6 +967,31 @@ class Client(object):
         url = self._url('config', f'/job/taskstatuses/{task_id}')
         return self._get(url)
 
+    @utils.minimum_version_required('6.3.0')
+    def get_upgradepackages(self):
+        url = self._url('platform', '/updates/upgradepackages')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_upgradepackage(self, package_id: str):
+        url = self._url('platform', f'/updates/upgradepackages/{package_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_upgradepackage_applicabledevices(self, package_id: str):
+        url = self._url('platform', f'/updates/upgradepackages/{package_id}/applicabledevices')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.3.0')
+    def delete_upgradepackage(self, package_id: str):
+        url = self._url('platform', f'/updates/upgradepackages/{package_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.3.0')
+    def install_upgradepackage(self, data: Dict):
+        url = self._url('platform', '/updates/upgrades')
+        return self._create(url)
+
     @utils.minimum_version_required('6.4.0')
     def get_cloudeventsconfigs(self):
         url = self._url('config', '/integration/cloudeventsconfigs')
