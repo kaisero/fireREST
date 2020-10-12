@@ -787,6 +787,36 @@ class Client(object):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}')
         return self._delete(url)
 
+    @utils.minimum_version_required('6.1.0')
+    def get_accesspolicy_defaultactions(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_accesspolicy_defaultaction(self, policy_id: str, object_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def update_accesspolicy_defaultaction(self, policy_id: str, object_id: str, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{object_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_accesspolicy_loggingsettings(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/loggingsettings')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_accesspolicy_loggingsetting(self, policy_id: str, object_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/loggingsettings/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def update_accesspolicy_loggingsetting(self, policy_id: str, object_id: str, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/loggingsettings/{object_id}')
+        return self._update(url, data)
+
     @utils.minimum_version_required('6.5.0')
     def create_accesspolicy_category(
         self, policy_id: str, data: Dict, section=None, above_category=None, insert_before=None, insert_after=None
@@ -833,21 +863,6 @@ class Client(object):
     @utils.minimum_version_required('6.5.0')
     def update_accesspolicy_inheritancesetting(self, policy_id: str, object_id: str, data: Dict):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
-        return self._update(url, data)
-
-    @utils.minimum_version_required('6.1.0')
-    def get_accesspolicy_defaultactions(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions')
-        return self._get(url)
-
-    @utils.minimum_version_required('6.1.0')
-    def get_accesspolicy_defaultaction(self, policy_id: str, action_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{action_id}')
-        return self._get(url)
-
-    @utils.minimum_version_required('6.1.0')
-    def update_accesspolicy_defaultaction(self, policy_id: str, action_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{action_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.2.1')
