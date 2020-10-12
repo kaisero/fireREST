@@ -787,6 +787,54 @@ class Client(object):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}')
         return self._delete(url)
 
+    @utils.minimum_version_required('6.5.0')
+    def create_accesspolicy_category(
+        self, policy_id: str, data: Dict, section=None, above_category=None, insert_before=None, insert_after=None
+    ):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories')
+        params = {
+            'aboveCategory': above_category,
+            'section': section,
+            'insertBefore': insert_before,
+            'insertAfter': insert_after,
+        }
+        return self._create(url, data, params)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_accesspolicy_categories(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_accesspolicy_category(self, policy_id: str, category_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def update_accesspolicy_category(self, policy_id: str, category_id: str, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def delete_accesspolicy_category(self, policy_id: str, category_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_accesspolicy_defaultactions(self, policy_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_accesspolicy_defaultaction(self, policy_id: str, action_id: str):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{action_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def update_accesspolicy_defaultaction(self, policy_id: str, action_id: str, data: Dict):
+        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{action_id}')
+        return self._update(url, data)
+
     @utils.minimum_version_required('6.2.1')
     def create_accessrule(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
@@ -795,22 +843,22 @@ class Client(object):
         params = {
             'category': category,
             'section': section,
-            'insert_before': insert_before,
-            'insert_after': insert_after,
+            'insertBefore': insert_before,
+            'insertAfter': insert_after,
         }
         return self._create(url, data, params)
 
     @utils.minimum_version_required('6.2.1')
     def create_accessrules(
-        self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
+        self, policy_id: str, data: Dict, section=None, category=None, insert_before=None, insert_after=None,
     ):
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
             'bulk': True,
             'category': category,
             'section': section,
-            'insert_before': insert_before,
-            'insert_after': insert_after,
+            'insertBefore': insert_before,
+            'insertAfter': insert_after,
         }
         return self._create(url, data, params)
 
@@ -861,7 +909,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.5.0')
     def create_prefilterrule(
-        self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
+        self, policy_id: str, data: Dict, section=None, category=None, insert_before=None, insert_after=None,
     ):
         url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         params = {
