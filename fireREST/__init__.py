@@ -419,6 +419,11 @@ class Client(object):
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
+    def get_audit_record(self, record_id: str):
+        url = self._url('config', f'/audit/auditrecords/{record_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
     def get_syslogalerts(self):
         url = self._url('config', '/policy/syslogalerts')
         return self._get(url)
@@ -472,6 +477,31 @@ class Client(object):
     @utils.minimum_version_required('6.1.0')
     def delete_object(self, object_type: str, object_id: str):
         url = self._url('config', f'/object/{object_type}/{object_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def create_devicegroup(self, data: Dict):
+        url = self._url('config', '/devicegroups/devicegrouprecords')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_devicegroups(self):
+        url = self._url('config', '/devicegroups/devicegrouprecords')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_devicegroup(self, devicegroup_id: str):
+        url = self._url('config', f'/devicegroups/devicegrouprecords/{devicegroup_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.1.0')
+    def update_devicegroup(self, devicegroup_id: str, data: Dict):
+        url = self._url('config', f'/devicegroups/devicegrouprecords/{devicegroup_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.1.0')
+    def delete_devicegroup(self, devicegroup_id: str):
+        url = self._url('config', f'/devicegroups/devicegrouprecords/{devicegroup_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -931,3 +961,58 @@ class Client(object):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
         url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
         return self._update(url, params)
+
+    @utils.minimum_version_required('6.1.0')
+    def get_taskstatus(self, task_id: str):
+        url = self._url('config', f'/job/taskstatuses/{task_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_cloudeventsconfigs(self):
+        url = self._url('config', '/integration/cloudeventsconfigs')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_cloudeventsconfig(self, object_id: str):
+        url = self._url('config', '/integration/cloudeventsconfigs/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def update_cloudeventsconfig(self, object_id: str, data: Dict):
+        url = self._url('config', '/integration/cloudeventsconfigs/{object_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.4.0')
+    def create_externallookup(self, data: Dict):
+        url = self._url('config', '/integration/externallookups')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_externallookups(self):
+        url = self._url('config', '/integration/externallookups')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def get_externallookup(self, object_id: str):
+        url = self._url('config', '/integration/externallookups/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.4.0')
+    def update_externallookup(self, object_id: str, data: Dict):
+        url = self._url('config', '/integration/externallookups/{object_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_cloudregions(self):
+        url = self._url('config', '/integration/cloudregions')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_cloudregion(self, object_id: str):
+        url = self._url('config', '/integration/cloudregions/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def update_cloudregion(self, object_id: str, data: Dict):
+        url = self._url('config', '/integration/cloudregions/{object_id}')
+        return self._update(url, data)
