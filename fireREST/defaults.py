@@ -14,9 +14,11 @@ API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
 
 #: url used to access platform related api calls
 API_PLATFORM_URL = '/api/fmc_platform/v1'
+API_PLATFORM_NAME = 'platform'
 
 #: url used to access configuration related api calls
 API_CONFIG_URL = '/api/fmc_config/v1'
+API_CONFIG_NAME = 'config'
 
 #: content type. as of 6.6.0 FMC only supports json
 API_CONTENT_TYPE = 'application/json'
@@ -41,3 +43,13 @@ API_REFRESH_COUNTER_MAX = 3
 
 #: max size of api payload in bytes
 API_PAYLOAD_SIZE_MAX = 2048000
+
+# software releases
+API_RELEASE_610 = '6.1.0'
+API_RELEASE_620 = '6.2.0'
+API_RELEASE_621 = '6.2.1'
+API_RELEASE_623 = '6.2.3'
+API_RELEASE_630 = '6.3.0'
+API_RELEASE_640 = '6.4.0'
+API_RELEASE_650 = '6.5.0'
+API_RELEASE_660 = '6.6.0'

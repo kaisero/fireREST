@@ -187,7 +187,7 @@ class Client(object):
         '''
         return self._request('delete', url, params=params)
 
-    def _create(self, url: str, data: Dict, params=None):
+    def _post(self, url: str, data: Dict, params=None):
         '''
         CREATE operation
         : param url: request that should be performed
@@ -198,7 +198,7 @@ class Client(object):
         data = self._sanitize('post', data)
         return self._request('post', url, params=params, data=data)
 
-    def _update(self, url: str, data: Dict, params=None):
+    def _put(self, url: str, data: Dict, params=None):
         '''
         UPDATE operation
         : param url: request that should be performed
@@ -232,7 +232,7 @@ class Client(object):
         return sanitized_payload
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_object_id_by_name(self, object_type: str, object_name: str):
         '''
         helper function to retrieve object id by name
@@ -246,7 +246,7 @@ class Client(object):
                 return obj['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_id_by_name(self, name: str):
         '''
         helper function to retrieve device id by name
@@ -259,20 +259,20 @@ class Client(object):
                 return device['id']
         return None
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_devicehapair_id_by_name(self, name: str):
         '''
         helper function to retrieve device ha - pair id by name
         : param name: name of the hapair
         : return: id if hapair is found, None otherwise
         '''
-        devicehapairs = self.get_devicehapairs(self, name)
+        devicehapairs = self.get_devicehapairs()
         for devicehapair in devicehapairs:
             if devicehapair['name'] == name:
                 return devicehapair['id']
         return None
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_device_id_from_devicehapair(self, devicehapair_id: str):
         '''
         helper function to retrieve device id from hapair
@@ -282,7 +282,7 @@ class Client(object):
         devicehapair = self.get_devicehapair(devicehapair_id)
         return devicehapair['primary']['id']
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_natpolicy_id_by_name(self, name: str):
         '''
         helper function to retrieve nat policy id by name
@@ -295,7 +295,7 @@ class Client(object):
                 return policy['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy_id_by_name(self, name: str):
         '''
         helper function to retrieve access control policy id by name
@@ -308,7 +308,7 @@ class Client(object):
                 return policy['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_filepolicy_id_by_name(self, name: str):
         '''
         helper function to retrieve file policy id by name
@@ -321,7 +321,7 @@ class Client(object):
                 return policy['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_intrusionpolicy_id_by_name(self, name: str):
         '''
         helper function to retrieve intrusion policy id by name
@@ -346,7 +346,7 @@ class Client(object):
                 return policy['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accessrule_id_by_name(self, policy_id: str, rule_name: str):
         '''
         helper function to retrieve access control policy rule id by name
@@ -355,14 +355,14 @@ class Client(object):
         : return: accesspolicy rule id if accessrule is found, None otherwise
         '''
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
-        url = self._url('config', request)
+        url = self._url(defaults.API_CONFIG_NAME, request)
         accessrules = self._get(url)
         for accessrule in accessrules:
             if accessrule['name'] == rule_name:
                 return accessrule['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_syslogalert_id_by_name(self, name: str):
         '''
         helper function to retrieve syslog alert object id by name
@@ -375,7 +375,7 @@ class Client(object):
                 return syslogalert['id']
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_snmpalert_id_by_name(self, name: str):
         '''
         helper function to retrieve snmp alert object id by name
@@ -420,45 +420,45 @@ class Client(object):
         logger.debug('Available Domains: %s', available_domains)
         return None
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_system_version(self):
-        url = self._url('platform', '/info/serverversion')
+        url = self._url(defaults.API_PLATFORM_NAME, '/info/serverversion')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_audit_records(self):
-        url = self._url('config', '/audit/auditrecords')
+        url = self._url(defaults.API_CONFIG_NAME, '/audit/auditrecords')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_audit_record(self, record_id: str):
-        url = self._url('config', f'/audit/auditrecords/{record_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/audit/auditrecords/{record_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_syslogalerts(self):
-        url = self._url('config', '/policy/syslogalerts')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/syslogalerts')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_snmpalerts(self):
-        url = self._url('config', '/policy/snmpalerts')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/snmpalerts')
         return self._get(url)
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_object(self, object_type: str, data: Dict):
-        url = self._url('config', f'/object/{object_type}')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}')
+        return self._post(url, data)
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_objects(self, object_type: str):
-        url = self._url('config', f'/object/{object_type}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}')
         return self._get(url)
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_objects_override(self, object_type: str, objects: List):
         overrides = []
         for obj in objects:
@@ -468,460 +468,492 @@ class Client(object):
         return overrides
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_object(self, object_type: str, object_id: str):
-        url = self._url('config', f'/object/{object_type}/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}/{object_id}')
         return self._get(url)
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_object_override(self, object_type: str, object_id: str):
-        url = self._url('config', f'/object/{object_type}/{object_id}/overrides')
+        url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}/{object_id}/overrides')
         return self._get(url)
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_object(self, object_type: str, object_id: str, data: Dict):
-        url = self._url('config', f'/object/{object_type}/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}/{object_id}')
+        return self._put(url, data)
 
     @utils.validate_object_type
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_object(self, object_type: str, object_id: str):
-        url = self._url('config', f'/object/{object_type}/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}/{object_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_devicegroup(self, data: Dict):
-        url = self._url('config', '/devicegroups/devicegrouprecords')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/devicegroups/devicegrouprecords')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_devicegroups(self):
-        url = self._url('config', '/devicegroups/devicegrouprecords')
+        url = self._url(defaults.API_CONFIG_NAME, '/devicegroups/devicegrouprecords')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_devicegroup(self, devicegroup_id: str):
-        url = self._url('config', f'/devicegroups/devicegrouprecords/{devicegroup_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devicegroups/devicegrouprecords/{devicegroup_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_devicegroup(self, devicegroup_id: str, data: Dict):
-        url = self._url('config', f'/devicegroups/devicegrouprecords/{devicegroup_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devicegroups/devicegrouprecords/{devicegroup_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_devicegroup(self, devicegroup_id: str):
-        url = self._url('config', f'/devicegroups/devicegrouprecords/{devicegroup_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devicegroups/devicegrouprecords/{devicegroup_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_device(self, data: Dict):
-        url = self._url('config', '/devices/devicerecords')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/devices/devicerecords')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_devices(self):
-        url = self._url('config', '/devices/devicerecords')
+        url = self._url(defaults.API_CONFIG_NAME, '/devices/devicerecords')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_device(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_device(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_devicehapairs(self):
-        url = self._url('config', '/devicehapairs/ftddevicehapairs')
+        url = self._url(defaults.API_CONFIG_NAME, '/devicehapairs/ftddevicehapairs')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def create_devicehapair(self, data: Dict):
-        url = self._url('config', '/devicehapairs/ftddevicehapairs')
+        url = self._url(defaults.API_CONFIG_NAME, '/devicehapairs/ftddevicehapairs')
         return self._get(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_devicehapair(self, devicehapair_id: str):
-        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{devicehapair_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devicehapairs/ftddevicehapairs/{devicehapair_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def update_devicehapair(self, data: Dict, devicehapair_id: str):
-        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{devicehapair_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devicehapairs/ftddevicehapairs/{devicehapair_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def delete_devicehapair(self, devicehapair_id: str):
-        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{devicehapair_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devicehapairs/ftddevicehapairs/{devicehapair_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_devicehapair_monitoredinterfaces(self, devicehapair_id: str):
-        url = self._url('config', f'/devicehapairs/ftddevicehapairs/{devicehapair_id}/monitoredinterfaces')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devicehapairs/ftddevicehapairs/{devicehapair_id}/monitoredinterfaces'
+        )
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_devicehapair_monitoredinterface(self, devicehapair_id: str, monitoredinterface_id: str):
         url = self._url(
-            'config', f'/devicehapairs/ftddevicehapairs/{devicehapair_id}/monitoredinterfaces/{monitoredinterface_id}',
+            defaults.API_CONFIG_NAME,
+            f'/devicehapairs/ftddevicehapairs/{devicehapair_id}/monitoredinterfaces/{monitoredinterface_id}',
         )
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_devicehapair_monitoredinterface(self, devicehapair_id: str, monitoredinterface_id: str, data: Dict):
         url = self._url(
-            'config', f'/devicehapairs/ftddevicehapairs/{devicehapair_id}/monitoredinterfaces/{monitoredinterface_id}',
+            defaults.API_CONFIG_NAME,
+            f'/devicehapairs/ftddevicehapairs/{devicehapair_id}/monitoredinterfaces/{monitoredinterface_id}',
         )
-        return self._update(url, data)
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_physicalinterfaces(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/physicalinterfaces')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_physicalinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}'
+        )
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_device_physicalinterface(self, device_id: str, interface_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
-        return self._update(url, data)
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}'
+        )
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_device_redundantinterface(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/redundantinterfaces')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_redundantinterfaces(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_redundantinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
+        )
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_device_redundantinterface(self, device_id: str, interface_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
-        return self._update(url, data)
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
+        )
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_device_redundantinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}'
+        )
         return self._delete(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_device_etherchannelinterface(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_etherchannelinterfaces(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_etherchannelinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
+        )
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_device_etherchannelinterface(self, device_id: str, interface_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
-        return self._update(url, data)
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
+        )
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_device_etherchannelinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
+        )
         return self._delete(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_device_subinterface(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/subinterfaces')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_subinterfaces(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/subinterfaces')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_subinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_device_subinterface(self, device_id: str, interface_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_device_subinterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_device_vlaninterface(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/vlaninterfaces')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_device_vlaninterfaces(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/vlaninterfaces')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_device_vlaninterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def update_device_vlaninterface(self, device_id: str, interface_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def delete_device_vlaninterface(self, device_id: str, interface_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def create_device_ipv4staticroute(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_device_ipv4staticroutes(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_device_ipv4staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+        )
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_device_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
-        return self._update(url, data)
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+        )
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def delete_device_ipv4staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+        )
         return self._delete(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def create_device_ipv6staticroute(self, device_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_device_ipv6staticroutes(self, device_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_device_ipv6staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+        )
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_device_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
-        return self._update(url, data)
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+        )
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def delete_device_ipv6staticroute(self, device_id: str, route_id: str):
-        url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+        )
         return self._delete(url)
 
-    @utils.minimum_version_required('6.6.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
     def get_device_metrics(self, device_id: str, metric: str):
         params = {'filter': self._filter({'metric': metric})}
-        url = self._url('config', f'/devices/devicerecords/{device_id}/operational/metrics')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/operational/metrics')
         return self._get(url, params)
 
-    @utils.minimum_version_required('6.6.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
     def device_command(self, device_id: str, command: str):
         # commands with wordsize > 2 must be split into filter and parameters params due to fmc rest api impl
         split_cmd = command.split(' ')
         filter_str = ' '.join(split_cmd[:2])
         params_str = ' '.join(split_cmd[2:])
         params = {'filter': self._filter({'command': filter_str}), 'parameters': params_str}
-        url = self._url('config', f'/devices/devicerecords/{device_id}/operational/commands')
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/operational/commands')
         return self._get(url, params)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def deploy(self, data: Dict):
-        url = self._url('config', '/deployment/deploymentrequests')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/deployment/deploymentrequests')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_deployabledevices(self):
-        url = self._url('config', '/deployment/deployabledevices')
+        url = self._url(defaults.API_CONFIG_NAME, '/deployment/deployabledevices')
         return self._get(url)
 
-    @utils.minimum_version_required('6.6.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
     def get_pendingchanges(self, device_id: str):
-        url = self._url('config', f'/deployment/deployabledevices/{device_id}/pendingchanges')
+        url = self._url(defaults.API_CONFIG_NAME, f'/deployment/deployabledevices/{device_id}/pendingchanges')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_filepolicies(self):
-        url = self._url('config', '/policy/filepolicies')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/filepolicies')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_filepolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/filepolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/filepolicies/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_intrusionpolicies(self):
-        url = self._url('config', '/policy/intrusionpolicies')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/intrusionpolicies')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_intrusionpolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/intrusionpolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/intrusionpolicies/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_accesspolicy(self, data: Dict):
-        url = self._url('config', '/policy/accesspolicies')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/accesspolicies')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicies(self):
-        url = self._url('config', '/policy/accesspolicies')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/accesspolicies')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_accesspolicy(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_accesspolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy_defaultactions(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/defaultactions')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy_defaultaction(self, policy_id: str, object_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/defaultactions/{object_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_accesspolicy_defaultaction(self, policy_id: str, object_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/defaultactions/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/defaultactions/{object_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_accesspolicy_loggingsettings(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/loggingsettings')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/loggingsettings')
         return self._get(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_accesspolicy_loggingsetting(self, policy_id: str, object_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/loggingsettings/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/loggingsettings/{object_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def update_accesspolicy_loggingsetting(self, policy_id: str, object_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/loggingsettings/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/loggingsettings/{object_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_accesspolicy_category(
         self, policy_id: str, data: Dict, section=None, above_category=None, insert_before=None, insert_after=None
     ):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/categories')
         params = {
             'aboveCategory': above_category,
             'section': section,
             'insertBefore': insert_before,
             'insertAfter': insert_after,
         }
-        return self._create(url, data, params)
+        return self._post(url, data, params)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_accesspolicy_categories(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/categories')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_accesspolicy_category(self, policy_id: str, category_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def update_accesspolicy_category(self, policy_id: str, category_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def delete_accesspolicy_category(self, policy_id: str, category_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/categories/{category_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_accesspolicy_inheritancesettings(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/inheritancesettings')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_accesspolicy_inheritancesetting(self, policy_id: str, object_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def update_accesspolicy_inheritancesetting(self, policy_id: str, object_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/inheritancesettings/{object_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.2.1')
+    @utils.minimum_version_required(defaults.API_RELEASE_621)
     def create_accessrule(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
             'category': category,
             'section': section,
             'insertBefore': insert_before,
             'insertAfter': insert_after,
         }
-        return self._create(url, data, params)
+        return self._post(url, data, params)
 
-    @utils.minimum_version_required('6.2.1')
+    @utils.minimum_version_required(defaults.API_RELEASE_621)
     def create_accessrules(
         self, policy_id: str, data: Dict, section=None, category=None, insert_before=None, insert_after=None,
     ):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules')
         params = {
             'bulk': True,
             'category': category,
@@ -929,71 +961,71 @@ class Client(object):
             'insertBefore': insert_before,
             'insertAfter': insert_after,
         }
-        return self._create(url, data, params)
+        return self._post(url, data, params)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accessrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accessrules(self, policy_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_accessrule(self, policy_id: str, rule_id: str, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def delete_accessrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_prefilterpolicy(self, data: Dict):
-        url = self._url('config', '/policy/prefilterpolicies')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/prefilterpolicies')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_prefilterpolicies(self):
-        url = self._url('config', '/policy/prefilterpolicies')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/prefilterpolicies')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_prefilterpolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def update_prefilterpolicy(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def delete_prefilterpolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_prefilterrule(
         self, policy_id: str, data: Dict, section=None, category=None, insert_before=None, insert_after=None,
     ):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         params = {
             'category': category,
             'section': section,
             'insert_before': insert_before,
             'insert_after': insert_after,
         }
-        return self._create(url, data, params)
+        return self._post(url, data, params)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_prefilterrules(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         params = {
             'bulk': True,
             'category': category,
@@ -1001,309 +1033,309 @@ class Client(object):
             'insert_before': insert_before,
             'insert_after': insert_after,
         }
-        return self._create(url, data, params)
+        return self._post(url, data, params)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_prefilterrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_prefilterrules(self, policy_id: str):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def update_prefilterrule(self, policy_id: str, rule_id: str, data: Dict):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def delete_prefilterrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def create_natpolicy(self, data: Dict):
-        url = self._url('config', '/policy/ftdnatpolicies')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/ftdnatpolicies')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_natpolicies(self):
-        url = self._url('config', '/policy/ftdnatpolicies')
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/ftdnatpolicies')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_natpolicy(self, policy_id):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def update_natpolicy(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def delete_natpolicy(self, policy_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def create_autonatrule(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_autonatrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_autonatrules(self, policy_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def update_autonatrule(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def delete_autonatrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def create_manualnatrule(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_manualnatrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_manualnatrules(self, policy_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/manualnatrules/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/manualnatrules/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def update_manualnatrule(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.2.3')
+    @utils.minimum_version_required(defaults.API_RELEASE_623)
     def delete_manualnatrule(self, policy_id: str, rule_id: str):
-        url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_policyassignment(self, data: Dict):
-        url = self._url('config', '/assignment/policyassignments')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/assignment/policyassignments')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_policyassignments(self):
-        url = self._url('config', '/assignment/policyassignments')
+        url = self._url(defaults.API_CONFIG_NAME, '/assignment/policyassignments')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_policyassignment(self, policy_id: str):
-        url = self._url('config', f'/assignment/policyassignments/{policy_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/assignment/policyassignments/{policy_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def update_policyassignment(self, policy_id: str, data: Dict):
-        url = self._url('config', f'/assignment/policyassignments/{policy_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/assignment/policyassignments/{policy_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_accesspolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None, fetch_zero_hitcount=True):
         params = {
             'filter': self._filter({'deviceId': device_id, 'ids': rule_ids, 'fetchZeroHitCount': fetch_zero_hitcount})
         }
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
         return self._get(url, params)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def update_accesspolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
-        return self._update(url, params)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
+        return self._put(url, params)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def delete_accesspolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
-        url = self._url('config', f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
-        return self._update(url, params)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/operational/hitcounts')
+        return self._put(url, params)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_prefilterpolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None, fetch_zero_hitcount=True):
         params = {
             'filter': self._filter({'deviceId': device_id, 'ids': rule_ids, 'fetchZeroHitCount': fetch_zero_hitcount})
         }
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
         return self._get(url, params)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def update_prefilterpolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
-        return self._update(url, params)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
+        return self._put(url, params)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def delete_prefilterpolicy_hitcounts(self, policy_id: str, device_id: str, rule_ids=None):
         params = {'filter': self._filter({'deviceId': device_id, 'ids': rule_ids})}
-        url = self._url('config', f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
-        return self._update(url, params)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/operational/hitcounts')
+        return self._put(url, params)
 
-    @utils.minimum_version_required('6.1.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_taskstatus(self, task_id: str):
-        url = self._url('config', f'/job/taskstatuses/{task_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/job/taskstatuses/{task_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_upgradepackages(self):
-        url = self._url('platform', '/updates/upgradepackages')
+        url = self._url(defaults.API_PLATFORM_NAME, '/updates/upgradepackages')
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_upgradepackage(self, package_id: str):
-        url = self._url('platform', f'/updates/upgradepackages/{package_id}')
+        url = self._url(defaults.API_PLATFORM_NAME, f'/updates/upgradepackages/{package_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_upgradepackage_applicabledevices(self, package_id: str):
-        url = self._url('platform', f'/updates/upgradepackages/{package_id}/applicabledevices')
+        url = self._url(defaults.API_PLATFORM_NAME, f'/updates/upgradepackages/{package_id}/applicabledevices')
         return self._get(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def delete_upgradepackage(self, package_id: str):
-        url = self._url('platform', f'/updates/upgradepackages/{package_id}')
+        url = self._url(defaults.API_PLATFORM_NAME, f'/updates/upgradepackages/{package_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def install_upgradepackage(self, data: Dict):
-        url = self._url('platform', '/updates/upgrades')
-        return self._create(url)
+        url = self._url(defaults.API_PLATFORM_NAME, '/updates/upgrades')
+        return self._post(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_cloudeventsconfigs(self):
-        url = self._url('config', '/integration/cloudeventsconfigs')
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/cloudeventsconfigs')
         return self._get(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_cloudeventsconfig(self, object_id: str):
-        url = self._url('config', '/integration/cloudeventsconfigs/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/cloudeventsconfigs/{object_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def update_cloudeventsconfig(self, object_id: str, data: Dict):
-        url = self._url('config', '/integration/cloudeventsconfigs/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/cloudeventsconfigs/{object_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def create_externallookup(self, data: Dict):
-        url = self._url('config', '/integration/externallookups')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/externallookups')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_externallookups(self):
-        url = self._url('config', '/integration/externallookups')
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/externallookups')
         return self._get(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_externallookup(self, object_id: str):
-        url = self._url('config', '/integration/externallookups/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/externallookups/{object_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.4.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
     def update_externallookup(self, object_id: str, data: Dict):
-        url = self._url('config', '/integration/externallookups/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/externallookups/{object_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_cloudregions(self):
-        url = self._url('config', '/integration/cloudregions')
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/cloudregions')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def get_cloudregion(self, object_id: str):
-        url = self._url('config', '/integration/cloudregions/{object_id}')
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/cloudregions/{object_id}')
         return self._get(url)
 
-    @utils.minimum_version_required('6.5.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
     def update_cloudregion(self, object_id: str, data: Dict):
-        url = self._url('config', '/integration/cloudregions/{object_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/integration/cloudregions/{object_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def create_s2svpn(self, data: Dict):
-        url = self._url('config', '/policy/ftds2svpns')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/ftds2svpns')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpns(self, data: Dict, vpn_id=''):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn(self, vpn_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def delete_s2svpn(self, vpn_id: str):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def create_s2svpn_endpoint(self, vpn_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_endpoints(self, data: Dict, vpn_id: str, endpoint_id=''):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_endpoint(self, vpn_id: str, endpoint_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def delete_s2svpn_endpoint(self, vpn_id: str, endpoint_id: str):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
         return self._delete(url)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_ikesettings(self, data: Dict, vpn_id: str, ikesettings_id=''):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_ikesettings(self, vpn_id: str, ikesettings_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_ipsecsettings(self, data: Dict, vpn_id: str, ipsecsettings_id=''):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_ipsecsettings(self, vpn_id: str, ipsecsettings_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
+        return self._put(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_advancedsettings(self, data: Dict, vpn_id: str, advancedsettings_id=''):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
-        return self._create(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
+        return self._post(url, data)
 
-    @utils.minimum_version_required('6.3.0')
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_advancedsettings(self, vpn_id: str, advancedsettings_id: str, data: Dict):
-        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
-        return self._update(url, data)
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
+        return self._put(url, data)
