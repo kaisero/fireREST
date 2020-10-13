@@ -82,9 +82,9 @@ class Client(object):
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
-        return options[namespace]
+        return options[namespace].rstrip('/')
 
-    def _virtualrouter_url(self, url, virtualrouter_id=None):
+    def _virtualrouter_url(self, url, virtualrouter_id=''):
         '''
         Change url to include path to virtualrouter
         : param virtualrouter_id: uuid of virtualrouter
@@ -755,21 +755,21 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def create_device_ipv4staticroute(self, device_id: str, data: Dict, virtualrouter_id=None):
+    def create_device_ipv4staticroute(self, device_id: str, data: Dict, virtualrouter_id=''):
         url = self._virtualrouter_url(
             self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         )
         return self._post(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def get_device_ipv4staticroutes(self, device_id: str, virtualrouter_id=None):
+    def get_device_ipv4staticroutes(self, device_id: str, virtualrouter_id=''):
         url = self._virtualrouter_url(
             self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         )
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def get_device_ipv4staticroute(self, device_id: str, route_id: str, virtualrouter_id=None):
+    def get_device_ipv4staticroute(self, device_id: str, route_id: str, virtualrouter_id=''):
         url = self._virtualrouter_url(
             self._url(
                 defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
@@ -778,7 +778,7 @@ class Client(object):
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def update_device_ipv4staticroute(self, device_id: str, route_id: str, data: Dict, virtualrouter_id=None):
+    def update_device_ipv4staticroute(self, device_id: str, route_id: str, data: Dict, virtualrouter_id=''):
         url = self._virtualrouter_url(
             self._url(
                 defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
@@ -787,7 +787,7 @@ class Client(object):
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def delete_device_ipv4staticroute(self, device_id: str, route_id: str, virtualrouter_id=None):
+    def delete_device_ipv4staticroute(self, device_id: str, route_id: str, virtualrouter_id=''):
         url = self._virtualrouter_url(
             self._url(
                 defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
@@ -1114,6 +1114,16 @@ class Client(object):
     def delete_prefilterpolicy(self, policy_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}')
         return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
+    def get_prefilterpolicy_defaultactions(self, policy_id: str, object_id=''):
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/defaultactions/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_650)
+    def update_prefilterpolicy_defaultaction(self, policy_id: str, object_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/defaultactions/{object_id}')
+        return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_prefilterpolicy_rule(

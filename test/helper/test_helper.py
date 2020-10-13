@@ -103,6 +103,12 @@ def test_filter_with_invalid_input(api):
     assert actual_filter == expected_filter
 
 
+def test_default_url_with_trailing_slash(api):
+    expected_url = f'{api.protocol}://{api.hostname}/test'
+    actual_url = api._url(path='/test/')
+    assert actual_url == expected_url
+
+
 def test_default_url(api):
     expected_url = f'{api.protocol}://{api.hostname}/test'
     actual_url = api._url(path='/test')
