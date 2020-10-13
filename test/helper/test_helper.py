@@ -62,6 +62,21 @@ def test_sanitize_with_valid_list_payload_and_post_operation(api):
     assert actual_result == expected_result
 
 
+def test_virtualrouter_support_with_virtualrouter_param(api):
+    virtualrouter_id = '1111-1111'
+    expected_result = f'/devices/devicerecords/0000-0000/routing/virtualrouters/{virtualrouter_id}/ipv4staticroutes'
+    actual_result = api._virtualrouter_url(
+        '/devices/devicerecords/0000-0000/routing/ipv4staticroutes', virtualrouter_id
+    )
+    assert actual_result == expected_result
+
+
+def test_virtualrouter_support_without_virtualrouter_param(api):
+    expected_result = f'/devices/devicerecords/0000-0000/routing/ipv4staticroutes'
+    actual_result = api._virtualrouter_url(expected_result)
+    assert actual_result == expected_result
+
+
 def test_filter_with_single_item(api):
     expected_filter = 'deviceId:457d932a-3dfb-11ea-9b36-8a42de410c5c'
     actual_filter = api._filter(items={'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c'})

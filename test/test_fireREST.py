@@ -158,16 +158,16 @@ def test_get_prefilterpolicy_id_by_name_with_incorrect_name(api, constants):
     assert expected_result == actual_result
 
 
-def test_get_accessrule_id_by_name_with_correct_name(api, constants):
+def test_get_accesspolicy_rule_id_by_name_with_correct_name(api, constants):
     expected_result = constants['accessrule_id']
-    actual_result = api.get_accessrule_id_by_name(constants['accesspolicy_id'], constants['accessrule'])
+    actual_result = api.get_accesspolicy_rule_id_by_name(constants['accesspolicy_id'], constants['accessrule'])
 
     assert expected_result == actual_result
 
 
-def test_get_accessrule_id_by_name_with_incorrect_name(api, constants):
+def test_get_accesspolicy_rule_id_by_name_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_accessrule_id_by_name(constants['accesspolicy_id'], 'INCORRECT-NAME')
+    actual_result = api.get_accesspolicy_rule_id_by_name(constants['accesspolicy_id'], 'INCORRECT-NAME')
 
     assert expected_result == actual_result
 

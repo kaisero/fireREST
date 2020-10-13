@@ -84,6 +84,16 @@ class Client(object):
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
         return options[namespace]
 
+    def _virtualrouter_url(self, url, virtualrouter_id=None):
+        '''
+        Change url to include path to virtualrouter
+        : param virtualrouter_id: uuid of virtualrouter
+        : return: adapted url that points to specified virtualrouter, same url if no virtualrouter is specified
+        '''
+        if virtualrouter_id:
+            return url.replace('/routing/', f'/routing/virtualrouters/{virtualrouter_id}/')
+        return url
+
     def _filter(self, items=None):
         '''
         Get filter string from list of key, value pairs
@@ -347,7 +357,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_accessrule_id_by_name(self, policy_id: str, rule_name: str):
+    def get_accesspolicy_rule_id_by_name(self, policy_id: str, rule_name: str):
         '''
         helper function to retrieve access control policy rule id by name
         : param policy_id: id of the accesspolicy that will be queried
@@ -459,12 +469,11 @@ class Client(object):
 
     @utils.validate_object_type
     @utils.minimum_version_required(defaults.API_RELEASE_640)
-    def get_objects_override(self, object_type: str, objects: List):
+    def get_objects_overrides(self, object_type: str, objects: List):
         overrides = []
         for obj in objects:
             if obj['overridable']:
-                responses = self.get_object_override(object_type, obj['id'])
-                overrides.extend(responses)
+                overrides.extend(self.get_object_overrides(object_type, obj['id']))
         return overrides
 
     @utils.validate_object_type
@@ -475,7 +484,7 @@ class Client(object):
 
     @utils.validate_object_type
     @utils.minimum_version_required(defaults.API_RELEASE_640)
-    def get_object_override(self, object_type: str, object_id: str):
+    def get_object_overrides(self, object_type: str, object_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}/{object_id}/overrides')
         return self._get(url)
 
@@ -746,64 +755,115 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def create_device_ipv4staticroute(self, device_id: str, data: Dict):
-        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
+    def create_device_ipv4staticroute(self, device_id: str, data: Dict, virtualrouter_id=None):
+        url = self._virtualrouter_url(
+            self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
+        )
         return self._post(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def get_device_ipv4staticroutes(self, device_id: str):
-        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
-        return self._get(url)
-
-    @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def get_device_ipv4staticroute(self, device_id: str, route_id: str):
-        url = self._url(
-            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+    def get_device_ipv4staticroutes(self, device_id: str, virtualrouter_id=None):
+        url = self._virtualrouter_url(
+            self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         )
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def update_device_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
-        url = self._url(
-            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+    def get_device_ipv4staticroute(self, device_id: str, route_id: str, virtualrouter_id=None):
+        url = self._virtualrouter_url(
+            self._url(
+                defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+            )
+        )
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
+    def update_device_ipv4staticroute(self, device_id: str, route_id: str, data: Dict, virtualrouter_id=None):
+        url = self._virtualrouter_url(
+            self._url(
+                defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+            )
         )
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def delete_device_ipv4staticroute(self, device_id: str, route_id: str):
-        url = self._url(
-            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+    def delete_device_ipv4staticroute(self, device_id: str, route_id: str, virtualrouter_id=None):
+        url = self._virtualrouter_url(
+            self._url(
+                defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}'
+            )
         )
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def create_device_ipv6staticroute(self, device_id: str, data: Dict):
-        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
+        url = self._virtualrouter_url(
+            self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
+        )
         return self._post(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_device_ipv6staticroutes(self, device_id: str):
-        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
+        url = self._virtualrouter_url(
+            self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
+        )
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_device_ipv6staticroute(self, device_id: str, route_id: str):
-        url = self._url(
-            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+        url = self._virtualrouter_url(
+            self._url(
+                defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+            )
         )
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_device_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
-        url = self._url(
-            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+        url = self._virtualrouter_url(
+            self._url(
+                defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+            )
         )
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def delete_device_ipv6staticroute(self, device_id: str, route_id: str):
+        url = self._virtualrouter_url(
+            self._url(
+                defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+            )
+        )
+        return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
+    def create_device_virtualrouter(self, device_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/virtualrouters')
+        return self._post(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
+    def get_device_virtualrouters(self, device_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/virtualrouters')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
+    def get_device_virtualrouter(self, device_id: str, virtualrouter_id: str):
         url = self._url(
-            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/virtualrouters/{virtualrouter_id}'
+        )
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
+    def update_device_virtualrouter(self, device_id: str, virtualrouter_id: str, data: Dict):
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/virtualrouters/{virtualrouter_id}'
+        )
+        return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_660)
+    def delete_device_virtualrouter(self, device_id: str, virtualrouter_id: str):
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/virtualrouters/{virtualrouter_id}'
         )
         return self._delete(url)
 
@@ -984,7 +1044,7 @@ class Client(object):
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_621)
-    def create_accessrule(
+    def create_accesspolicy_rule(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules')
@@ -997,7 +1057,7 @@ class Client(object):
         return self._post(url, data, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_621)
-    def create_accessrules(
+    def create_accesspolicy_rules(
         self, policy_id: str, data: Dict, section=None, category=None, insert_before=None, insert_after=None,
     ):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules')
@@ -1011,22 +1071,22 @@ class Client(object):
         return self._post(url, data, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_accessrule(self, policy_id: str, rule_id: str):
+    def get_accesspolicy_rule(self, policy_id: str, rule_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_accessrules(self, policy_id: str):
+    def get_accesspolicy_rules(self, policy_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules')
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def update_accessrule(self, policy_id: str, rule_id: str, data: Dict):
+    def update_accesspolicy_rule(self, policy_id: str, rule_id: str, data: Dict):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def delete_accessrule(self, policy_id: str, rule_id: str):
+    def delete_accesspolicy_rule(self, policy_id: str, rule_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/accesspolicies/{policy_id}/accessrules/{rule_id}')
         return self._delete(url)
 
@@ -1056,7 +1116,7 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
-    def create_prefilterrule(
+    def create_prefilterpolicy_rule(
         self, policy_id: str, data: Dict, section=None, category=None, insert_before=None, insert_after=None,
     ):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
@@ -1069,7 +1129,7 @@ class Client(object):
         return self._post(url, data, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
-    def create_prefilterrules(
+    def create_prefilterpolicy_rules(
         self, policy_id: str, data: Dict, section='', category='', insert_before=None, insert_after=None,
     ):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
@@ -1083,22 +1143,22 @@ class Client(object):
         return self._post(url, data, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
-    def get_prefilterrule(self, policy_id: str, rule_id: str):
+    def get_prefilterpolicy_rule(self, policy_id: str, rule_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
-    def get_prefilterrules(self, policy_id: str):
+    def get_prefilterpolicy_rules(self, policy_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
-    def update_prefilterrule(self, policy_id: str, rule_id: str, data: Dict):
+    def update_prefilterpolicy_rule(self, policy_id: str, rule_id: str, data: Dict):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
-    def delete_prefilterrule(self, policy_id: str, rule_id: str):
+    def delete_prefilterpolicy_rule(self, policy_id: str, rule_id: str):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules/{rule_id}')
         return self._delete(url)
 
