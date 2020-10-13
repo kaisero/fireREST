@@ -588,142 +588,142 @@ class Client(object):
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_physical_interfaces(self, device_id: str):
+    def get_device_physical_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_physical_interface(self, device_id: str, interface_id: str):
+    def get_device_physical_interface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_ftd_physical_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_physical_interface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def create_ftd_redundant_interface(self, device_id: str, data: Dict):
+    def create_device_redundant_interface(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_redundant_interfaces(self, device_id: str):
+    def get_device_redundant_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_redundant_interface(self, device_id: str, interface_id: str):
+    def get_device_redundant_interface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_ftd_redundant_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_redundant_interface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_ftd_redundant_interface(self, device_id: str, interface_id: str):
+    def delete_device_redundant_interface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
-    def create_ftd_portchannel_interface(self, device_id: str, data: Dict):
+    def create_device_portchannel_interface(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_portchannel_interfaces(self, device_id: str):
+    def get_device_portchannel_interfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_portchannel_interface(self, device_id: str, interface_id: str):
+    def get_device_portchannel_interface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_ftd_portchannel_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_portchannel_interface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_ftd_portchannel_interface(self, device_id: str, interface_id: str):
+    def delete_device_portchannel_interface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
-    def create_ftd_sub_interface(self, device_id: str, data: Dict):
+    def create_device_subinterface(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_sub_interfaces(self, device_id: str):
+    def get_device_subinterfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_ftd_sub_interface(self, device_id: str, interface_id: str):
+    def get_device_subinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_ftd_sub_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_subinterface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_ftd_sub_interface(self, device_id: str, interface_id: str):
+    def delete_device_subinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.3.0')
-    def create_ftd_ipv4staticroute(self, device_id: str, data: Dict):
+    def create_device_ipv4staticroute(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.3.0')
-    def get_ftd_ipv4staticroutes(self, device_id: str):
+    def get_device_ipv4staticroutes(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
-    def get_ftd_ipv4staticroute(self, device_id: str, route_id: str):
+    def get_device_ipv4staticroute(self, device_id: str, route_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
-    def update_ftd_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
+    def update_device_ipv4staticroute(self, device_id: str, route_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.3.0')
-    def delete_ftd_ipv4staticroute(self, device_id: str, route_id: str):
+    def delete_device_ipv4staticroute(self, device_id: str, route_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes/{route_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.3.0')
-    def create_ftd_ipv6staticroute(self, device_id: str, data: Dict):
+    def create_device_ipv6staticroute(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.3.0')
-    def get_ftd_ipv6staticroutes(self, device_id: str):
+    def get_device_ipv6staticroutes(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
-    def get_ftd_ipv6staticroute(self, device_id: str, route_id: str):
+    def get_device_ipv6staticroute(self, device_id: str, route_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.3.0')
-    def update_ftd_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
+    def update_device_ipv6staticroute(self, device_id: str, route_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.3.0')
-    def delete_ftd_ipv6staticroute(self, device_id: str, route_id: str):
+    def delete_device_ipv6staticroute(self, device_id: str, route_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._delete(url)
 
@@ -744,7 +744,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_filepolicies(self):
-        url = self._url('config', f'/policy/filepolicies')
+        url = self._url('config', '/policy/filepolicies')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -754,7 +754,7 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def get_intrusionpolicies(self):
-        url = self._url('config', f'/policy/intrusionpolicies')
+        url = self._url('config', '/policy/intrusionpolicies')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -764,12 +764,12 @@ class Client(object):
 
     @utils.minimum_version_required('6.1.0')
     def create_accesspolicy(self, data: Dict):
-        url = self._url('config', f'/policy/accesspolicies')
+        url = self._url('config', '/policy/accesspolicies')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
     def get_accesspolicies(self):
-        url = self._url('config', f'/policy/accesspolicies')
+        url = self._url('config', '/policy/accesspolicies')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
@@ -914,12 +914,12 @@ class Client(object):
 
     @utils.minimum_version_required('6.5.0')
     def create_prefilterpolicy(self, data: Dict):
-        url = self._url('config', f'/policy/prefilterpolicies')
+        url = self._url('config', '/policy/prefilterpolicies')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.5.0')
     def get_prefilterpolicies(self):
-        url = self._url('config', f'/policy/prefilterpolicies')
+        url = self._url('config', '/policy/prefilterpolicies')
         return self._get(url)
 
     @utils.minimum_version_required('6.5.0')
