@@ -675,6 +675,31 @@ class Client(object):
         url = self._url('config', f'/devices/devicerecords/{device_id}/subinterfaces/{interface_id}')
         return self._delete(url)
 
+    @utils.minimum_version_required('6.5.0')
+    def create_device_vlaninterface(self, device_id: str, data: Dict):
+        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_device_vlaninterfaces(self, device_id: str):
+        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def get_device_vlaninterface(self, device_id: str, interface_id: str):
+        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required('6.5.0')
+    def update_device_vlaninterface(self, device_id: str, interface_id: str, data: Dict):
+        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.5.0')
+    def delete_device_vlaninterface(self, device_id: str, interface_id: str):
+        url = self._url('config', f'/devices/devicerecords/{device_id}/vlaninterfaces/{interface_id}')
+        return self._delete(url)
+
     @utils.minimum_version_required('6.3.0')
     def create_device_ipv4staticroute(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv4staticroutes')
@@ -724,6 +749,22 @@ class Client(object):
     def delete_device_ipv6staticroute(self, device_id: str, route_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}')
         return self._delete(url)
+
+    @utils.minimum_version_required('6.6.0')
+    def get_device_metrics(self, device_id: str, metric: str):
+        params = {'filter': self._filter({'metric': metric})}
+        url = self._url('config', f'/devices/devicerecords/{device_id}/operational/metrics')
+        return self._get(url, params)
+
+    @utils.minimum_version_required('6.6.0')
+    def device_command(self, device_id: str, command: str):
+        # commands with wordsize > 2 must be split into filter and parameters params due to fmc rest api impl
+        split_cmd = command.split(' ')
+        filter_str = ' '.join(split_cmd[:2])
+        params_str = ' '.join(split_cmd[2:])
+        params = {'filter': self._filter({'command': filter_str}), 'parameters': params_str}
+        url = self._url('config', f'/devices/devicerecords/{device_id}/operational/commands')
+        return self._get(url, params)
 
     @utils.minimum_version_required('6.1.0')
     def deploy(self, data: Dict):
