@@ -266,23 +266,21 @@ class Client(object):
         : param name: name of the hapair
         : return: id if hapair is found, None otherwise
         '''
-        request = '/devicehapairs/ftddevicehapairs'
-        url = self._url('config', request)
-        ha_pairs = self._get(url)
-        for ha_pair in ha_pairs:
-            if ha_pair['name'] == name:
-                return ha_pair['id']
+        devicehapairs = self.get_devicehapairs(self, name)
+        for devicehapair in devicehapairs:
+            if devicehapair['name'] == name:
+                return devicehapair['id']
         return None
 
     @utils.minimum_version_required('6.2.3')
-    def get_device_id_from_hapair(self, hapair_id: str):
+    def get_device_id_from_devicehapair(self, devicehapair_id: str):
         '''
         helper function to retrieve device id from hapair
-        : param hapair_id: id of hapair
+        : param devicehapair_id: id of hapair
         : return: id if device is found, None otherwise
         '''
-        ha_pair = self.get_devicehapair(hapair_id)
-        return ha_pair['primary']['id']
+        devicehapair = self.get_devicehapair(devicehapair_id)
+        return devicehapair['primary']['id']
 
     @utils.minimum_version_required('6.2.3')
     def get_natpolicy_id_by_name(self, name: str):
