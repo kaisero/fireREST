@@ -586,67 +586,67 @@ class Client(object):
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_physical_interfaces(self, device_id: str):
+    def get_device_physicalinterfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_physical_interface(self, device_id: str, interface_id: str):
+    def get_device_physicalinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_device_physical_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_physicalinterface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/physicalinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def create_device_redundant_interface(self, device_id: str, data: Dict):
+    def create_device_redundantinterface(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_redundant_interfaces(self, device_id: str):
+    def get_device_redundantinterfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_redundant_interface(self, device_id: str, interface_id: str):
+    def get_device_redundantinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_device_redundant_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_redundantinterface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_device_redundant_interface(self, device_id: str, interface_id: str):
+    def delete_device_redundantinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/redundantinterfaces/{interface_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
-    def create_device_portchannel_interface(self, device_id: str, data: Dict):
+    def create_device_etherchannelinterface(self, device_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_portchannel_interfaces(self, device_id: str):
+    def get_device_etherchannelinterfaces(self, device_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_device_portchannel_interface(self, device_id: str, interface_id: str):
+    def get_device_etherchannelinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_device_portchannel_interface(self, device_id: str, interface_id: str, data: Dict):
+    def update_device_etherchannelinterface(self, device_id: str, interface_id: str, data: Dict):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def delete_device_portchannel_interface(self, device_id: str, interface_id: str):
+    def delete_device_etherchannelinterface(self, device_id: str, interface_id: str):
         url = self._url('config', f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}')
         return self._delete(url)
 
@@ -731,7 +731,7 @@ class Client(object):
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_deployable_devices(self):
+    def get_deployabledevices(self):
         url = self._url('config', '/deployment/deployabledevices')
         return self._get(url)
 
@@ -1008,72 +1008,72 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
-    def create_autonat_rule(self, policy_id: str, data: Dict):
+    def create_autonatrule(self, policy_id: str, data: Dict):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.2.3')
-    def get_autonat_rule(self, policy_id: str, rule_id: str):
+    def get_autonatrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
-    def get_autonat_rules(self, policy_id: str):
+    def get_autonatrules(self, policy_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
-    def update_autonat_rule(self, policy_id: str, data: Dict):
+    def update_autonatrule(self, policy_id: str, data: Dict):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.2.3')
-    def delete_autonat_rule(self, policy_id: str, rule_id: str):
+    def delete_autonatrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/autonatrules/{rule_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.2.3')
-    def create_manualnat_rule(self, policy_id: str, data: Dict):
+    def create_manualnatrule(self, policy_id: str, data: Dict):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.2.3')
-    def get_manualnat_rule(self, policy_id: str, rule_id: str):
+    def get_manualnatrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
-    def get_manualnat_rules(self, policy_id: str):
+    def get_manualnatrules(self, policy_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/manualnatrules/{policy_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.2.3')
-    def update_manualnat_rule(self, policy_id: str, data: Dict):
+    def update_manualnatrule(self, policy_id: str, data: Dict):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules')
         return self._update(url, data)
 
     @utils.minimum_version_required('6.2.3')
-    def delete_manualnat_rule(self, policy_id: str, rule_id: str):
+    def delete_manualnatrule(self, policy_id: str, rule_id: str):
         url = self._url('config', f'/policy/ftdnatpolicies/{policy_id}/manualnatrules/{rule_id}')
         return self._delete(url)
 
     @utils.minimum_version_required('6.1.0')
-    def create_policy_assignment(self, data: Dict):
+    def create_policyassignment(self, data: Dict):
         url = self._url('config', '/assignment/policyassignments')
         return self._create(url, data)
 
     @utils.minimum_version_required('6.1.0')
-    def get_policy_assignments(self):
+    def get_policyassignments(self):
         url = self._url('config', '/assignment/policyassignments')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def get_policy_assignment(self, policy_id: str):
+    def get_policyassignment(self, policy_id: str):
         url = self._url('config', f'/assignment/policyassignments/{policy_id}')
         return self._get(url)
 
     @utils.minimum_version_required('6.1.0')
-    def update_policy_assignment(self, policy_id: str, data: Dict):
+    def update_policyassignment(self, policy_id: str, data: Dict):
         url = self._url('config', f'/assignment/policyassignments/{policy_id}')
         return self._update(url, data)
 
