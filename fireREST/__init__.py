@@ -782,6 +782,23 @@ class Client(object):
         )
         return self._delete(url)
 
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
+    def get_device_interfaceevents(self, device_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/interfaceevents')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
+    def accept_device_interfaces(self, device_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/interfaceevents')
+        data = {'action': 'ACCEPT_CHANGES'}
+        return self._post(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_640)
+    def sync_device_interfaces(self, device_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/interfaceevents')
+        data = {'action': 'SYNC_WITH_DEVICE'}
+        return self._post(url, data)
+
     @utils.minimum_version_required(defaults.API_RELEASE_660)
     def get_device_metrics(self, device_id: str, metric: str):
         params = {'filter': self._filter({'metric': metric})}
