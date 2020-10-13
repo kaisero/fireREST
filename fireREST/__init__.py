@@ -640,6 +640,31 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def create_device_inlineset(self, device_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/inlinesets')
+        return self._post(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def get_device_inlinesets(self, device_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/inlinesets')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def get_device_inlineset(self, device_id: str, inlineset_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/inlinesets/{inlineset_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def update_device_inlineset(self, device_id: str, inlineset_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/inlinesets/{inlineset_id}')
+        return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def delete_device_inlineset(self, device_id: str, inlineset_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/inlinesets/{inlineset_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_device_etherchannelinterface(self, device_id: str, data: Dict):
         url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._post(url, data)
@@ -781,6 +806,11 @@ class Client(object):
             defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/routing/ipv6staticroutes/{route_id}'
         )
         return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
+    def copy_device_configuration(self, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, '/devices/copyconfigrequests')
+        return self._post(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_device_interfaceevents(self, device_id: str):
