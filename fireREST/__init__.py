@@ -1198,3 +1198,73 @@ class Client(object):
     def update_cloudregion(self, object_id: str, data: Dict):
         url = self._url('config', '/integration/cloudregions/{object_id}')
         return self._update(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def create_s2svpn(self, data: Dict):
+        url = self._url('config', '/policy/ftds2svpns')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_s2svpns(self, data: Dict, vpn_id=''):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def update_s2svpn(self, vpn_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def delete_s2svpn(self, vpn_id: str):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.3.0')
+    def create_s2svpn_endpoint(self, vpn_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_s2svpn_endpoints(self, data: Dict, vpn_id: str, endpoint_id=''):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def update_s2svpn_endpoint(self, vpn_id: str, endpoint_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def delete_s2svpn_endpoint(self, vpn_id: str, endpoint_id: str):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_s2svpn_ikesettings(self, data: Dict, vpn_id: str, ikesettings_id=''):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def update_s2svpn_ikesettings(self, vpn_id: str, ikesettings_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_s2svpn_ipsecsettings(self, data: Dict, vpn_id: str, ipsecsettings_id=''):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def update_s2svpn_ipsecsettings(self, vpn_id: str, ipsecsettings_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
+        return self._update(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def get_s2svpn_advancedsettings(self, data: Dict, vpn_id: str, advancedsettings_id=''):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
+        return self._create(url, data)
+
+    @utils.minimum_version_required('6.3.0')
+    def update_s2svpn_advancedsettings(self, vpn_id: str, advancedsettings_id: str, data: Dict):
+        url = self._url('config', f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
+        return self._update(url, data)
