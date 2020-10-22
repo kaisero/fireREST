@@ -179,6 +179,7 @@ def raise_for_status(response):
     '''
     status_code = response.status_code
     exceptions = {
+        404: exc.ResourceNotFoundError,
         422: exc.UnprocessableEntityError,
         429: exc.RateLimitException,
         500: exc.GenericApiError,

@@ -24,16 +24,16 @@ def test_initialization(api, constants):
     assert api.domain_name == expected_domain_name
 
 
-def test_get_domain_id_by_name_with_correct_name(api):
+def test_get_domain_id_with_correct_name(api):
     expected_result = api.domain
-    actual_result = api.get_domain_id_by_name(api.domain_name)
+    actual_result = api.get_domain_id(api.domain_name)
 
     assert expected_result == actual_result
 
 
-def test_get_domain_id_by_name_with_incorrect_name(api):
+def test_get_domain_id_with_incorrect_name(api):
     expected_result = None
-    actual_result = api.get_domain_id_by_name('NON-EXISTING-DOMAIN')
+    actual_result = api.get_domain_id('NON-EXISTING-DOMAIN')
 
     assert expected_result == actual_result
 
@@ -65,7 +65,7 @@ def test_create_object(api):
 
 
 def test_get_object(api):
-    object_id = api.get_object_id_by_name('network', 'firerest_test_netobj')
+    object_id = api.get_object_id('network', 'firerest_test_netobj')
     expected_object = {
         'id': object_id,
         'name': 'firerest_test_netobj',
@@ -82,7 +82,7 @@ def test_update_object(api):
     expected_response = 200
     expected_description = 'test_update_object'
 
-    object_id = api.get_object_id_by_name('network', 'firerest_test_netobj')
+    object_id = api.get_object_id('network', 'firerest_test_netobj')
     payload = api.get_object('network', object_id)
     payload['description'] = expected_description
 
@@ -94,7 +94,7 @@ def test_update_object(api):
 
 
 def test_delete_object(api):
-    object_id = api.get_object_id_by_name('network', 'firerest_test_netobj')
+    object_id = api.get_object_id('network', 'firerest_test_netobj')
 
     actual_result = api.delete_object('network', object_id).status_code
     expected_result = 200
@@ -102,113 +102,113 @@ def test_delete_object(api):
     assert expected_result == actual_result
 
 
-def test_get_device_id_by_name_with_correct_name(api, constants):
+def test_get_device_id_with_correct_name(api, constants):
     expected_result = constants['device_id']
-    actual_result = api.get_device_id_by_name(constants['device'])
+    actual_result = api.get_device_id(constants['device'])
 
     assert expected_result == actual_result
 
 
-def test_get_device_id_by_name_with_incorrect_name(api, constants):
+def test_get_device_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_device_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_device_id('INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_devicehapair_id_by_name_with_correct_name(api, constants):
+def test_get_devicehapair_id_with_correct_name(api, constants):
     expected_result = constants['devicehapair_id']
-    actual_result = api.get_devicehapair_id_by_name(constants['devicehapair'])
+    actual_result = api.get_devicehapair_id(constants['devicehapair'])
 
     assert expected_result == actual_result
 
 
-def test_get_devicehapair_id_by_name_with_incorrect_name(api, constants):
+def test_get_devicehapair_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_devicehapair_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_devicehapair_id('INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_accesspolicy_id_by_name_with_correct_name(api, constants):
+def test_get_accesspolicy_id_with_correct_name(api, constants):
     expected_result = constants['accesspolicy_id']
-    actual_result = api.get_accesspolicy_id_by_name(constants['accesspolicy'])
+    actual_result = api.get_accesspolicy_id(constants['accesspolicy'])
 
     assert expected_result == actual_result
 
 
-def test_get_accesspolicy_id_by_name_with_incorrect_name(api, constants):
+def test_get_accesspolicy_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_accesspolicy_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_accesspolicy_id('INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_prefilterpolicy_id_by_name_with_correct_name(api, constants):
+def test_get_prefilterpolicy_id_with_correct_name(api, constants):
     expected_result = constants['prefilterpolicy_id']
-    actual_result = api.get_prefilterpolicy_id_by_name(constants['prefilterpolicy'])
+    actual_result = api.get_prefilterpolicy_id(constants['prefilterpolicy'])
 
     assert expected_result == actual_result
 
 
-def test_get_prefilterpolicy_id_by_name_with_incorrect_name(api, constants):
+def test_get_prefilterpolicy_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_prefilterpolicy_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_prefilterpolicy_id('INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_accesspolicy_rule_id_by_name_with_correct_name(api, constants):
+def test_get_accesspolicy_rule_id_with_correct_name(api, constants):
     expected_result = constants['accessrule_id']
-    actual_result = api.get_accesspolicy_rule_id_by_name(constants['accesspolicy_id'], constants['accessrule'])
+    actual_result = api.get_accesspolicy_rule_id(constants['accesspolicy_id'], constants['accessrule'])
 
     assert expected_result == actual_result
 
 
-def test_get_accesspolicy_rule_id_by_name_with_incorrect_name(api, constants):
+def test_get_accesspolicy_rule_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_accesspolicy_rule_id_by_name(constants['accesspolicy_id'], 'INCORRECT-NAME')
+    actual_result = api.get_accesspolicy_rule_id(constants['accesspolicy_id'], 'INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_natpolicy_id_by_name_with_correct_name(api, constants):
+def test_get_natpolicy_id_with_correct_name(api, constants):
     expected_result = constants['natpolicy_id']
-    actual_result = api.get_natpolicy_id_by_name(constants['natpolicy'])
+    actual_result = api.get_natpolicy_id(constants['natpolicy'])
 
     assert expected_result == actual_result
 
 
-def test_get_natpolicy_id_by_name_with_incorrect_name(api, constants):
+def test_get_natpolicy_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_natpolicy_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_natpolicy_id('INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_syslogalert_id_by_name_with_correct_name(api, constants):
+def test_get_syslogalert_id_with_correct_name(api, constants):
     expected_result = constants['syslogalert_id']
-    actual_result = api.get_syslogalert_id_by_name(constants['syslogalert'])
+    actual_result = api.get_syslogalert_id(constants['syslogalert'])
 
     assert expected_result == actual_result
 
 
-def test_get_syslogalert_id_by_name_with_incorrect_name(api, constants):
+def test_get_syslogalert_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_syslogalert_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_syslogalert_id('INCORRECT-NAME')
 
     assert expected_result == actual_result
 
 
-def test_get_snmpalert_id_by_name_with_correct_name(api, constants):
+def test_get_snmpalert_id_with_correct_name(api, constants):
     expected_result = constants['snmpalert_id']
-    actual_result = api.get_snmpalert_id_by_name(constants['snmpalert'])
+    actual_result = api.get_snmpalert_id(constants['snmpalert'])
 
     assert expected_result == actual_result
 
 
-def test_get_snmpalert_id_by_name_with_incorrect_name(api, constants):
+def test_get_snmpalert_id_with_incorrect_name(api, constants):
     expected_result = None
-    actual_result = api.get_snmpalert_id_by_name('INCORRECT-NAME')
+    actual_result = api.get_snmpalert_id('INCORRECT-NAME')
 
     assert expected_result == actual_result

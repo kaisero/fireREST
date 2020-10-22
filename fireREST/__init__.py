@@ -64,7 +64,7 @@ class Client(object):
         self.verify_cert = verify_cert
         self._login()
         self.domain_name = domain
-        self.domain = self.get_domain_id_by_name(domain)
+        self.domain = self.get_domain_id(domain)
         self.version = version.parse(self.get_system_version()[0]['serverVersion'].split(' ')[0])
 
     def _url(self, namespace='base', path=''):
@@ -243,7 +243,7 @@ class Client(object):
 
     @utils.validate_object_type
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_object_id_by_name(self, object_type: str, object_name: str):
+    def get_object_id(self, object_type: str, object_name: str):
         '''
         helper function to retrieve object id by name
         : param object_type: object type that will be queried
@@ -257,7 +257,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_device_id_by_name(self, name: str):
+    def get_device_id(self, name: str):
         '''
         helper function to retrieve device id by name
         : param name: name of the device
@@ -270,7 +270,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
-    def get_devicehapair_id_by_name(self, name: str):
+    def get_devicehapair_id(self, name: str):
         '''
         helper function to retrieve device ha - pair id by name
         : param name: name of the hapair
@@ -293,7 +293,7 @@ class Client(object):
         return devicehapair['primary']['id']
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
-    def get_natpolicy_id_by_name(self, name: str):
+    def get_natpolicy_id(self, name: str):
         '''
         helper function to retrieve nat policy id by name
         : param name: name of nat policy
@@ -306,7 +306,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_accesspolicy_id_by_name(self, name: str):
+    def get_accesspolicy_id(self, name: str):
         '''
         helper function to retrieve access control policy id by name
         : param name: name of the access control policy
@@ -319,7 +319,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_filepolicy_id_by_name(self, name: str):
+    def get_filepolicy_id(self, name: str):
         '''
         helper function to retrieve file policy id by name
         : param name: name of the file policy
@@ -332,7 +332,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_intrusionpolicy_id_by_name(self, name: str):
+    def get_intrusionpolicy_id(self, name: str):
         '''
         helper function to retrieve intrusion policy id by name
         : param name: name of the intrusion policy
@@ -344,7 +344,7 @@ class Client(object):
                 return policy['id']
         return None
 
-    def get_prefilterpolicy_id_by_name(self, name: str):
+    def get_prefilterpolicy_id(self, name: str):
         '''
         helper function to retrieve prefilter policy id by name
         : param name: name of the prefilter policy
@@ -357,7 +357,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_accesspolicy_rule_id_by_name(self, policy_id: str, rule_name: str):
+    def get_accesspolicy_rule_id(self, policy_id: str, rule_name: str):
         '''
         helper function to retrieve access control policy rule id by name
         : param policy_id: id of the accesspolicy that will be queried
@@ -373,7 +373,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_syslogalert_id_by_name(self, name: str):
+    def get_syslogalert_id(self, name: str):
         '''
         helper function to retrieve syslog alert object id by name
         : param name: name of syslog alert object
@@ -386,7 +386,7 @@ class Client(object):
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_snmpalert_id_by_name(self, name: str):
+    def get_snmpalert_id(self, name: str):
         '''
         helper function to retrieve snmp alert object id by name
         : param name: name of snmp alert object
@@ -398,7 +398,7 @@ class Client(object):
                 return snmpalert['id']
         return None
 
-    def get_domain_id_by_name(self, domain_name: str):
+    def get_domain_id(self, domain_name: str):
         '''
         helper function to retrieve domain id from list of domains
         : param domain_name: name of the domain
