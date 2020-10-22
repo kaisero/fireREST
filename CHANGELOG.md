@@ -1,3 +1,30 @@
+# 0.1.6
+
+## Bugfixes
+
+Fixed issue with incorrect default id values
+
+## Enhancements
+
+Added ResourceNotFound exception for 404 errors
+
+Added additional api calls
+* s2svpn
+* vlaninterfaces
+* interfaceevents
+* devicecopyrequests
+* virtualrouter
+* inlinesets
+* prefilterpolicy
+* prefilterpolicy rules
+* accesspolicy defaultaction
+* device metrics
+* device commands
+
+Added vrf support for applicable device api calls
+
+Renamed get_id functions (removed _by_name suffix)
+
 # 0.1.5
 
 ## Bugfixes
