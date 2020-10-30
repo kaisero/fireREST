@@ -128,11 +128,11 @@ def validate_object_type(f):
         try:
             object_type = kwargs.get('object_type', None)
             if object_type:
-                kwargs['object_type'] = OBJECT_TYPE[object_type]
+                kwargs['object_type'] = OBJECT_TYPE[object_type.lower()]
             else:
                 args = list(args)
                 object_type = args[1]
-                args[1] = OBJECT_TYPE[object_type]
+                args[1] = OBJECT_TYPE[object_type.lower()]
         except KeyError:
             if object_type in OBJECT_TYPE.values():
                 return f(*args, **kwargs)
@@ -179,6 +179,7 @@ def raise_for_status(response):
     '''
     status_code = response.status_code
     exceptions = {
+        404: exc.ResourceNotFoundError,
         422: exc.UnprocessableEntityError,
         429: exc.RateLimitException,
         500: exc.GenericApiError,

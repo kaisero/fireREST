@@ -71,8 +71,10 @@ class UnprocessableEntityError(Exception):
     exception used when unprocessable entity was passed to api call
     '''
 
-    MSG = 'The payload contains an unprocessable or unreadable entity' \
-          'such as a invalid attribut name or incorrect JSON syntax'
+    MSG = (
+        'The payload contains an unprocessable or unreadable entity'
+        'such as a invalid attribut name or incorrect JSON syntax'
+    )
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
@@ -82,7 +84,19 @@ class PayloadLimitExceededError(Exception):
     '''
     exception used when size limit of api payload is exceeded
     '''
+
     MSG = f'Payload exceeds maximum size of {defaults.API_PAYLOAD_SIZE_MAX}'
+
+    def __init__(self, msg='', *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)
+
+
+class ResourceNotFoundError(Exception):
+    '''
+    exception used when http 404 error occurs
+    '''
+
+    MSG = f'Resource not found (404)'
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
