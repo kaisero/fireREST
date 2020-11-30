@@ -434,6 +434,7 @@ class Client(object):
                 return item['id']
         return None
 
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_id(self, name: str):
         '''
         helper function to retrieve s2svpn id by name
@@ -445,6 +446,16 @@ class Client(object):
             if item['name'] == name:
                 return item['id']
         return None
+
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
+    def get_s2svpn_ikesettings_id(self, s2svpn_id: str):
+        '''
+        helper function to retrieve s2svpn ikesettings id s2svpn id
+        : param name: id of s2svpn
+        : return: s2svpn ikesettings id 
+        '''
+        s2svpn = self.get_s2svpn(s2svpn_id)
+        return s2svpn['ikeSettings']['id']
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_domain_id(self, domain_name: str):
@@ -1457,9 +1468,10 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def create_s2svpn_endpoint(self, vpn_id: str, data: Dict):
+    def create_s2svpn_endpoints(self, vpn_id: str, data: Dict):
+        params = {'bulk': True if isinstance(data, list) else False}
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints')
-        return self._post(url, data)
+        return self._post(url, data, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_endpoints(self, data: Dict, vpn_id: str, endpoint_id=''):
