@@ -21,7 +21,7 @@ def constants():
         'accesspolicy': 'ACCESS-POLICY',
         'accesspolicy_id': '00505699-76B7-0ed3-0000-034359744995',
         'accessrule': 'ACCESSRULE',
-        'accessrule_id': '00505699-76B7-0ed3-0000-000268446723',
+        'accessrule_id': '00505699-76B7-0ed3-0000-000268448801',
         'natpolicy': 'NAT-POLICY',
         'natpolicy_id': '00505699-76B7-0ed3-0000-034359745131',
         'syslogalert': 'SYSLOG-ALERT',
