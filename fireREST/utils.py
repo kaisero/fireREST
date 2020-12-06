@@ -4,7 +4,7 @@ import sys
 from http.client import responses as http_responses
 from functools import lru_cache, wraps
 from logging import getLogger
-from requests import HTTPError
+from requests.exceptions import HTTPError
 from retry import retry
 from packaging import version
 from time import sleep
@@ -142,11 +142,11 @@ def validate_object_type(f):
     return wrapper
 
 
-@retry(exceptions=exc.RateLimitException, tries=6, delay=10, logger=logger)
 def handle_errors(f):
     ''' decorator that handles common api errors automatically '''
 
     @wraps(f)
+    @retry(exceptions=exc.RateLimitException, tries=6, delay=10, logger=logger)
     def wrapper(*args, **kwargs):
         client = args[0]
         try:
@@ -154,7 +154,7 @@ def handle_errors(f):
             response = f(*args, **kwargs)
             response.raise_for_status()
         except HTTPError:
-            if response.status_code == 401:
+            if response.status_code == 401 and 'Access token invalid' in response.text:
                 # Invalid access token detected. Refresh authorization token
                 client._refresh()
             else:
@@ -179,14 +179,17 @@ def raise_for_status(response):
     '''
     status_code = response.status_code
     exceptions = {
+        400: exc.GenericApiError,
         404: exc.ResourceNotFoundError,
         422: exc.UnprocessableEntityError,
         429: exc.RateLimitException,
         500: exc.GenericApiError,
     }
-    errors = {500: [{'msg': 'Unauthorized', 'exception': exc.AuthError}]}
+    errors = {
+        401: [{'msg': 'User authentication failed', 'exception': exc.AuthError}],
+    }
     if status_code in errors:
         for error in errors[status_code]:
             if error['msg'] in response.text:
                 raise error['exception']
-    raise exceptions.get(status_code, HTTPError)
+    raise exceptions.get(status_code, HTTPError)(msg=response.json()['error']['messages'][0]['description'])

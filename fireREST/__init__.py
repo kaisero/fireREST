@@ -110,12 +110,6 @@ class Client(object):
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
-        if params:
-            logger.info('[%s] %s?%s', method.upper(), url, urlencode(params))
-        else:
-            logger.info('[%s] %s', method.upper(), url)
-        if data:
-            logger.debug(data)
         response = self.session.request(
             method=method,
             url=url,
@@ -126,12 +120,22 @@ class Client(object):
             timeout=self.timeout,
             verify=self.verify_cert,
         )
-        logger.info('[RESPONSE] %s (%s)', http_responses[response.status_code], response.status_code)
-        if response.text:
-            if method == 'get':
-                logger.debug('\n%s', json.dumps(response.json(), sort_keys=True, indent=4))
-            else:
-                logger.debug(response.text)
+        msg = {
+            'method': method.upper(),
+            'url': url,
+            'params': urlencode(params) if params else '',
+            'data': data if data else '',
+            'status': f'{http_responses[response.status_code]} ({response.status_code})',
+        }
+        if response.status_code >= 400:
+            logger.error('\n%s', json.dumps(msg, indent=4))
+        else:
+            logger.info('\n%s', json.dumps(msg, indent=4))
+            try:
+                logger.debug('\n"response": %s', json.dumps(response.json(), sort_keys=True, indent=4))
+            except json.JSONDecodeError:
+                pass
+
         return response
 
     def _get(self, url: str, params=None, items=None):
@@ -179,11 +183,12 @@ class Client(object):
         '''
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
             logger.info('Access token is invalid. Refreshing authentication token')
+            self.refresh_counter += 1
             url = self._url('refresh')
             response = self._request('post', url)
             self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
             self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-            self.refresh_counter += 1
+
         else:
             logger.info('Maximum number of authentication refresh operations reached', self.hostname)
             self._login()
@@ -243,43 +248,48 @@ class Client(object):
 
     @utils.validate_object_type
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_object_id(self, object_type: str, object_name: str):
+    def get_object_id(self, object_type: str, name: str):
         '''
         helper function to retrieve object id by name
         : param object_type: object type that will be queried
-        : param object_name: name of the object
-        : return: object id if object is found, None otherwise
+        : param name: name of object
+        : return: uuid if resource is found, None otherwise
         '''
         objects = self.get_objects(object_type)
-        for obj in objects:
-            if obj['name'] == object_name:
-                return obj['id']
+        for item in objects:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_id(self, name: str):
         '''
-        helper function to retrieve device id by name
-        : param name: name of the device
-        : return: device id if device is found, None otherwise
+        helper function to retrieve device id by name (queries both standalone and hapairs)
+        : param name: name of device
+        : return: uuid if resource is found, None otherwise
         '''
         devices = self.get_devices()
-        for device in devices:
-            if device['name'] == name:
-                return device['id']
+        for item in devices:
+            if item['name'] == name:
+                return item['id']
+        # search for device in devicehapairs
+        devicehapairs = self.get_devicehapairs()
+        for item in devicehapairs:
+            if item['name'] == name:
+                return self.get_device_id_from_devicehapair(item['id'])
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_devicehapair_id(self, name: str):
         '''
-        helper function to retrieve device ha - pair id by name
-        : param name: name of the hapair
-        : return: id if hapair is found, None otherwise
+        helper function to retrieve devicehapair id by name
+        : param name: name of devicehapair
+        : return: uuid if resource is found, None otherwise
         '''
         devicehapairs = self.get_devicehapairs()
-        for devicehapair in devicehapairs:
-            if devicehapair['name'] == name:
-                return devicehapair['id']
+        for item in devicehapairs:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
@@ -287,117 +297,167 @@ class Client(object):
         '''
         helper function to retrieve device id from hapair
         : param devicehapair_id: id of hapair
-        : return: id if device is found, None otherwise
+        : return: uuid if resource is found, None otherwise
         '''
         devicehapair = self.get_devicehapair(devicehapair_id)
         return devicehapair['primary']['id']
 
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def get_interface_id(self, device_id, name: str):
+        '''
+        helper function to retrieve interface id by name
+        queries etherchannelinterfaces, etherchannelinterfaces, physicalinterfaces and subinterfaces
+        : param device_id: uuid of device to query
+        : param name: name of interface
+        : return: uuid if resource is found, None otherwise
+        '''
+        subinterfaces = self.get_device_subinterfaces(device_id)
+        for item in subinterfaces:
+            if item['ifname'] == name:
+                return item['id']
+
+        etherchannelinterfaces = self.get_device_etherchannelinterfaces(device_id)
+        for item in etherchannelinterfaces:
+            if item['ifname'] == name:
+                return item['id']
+
+        physicalinterfaces = self.get_device_physicalinterfaces(device_id)
+        for item in physicalinterfaces:
+            if item['ifname'] == name:
+                return item['id']
+
+        return None
+
     @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_natpolicy_id(self, name: str):
         '''
-        helper function to retrieve nat policy id by name
-        : param name: name of nat policy
-        : return: policy id if nat policy is found, None otherwise
+        helper function to retrieve natpolicy id by name
+        : param name: name of natpolicy
+        : return: uuid if resource is found, None otherwise
         '''
         policies = self.get_natpolicies()
-        for policy in policies:
-            if policy['name'] == name:
-                return policy['id']
+        for item in policies:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy_id(self, name: str):
         '''
-        helper function to retrieve access control policy id by name
-        : param name: name of the access control policy
-        : return: accesspolicy id if access control policy is found, None otherwise
+        helper function to retrieve accesspolicy id by name
+        : param name: name of accesspolicy
+        : return: uuid if resource is found, None otherwise
         '''
         policies = self.get_accesspolicies()
-        for policy in policies:
-            if policy['name'] == name:
-                return policy['id']
+        for item in policies:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_filepolicy_id(self, name: str):
         '''
-        helper function to retrieve file policy id by name
-        : param name: name of the file policy
-        : return: policy id if file policy is found, None otherwise
+        helper function to retrieve filepolicy id by name
+        : param name: name of filepolicy
+        : return: uuid if resource is found, None otherwise
         '''
         policies = self.get_filepolicies()
-        for policy in policies:
-            if policy['name'] == name:
-                return policy['id']
+        for item in policies:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_intrusionpolicy_id(self, name: str):
         '''
-        helper function to retrieve intrusion policy id by name
-        : param name: name of the intrusion policy
-        : return: policy id if intrusion policy is found, None otherwise
+        helper function to retrieve intrusionpolicy id by name
+        : param name: name of intrusionpolicy
+        : return: uuid if resource is found, None otherwise
         '''
         policies = self.get_intrusionpolicies()
-        for policy in policies:
-            if policy['name'] == name:
-                return policy['id']
+        for item in policies:
+            if item['name'] == name:
+                return item['id']
         return None
 
     def get_prefilterpolicy_id(self, name: str):
         '''
-        helper function to retrieve prefilter policy id by name
-        : param name: name of the prefilter policy
-        : return: prefilter policy id if policy name is found, None otherwise
+        helper function to retrieve prefilterpolicy id by name
+        : param name: name of  prefilterpolicy
+        : return: uuid if resource is found, None otherwise
         '''
         prefilterpolicies = self.get_prefilterpolicies()
-        for policy in prefilterpolicies:
-            if policy['name'] == name:
-                return policy['id']
+        for item in prefilterpolicies:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def get_accesspolicy_rule_id(self, policy_id: str, rule_name: str):
+    def get_accesspolicy_rule_id(self, policy_id: str, name: str):
         '''
-        helper function to retrieve access control policy rule id by name
-        : param policy_id: id of the accesspolicy that will be queried
-        : param rule_name: name of the accessrule
-        : return: accesspolicy rule id if accessrule is found, None otherwise
+        helper function to retrieve accesspolicy rule id by name
+        : param policy_id: uuid of the accesspolicy that will be queried
+        : param name: name of accessrule
+        : return: uuid if resource is found, None otherwise
         '''
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url(defaults.API_CONFIG_NAME, request)
         accessrules = self._get(url)
-        for accessrule in accessrules:
-            if accessrule['name'] == rule_name:
-                return accessrule['id']
+        for item in accessrules:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_syslogalert_id(self, name: str):
         '''
-        helper function to retrieve syslog alert object id by name
-        : param name: name of syslog alert object
-        : return: syslogalert id if syslog alert is found, None otherwise
+        helper function to retrieve syslogalert id by name
+        : param name: name of syslogalert
+        : return: uuid if resource is found, None otherwise
         '''
         syslogalerts = self.get_syslogalerts()
-        for syslogalert in syslogalerts:
-            if syslogalert['name'] == name:
-                return syslogalert['id']
+        for item in syslogalerts:
+            if item['name'] == name:
+                return item['id']
         return None
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_snmpalert_id(self, name: str):
         '''
-        helper function to retrieve snmp alert object id by name
-        : param name: name of snmp alert object
-        : return: snmpalert id if snmp alert is found, None otherwise
+        helper function to retrieve snmpalert id by name
+        : param name: name of snmpalert
+        : return: uuid if resource is found, None otherwise
         '''
         snmpalerts = self.get_snmpalerts()
-        for snmpalert in snmpalerts:
-            if snmpalert['name'] == name:
-                return snmpalert['id']
+        for item in snmpalerts:
+            if item['name'] == name:
+                return item['id']
         return None
 
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
+    def get_s2svpn_id(self, name: str):
+        '''
+        helper function to retrieve s2svpn id by name
+        : param name: name of s2svpn
+        : return: uuid if resource is found, None otherwise
+        '''
+        s2svpns = self.get_s2svpns()
+        for item in s2svpns:
+            if item['name'] == name:
+                return item['id']
+        return None
+
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
+    def get_s2svpn_ikesettings_id(self, s2svpn_id: str):
+        '''
+        helper function to retrieve s2svpn ikesettings id s2svpn id
+        : param name: id of s2svpn
+        : return: s2svpn ikesettings id 
+        '''
+        s2svpn = self.get_s2svpn(s2svpn_id)
+        return s2svpn['ikeSettings']['id']
+
+    @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_domain_id(self, domain_name: str):
         '''
         helper function to retrieve domain id from list of domains
@@ -1393,9 +1453,9 @@ class Client(object):
         return self._post(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def get_s2svpns(self, data: Dict, vpn_id=''):
+    def get_s2svpns(self, vpn_id=''):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}')
-        return self._post(url, data)
+        return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn(self, vpn_id: str, data: Dict):
@@ -1408,14 +1468,15 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def create_s2svpn_endpoint(self, vpn_id: str, data: Dict):
+    def create_s2svpn_endpoints(self, vpn_id: str, data: Dict):
+        params = {'bulk': True if isinstance(data, list) else False}
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints')
-        return self._post(url, data)
+        return self._post(url, data, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_endpoints(self, data: Dict, vpn_id: str, endpoint_id=''):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/endpoints/{endpoint_id}')
-        return self._post(url, data)
+        return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_endpoint(self, vpn_id: str, endpoint_id: str, data: Dict):
@@ -1428,9 +1489,9 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
-    def get_s2svpn_ikesettings(self, data: Dict, vpn_id: str, ikesettings_id=''):
+    def get_s2svpn_ikesettings(self, vpn_id: str, ikesettings_id=''):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/ikesettings/{ikesettings_id}')
-        return self._post(url, data)
+        return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_ikesettings(self, vpn_id: str, ikesettings_id: str, data: Dict):
@@ -1440,7 +1501,7 @@ class Client(object):
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_ipsecsettings(self, data: Dict, vpn_id: str, ipsecsettings_id=''):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/ipsecsettings/{ipsecsettings_id}')
-        return self._post(url, data)
+        return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_ipsecsettings(self, vpn_id: str, ipsecsettings_id: str, data: Dict):
@@ -1450,9 +1511,52 @@ class Client(object):
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_advancedsettings(self, data: Dict, vpn_id: str, advancedsettings_id=''):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
-        return self._post(url, data)
+        return self._get(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def update_s2svpn_advancedsettings(self, vpn_id: str, advancedsettings_id: str, data: Dict):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/ftds2svpns/{vpn_id}/advancedsettings/{advancedsettings_id}')
         return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_health_alerts(self, start_time=None, end_time=None, device_uuids=None, status=None, module_ids=None):
+        params = {
+            'filter': self._filter(
+                {
+                    'startTime': start_time,
+                    'endTime': end_time,
+                    'deviceUUIDs': device_uuids,
+                    'status': status,
+                    'moduleIDs': module_ids,
+                }
+            )
+        }
+        url = self._url(defaults.API_CONFIG_URL, '/health/alerts')
+        return self._get(url, params)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_health_metrics(
+        self,
+        device_uuids=None,
+        metric=None,
+        start_time=None,
+        end_time=None,
+        step=None,
+        regex_filter=None,
+        query_function=None,
+    ):
+        params = {
+            'filter': self._filter(
+                {
+                    'deviceUUIDs': device_uuids,
+                    'metric': metric,
+                    'startTime': start_time,
+                    'endTime': end_time,
+                    'step': step,
+                    'regexFilter': regex_filter,
+                    'queryFunction': query_function,
+                }
+            )
+        }
+        url = self._url(defaults.API_CONFIG_URL, '/health/metrics')
+        return self._get(url, params)

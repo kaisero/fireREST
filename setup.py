@@ -24,7 +24,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=['packaging>=20.3', 'requests>=2.23.0', 'retry>=0.9.2', 'urllib3>=1.25.8'],
     setup_requires=[],
-    tests_require=['pytest==5.4.1', 'pytest-runner>=52'],
+    tests_require=['pytest>=5.4.1', 'pytest-runner>=52'],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

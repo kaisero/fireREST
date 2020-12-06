@@ -1,3 +1,15 @@
+# 0.1.7
+
+## Bugfixes
+
+Fixed issue where reauth was not triggered correctly
+
+## Enhancements
+
+Added health alert api calls for 6.7.0
+Added additional id_by_name operations
+Added better logging for requests
+
 # 0.1.6
 
 ## Bugfixes
