@@ -1526,3 +1526,18 @@ class Client(object):
         }
         url = self._url(defaults.API_CONFIG_URL, '/health/metrics')
         return self._get(url, params)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_users_authroles(self, authrole_id=None):
+        url = self._url(defaults.API_CONFIG_URL, f'/users/authroles/{authrole_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_users_ssoconfigs(self, ssoconfig_id=None):
+        url = self._url(defaults.API_CONFIG_URL, f'/users/authroles/{ssoconfig_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def update_users_ssoconfig(self, data: Dict, ssoconfig_id=None):
+        url = self._url(defaults.API_CONFIG_URL, f'/users/authroles/{ssoconfig_id}')
+        return self._put(url, data)
