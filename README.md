@@ -3,15 +3,67 @@
 
 # FireREST
 
-A simple wrapper for firepower management center restful api.
+FireREST is a python library for Cisco Firepower Management Center. The goal of
+FireREST is to provide a simple interface to interact with FMCs REST API without
+much overhead.
 
 ## Features
 
-* Authentication and automatic session refresh
-* Rate-limit handling with automatic retry operation
+* Authentication and automatic session refresh / re-authentication
+* Rate-limit handling with automatic retry operations
 * Automatic squashing of paginated api payloads
-* Sanitization of api payloads received via GET operations and used for PUT/POST operations
-* Debug logging for api calls using logger module
+* Sanitization of api payloads for create and update operations
+* Detailed logging of api calls
+
+## Supported operations
+
+Since FireREST does not try to provide a python object model nearly all api
+calls up to version 6.7.0 are available which includes but is not limited to
+the following CRUD operations:
+
+* Devices
+  * Interfaces
+    * PhysicalInterfaces
+    * RedundantInterfaces
+    * EtherChannelInterfaces
+    * SubInterfaces
+    * VlanInterfaces
+    * VirtualSwitches
+    * InlineSets
+    * VirtualTunnelInterfaces
+  * Routing
+    * StaticRoutes (IPv4 & IPv6)
+    * VirtualRouters 
+* DeviceHaPairs
+* Objects
+  * Hosts
+  * Networks
+  * NetworkGroups
+  * Protocols
+  * ProtocolGroups
+  * URLs
+  * UrlGroups
+  * SecurityZones
+* Policies
+  * Accesspolicies
+    * Accessrules
+  * Prefilterpolicies
+    * Prefilterrules
+  * NatPolicies
+    * ManualNatRules
+    * AutoNatRules
+* Deployment
+  * DeployableDevices
+  * Deploy
+  * Rollback
+  * JobHistory
+
+---
+**NOTE**
+The upside to not implementing models in FireREST is that  FireREST is able to provide api calls to all
+resources quickly, but you will need to construct api payloads for create and update
+operations manually
+---
 
 ## Requirements
 
@@ -33,8 +85,10 @@ from fireREST import Client
 
 ### Authentication
 
-FireREST uses basic authentication to authenticate with fmc. In case your authentication token times out the api client
-will automatically try to re-authenticate 3 times and handle any intermediate authentication exceptions.
+FireREST uses basic authentication to login on fmc. In case your authentication
+token times out, the api client will automatically refresh the session and retry
+a failed operation. If all 3 refresh tokens have been used `Client` will try to
+re-authenticate again.
 
 #### Basic Authentication
 
@@ -44,24 +98,29 @@ client = Client(hostname='fmc.example.com', username='firerest', password='Cisco
 
 ### Helper
 
-A variety of helper functions can be used to translate object names to their respective UUID values. Since fmc rest api uses uuid values this is neccessary
-to find pre-existing objects by the name defined in fmc.
+A variety of helper functions can be used to translate object names to their
+respective UUID values. Some resources may provide a `nameOrValue` or `name`
+filter to find a resource based on their `value` or `name`, but in case you are
+working with a resource that does not allow filtering you will need to use
+helpers.
 
-#### Object Name to ID
+Since fmc rest api uses uuid values this is neccessary to find pre-existing objects by the name defined in fmc.
+
+#### Get network object uuid by name
 
 ```python
 name = 'NET_OBJ'
 uuid = client.get_object_id('network', name)
 ```
 
-#### Access Control Policy Name to ID
+#### Get accesspolicy uuid by name
 
 ```python
 accesspolicy = 'ACCESSPOLICY'
 accesspolicy_id = client.get_accesspolicy_id(name)
 ```
 
-#### Access Control Policy Rule Name to ID
+#### Get accesspolicy rule uuid by name
 
 ```python
 accesspolicy = 'DEV-ACCESS-CONTROL-POLICY'
@@ -73,7 +132,7 @@ accessrule_id = client.get_accesspolicy_rule_id(accesspolicy_id, accessrule)
 
 ### Objects
 
-#### Create Network Object
+#### Create network object
 
 ```python
 net_obj = {
@@ -81,19 +140,18 @@ net_obj = {
     'value': '198.18.1.0/24',
 }
 
-response = client.create_object('network', net_obj)
+response = client.create_objects('network', net_obj)
 ```
 
-#### Get Network Object
+#### Get network object
 
 ```python
 obj_name = 'NetObjViaAPI'
 obj_id = client.get_object_id('network', obj_name)
-
 obj = client.get_objects('network', obj_id)
 ```
 
-#### Update Network Object
+#### Update network object
 
 ```python
 obj_name = 'NetObjViaAPI'
@@ -108,12 +166,11 @@ net_obj = {
 response = client.update_object('network', obj_id, net_obj)
 ```
 
-#### Delete Network Object
+#### Delete network object
 
 ```python
 obj_name = 'NetObjViaAPI'
 obj_id = client.get_object_id('network', 'NetObjViaAPI')
-
 response = client.delete_object('network', obj_id)
 ```
 

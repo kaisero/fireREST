@@ -25,6 +25,9 @@ logger.addHandler(logging.NullHandler())
 
 
 class Client(object):
+    """API Client for Firepower Management Center REST API
+    """
+
     def __init__(
         self,
         hostname: str,
@@ -36,8 +39,8 @@ class Client(object):
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
     ):
-        """
-        Initialize api client object (make sure to use a dedicated api user!)
+        """Initialize api client object (make sure to use a dedicated api user!)
+
         :param hostname: ip address or fqdn of firepower management center
         :param username: login username
         :param password: login password
@@ -69,11 +72,11 @@ class Client(object):
         self.version = version.parse(self.get_system_version()[0]['serverVersion'].split(' ')[0])
 
     def _url(self, namespace='base', path=''):
-        """
-        helper to generate url for requests to fmc rest api
-        : param namespace: name of the url namespace that should be used. options: base, config, auth. Defaults to `base`
-        : param path: the url path for which a full url should be created
-        : return: url as string
+        """helper to generate url for requests to fmc rest api
+
+        :param namespace: name of the url namespace that should be used. options: base, config, auth. Defaults to `base`
+        :param path: the url path for which a full url should be created
+        :return: url as string
         """
         options = {
             'base': f'{self.protocol}://{self.hostname}{path}',
@@ -86,20 +89,20 @@ class Client(object):
         return re.sub(r'\/None$', '', options[namespace].rstrip('/'))
 
     def _virtualrouter_url(self, url, virtualrouter_id=None):
-        """
-        helper that changes url to include path to virtualrouter
-        : param virtualrouter_id: uuid of virtualrouter resource
-        : return: adapted url that points to specified virtualrouter, same url if no virtualrouter is specified
+        """helper that changes url to include path to virtualrouter
+
+        :param virtualrouter_id: uuid of virtualrouter resource
+        :return: adapted url that points to specified virtualrouter, same url if no virtualrouter is specified
         """
         if virtualrouter_id:
             return url.replace('/routing/', f'/routing/virtualrouters/{virtualrouter_id}/')
         return url
 
     def _filter(self, items=None):
-        """
-        helper that generates a filter string from a list of key,value pairs
-        : param items: list of key value pairs in dict format used to build filter string
-        : return: valid filter string or an empty filter string if items passed are invalid
+        """helper that generates a filter string from a list of key,value pairs
+
+        :param items: list of key value pairs in dict format used to build filter string
+        :return: valid filter string or an empty filter string if items passed are invalid
         """
         if items:
             filter_str = ''
@@ -110,10 +113,10 @@ class Client(object):
         return ''
 
     def _params(self, params: Dict):
-        """
-        helper that filters out params with empty values
-        : param params: request params in dict format
-        : return: new params dictionary that only includes valid entries or an empty dict if params was empty
+        """helper that filters out params with empty values
+
+        :param params: request params in dict format
+        :return: new params dictionary that only includes valid entries or an empty dict if params was empty
         """
         if isinstance(params, dict):
             return {k: v for k, v in params.items() if v is not None and v != ''}
@@ -121,14 +124,14 @@ class Client(object):
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
-        """
-        base operations used for all http api calls to firepower management center
-        : param method: http operations in string format (post, get, put, delete)
-        : param url: url to api resource in string format
-        : param params: dictionary of additional params that should be passed to the request. Defaults to `None`
-        : param auth: credentials in base64 format. Defaults to `None`
-        : param data: request body in dict format. Defaults to `None`
-        : return: requests.response object
+        """base operations used for all http api calls to firepower management center
+
+        :param method: http operations in string format (post, get, put, delete)
+        :param url: url to api resource in string format
+        :param params: dictionary of additional params that should be passed to the request. Defaults to `None`
+        :param auth: credentials in base64 format. Defaults to `None`
+        :param data: request body in dict format. Defaults to `None`
+        :return: requests.response object
         """
         response = self.session.request(
             method=method,
@@ -159,12 +162,12 @@ class Client(object):
         return response
 
     def _get(self, url: str, params=None, items=None):
-        """
-        get operation with pagination support. Returned results are automatically
+        """get operation with pagination support. Returned results are automatically
         squashed in a single result
-        : param url: request that should be performed
-        : param params: dict of parameters for http request. Defaults to `None`
-        : return: dictionary or list of returned api objects
+
+        :param url: request that should be performed
+        :param params: dict of parameters for http request. Defaults to `None`
+        :return: dictionary or list of returned api objects
         """
         if not utils.is_getbyid_operation(url) and items is None:
             if params is None:
@@ -186,8 +189,7 @@ class Client(object):
         return payload
 
     def _login(self):
-        """
-        basic authentication to firepower management center rest api
+        """basic authentication to firepower management center rest api
         in case authentication is successful an access and refresh token are being saved to
         the `Client` object which will be used for subsequent api calls for authentication
         """
@@ -200,8 +202,7 @@ class Client(object):
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def _refresh(self):
-        """
-        Refresh authorization token. This operation is performed for up to three
+        """refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using `_login()` will be performed
         """
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
@@ -217,45 +218,45 @@ class Client(object):
             self._login()
 
     def _delete(self, url: str, params=None):
-        """
-        delete operation
-        : param url: request that should be performed
-        : param params: dict of parameters for http request
-        : return: requests.response object
+        """delete operation
+
+        :param url: request that should be performed
+        :param params: dict of parameters for http request
+        :return: requests.response object
         """
         return self._request('delete', url, params=params)
 
     def _post(self, url: str, data: Dict, params=None):
-        """
-        create operation that takes a payload as `dict` which is sent
+        """create operation that takes a payload as `dict` which is sent
         to the specified url to create a new resource
-        : param url: request that should be performed
-        : param data: dict of data that will be sent to the api
-        : param params: dict of parameters for http request
-        : return: requests.response object
+
+        :param url: request that should be performed
+        :param data: dict of data that will be sent to the api
+        :param params: dict of parameters for http request
+        :return: requests.response object
         """
         data = self._sanitize('post', data)
         return self._request('post', url, params=params, data=data)
 
     def _put(self, url: str, data: Dict, params=None):
-        """
-        put operation that updates existing resources according to the payload provided
-        : param url: request that should be performed
-        : param json: dict of data that will be sent to the api
-        : param params: dict of parameters for http request
-        : return: requests.response object
+        """put operation that updates existing resources according to the payload provided
+
+        :param url: request that should be performed
+        :param json: dict of data that will be sent to the api
+        :param params: dict of parameters for http request
+        :return: requests.response object
         """
         data = self._sanitize('put', data)
         return self._request('put', url, data=data, params=params)
 
     def _sanitize(self, method: str, payload: Dict):
-        """
-        sanitize json object for api operation
+        """sanitize json object for api operation
         This is neccesarry since fmc api cannot handle json objects with some
         fields that are received via get operations (e.g. link, metadata). The provided
         payload will be copied to ensure the provided data is not manipulated by `_sanitize`
-        : param payload: api object in dict format
-        : return: sanitized api object in dict format
+
+        :param payload: api object in dict format
+        :return: sanitized api object in dict format
         """
         sanitized_payload = deepcopy(payload)
         if not isinstance(payload, list):
@@ -274,11 +275,11 @@ class Client(object):
     @utils.validate_object_type
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_object_id(self, object_type: str, name: str):
-        """
-        helper function to retrieve object id by name
-        : param object_type: object type that will be queried
-        : param name: name of object
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve object id by name
+
+        :param object_type: object type that will be queried
+        :param name: name of object
+        :return: uuid if resource is found, None otherwise
         """
         objects = self.get_objects(object_type)
         for item in objects:
@@ -288,10 +289,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_device_id(self, name: str):
-        """
-        helper function to retrieve device id by name (queries both standalone and hapairs)
-        : param name: name of device
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve device id by name (queries both standalone and hapairs)
+
+        :param name: name of device
+        :return: uuid if resource is found, None otherwise
         """
         devices = self.get_devices()
         for item in devices:
@@ -306,10 +307,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_devicehapair_id(self, name: str):
-        """
-        helper function to retrieve devicehapair id by name
-        : param name: name of devicehapair
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve devicehapair id by name
+
+        :param name: name of devicehapair
+        :return: uuid if resource is found, None otherwise
         """
         devicehapairs = self.get_devicehapairs()
         for item in devicehapairs:
@@ -319,22 +320,22 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_device_id_from_devicehapair(self, devicehapair_id: str):
-        """
-        helper function to retrieve device id from hapair
-        : param devicehapair_id: id of hapair
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve device id from hapair
+
+        :param devicehapair_id: id of hapair
+        :return: uuid if resource is found, None otherwise
         """
         devicehapair = self.get_devicehapair(devicehapair_id)
         return devicehapair['primary']['id']
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_interface_id(self, device_id, name: str):
-        """
-        helper function to retrieve interface id by name
+        """helper function to retrieve interface id by name
         queries etherchannelinterfaces, etherchannelinterfaces, physicalinterfaces and subinterfaces
-        : param device_id: uuid of device to query
-        : param name: name of interface
-        : return: uuid if resource is found, None otherwise
+
+        :param device_id: uuid of device to query
+        :param name: name of interface
+        :return: uuid if resource is found, None otherwise
         """
         subinterfaces = self.get_device_subinterfaces(device_id)
         for item in subinterfaces:
@@ -355,10 +356,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_623)
     def get_natpolicy_id(self, name: str):
-        """
-        helper function to retrieve natpolicy id by name
-        : param name: name of natpolicy
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve natpolicy id by name
+
+        :param name: name of natpolicy
+        :return: uuid if resource is found, None otherwise
         """
         policies = self.get_natpolicies()
         for item in policies:
@@ -368,10 +369,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy_id(self, name: str):
-        """
-        helper function to retrieve accesspolicy id by name
-        : param name: name of accesspolicy
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve accesspolicy id by name
+
+        :param name: name of accesspolicy
+        :return: uuid if resource is found, None otherwise
         """
         policies = self.get_accesspolicies()
         for item in policies:
@@ -381,10 +382,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_filepolicy_id(self, name: str):
-        """
-        helper function to retrieve filepolicy id by name
-        : param name: name of filepolicy
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve filepolicy id by name
+
+        :param name: name of filepolicy
+        :return: uuid if resource is found, None otherwise
         """
         policies = self.get_filepolicies()
         for item in policies:
@@ -396,8 +397,9 @@ class Client(object):
     def get_intrusionpolicy_id(self, name: str):
         """
         helper function to retrieve intrusionpolicy id by name
-        : param name: name of intrusionpolicy
-        : return: uuid if resource is found, None otherwise
+
+        :param name: name of intrusionpolicy
+        :return: uuid if resource is found, None otherwise
         """
         policies = self.get_intrusionpolicies()
         for item in policies:
@@ -406,10 +408,10 @@ class Client(object):
         return None
 
     def get_prefilterpolicy_id(self, name: str):
-        """
-        helper function to retrieve prefilterpolicy id by name
-        : param name: name of  prefilterpolicy
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve prefilterpolicy id by name
+
+        :param name: name of  prefilterpolicy
+        :return: uuid if resource is found, None otherwise
         """
         prefilterpolicies = self.get_prefilterpolicies()
         for item in prefilterpolicies:
@@ -419,11 +421,11 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_accesspolicy_rule_id(self, policy_id: str, name: str):
-        """
-        helper function to retrieve accesspolicy rule id by name
-        : param policy_id: uuid of the accesspolicy that will be queried
-        : param name: name of accessrule
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve accesspolicy rule id by name
+
+        :param policy_id: uuid of the accesspolicy that will be queried
+        :param name: name of accessrule
+        :return: uuid if resource is found, None otherwise
         """
         request = f'/policy/accesspolicies/{policy_id}/accessrules'
         url = self._url(defaults.API_CONFIG_NAME, request)
@@ -435,10 +437,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_syslogalert_id(self, name: str):
-        """
-        helper function to retrieve syslogalert id by name
-        : param name: name of syslogalert
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve syslogalert id by name
+
+        :param name: name of syslogalert
+        :return: uuid if resource is found, None otherwise
         """
         syslogalerts = self.get_syslogalerts()
         for item in syslogalerts:
@@ -450,8 +452,9 @@ class Client(object):
     def get_snmpalert_id(self, name: str):
         """
         helper function to retrieve snmpalert id by name
-        : param name: name of snmpalert
-        : return: uuid if resource is found, None otherwise
+
+        :param name: name of snmpalert
+        :return: uuid if resource is found, None otherwise
         """
         snmpalerts = self.get_snmpalerts()
         for item in snmpalerts:
@@ -461,10 +464,10 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_id(self, name: str):
-        """
-        helper function to retrieve s2svpn id by name
-        : param name: name of s2svpn
-        : return: uuid if resource is found, None otherwise
+        """helper function to retrieve s2svpn id by name
+
+        :param name: name of s2svpn
+        :return: uuid if resource is found, None otherwise
         """
         s2svpns = self.get_s2svpns()
         for item in s2svpns:
@@ -474,20 +477,20 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_s2svpn_ikesettings_id(self, s2svpn_id: str):
-        """
-        helper function to retrieve s2svpn ikesettings id s2svpn id
-        : param name: id of s2svpn
-        : return: s2svpn ikesettings id
+        """helper function to retrieve s2svpn ikesettings id s2svpn id
+
+        :param name: uuid of s2svpn
+        :return: uuid of ikev2settings within s2svpn
         """
         s2svpn = self.get_s2svpn(s2svpn_id)
         return s2svpn['ikeSettings']['id']
 
     @utils.minimum_version_required(defaults.API_RELEASE_630)
     def get_domain_id(self, domain_name: str):
-        """
-        helper function to retrieve domain id from list of domains
-        : param domain_name: name of the domain
-        : return: did if domain is found, None otherwise
+        """helper function to retrieve domain id from list of domains
+
+        :param domain_name: name of the domain
+        :return: did if domain is found, None otherwise
         """
         for domain in self.domains:
             if domain['name'] == domain_name:
@@ -500,10 +503,10 @@ class Client(object):
         return None
 
     def get_domain_name_by_id(self, domain_id: str):
-        """
-        helper function to retrieve domain name by id
-        : param domain_id: id of the domain
-        : return: name if domain is found, None otherwise
+        """helper function to retrieve domain name by id
+
+        :param domain_id: id of the domain
+        :return: name if domain is found, None otherwise
         """
         for domain in self.domains:
             if domain['uuid'] == domain_id:
