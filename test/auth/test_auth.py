@@ -3,7 +3,7 @@ import pytest
 # -*- coding: utf-8 -*-
 
 from fireREST import Client
-from fireREST.exceptions import GenericApiError, AuthError, AuthRefreshError
+from fireREST.exceptions import AuthError, AuthRefreshError
 from requests.auth import HTTPBasicAuth
 
 
