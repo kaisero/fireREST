@@ -38,15 +38,15 @@ class Client(object):
     ):
         """
         Initialize api client object (make sure to use a dedicated api user!)
-        :param hostname: ip address or dns name of fmc
-        :param username: fmc username
-        :param password: fmc password
-        :param protocol: protocol used to access fmc rest api
-        :param verify_cert: check https certificate for validity
-        :param cache: enable result caching for get operations
-        :param logger: optional logger instance
-        :param domain: name of the domain to access
-        :param timeout: timeout value for http requests
+        :param hostname: ip address or fqdn of firepower management center
+        :param username: login username
+        :param password: login password
+        :param protocol: protocol used to access fmc rest api. Defaults to `https`
+        :param verify_cert: check https certificate for validity. Defaults to `False`
+        :param cache: enable result caching for get operations. Not implemented yet
+        :param logger: logger instance. Defaults to `None`
+        :param domain: name of the domain to access. Defaults to `Global`
+        :param timeout: timeout value for http requests. Defaults to `120` seconds
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -70,10 +70,10 @@ class Client(object):
 
     def _url(self, namespace='base', path=''):
         """
-        Generate url on the for requests to fmc rest api
-        : param namespace: name of the url namespace that should be used. options: base, config, auth. default = base
+        helper to generate url for requests to fmc rest api
+        : param namespace: name of the url namespace that should be used. options: base, config, auth. Defaults to `base`
         : param path: the url path for which a full url should be created
-        : return: url in string format
+        : return: url as string
         """
         options = {
             'base': f'{self.protocol}://{self.hostname}{path}',
@@ -87,8 +87,8 @@ class Client(object):
 
     def _virtualrouter_url(self, url, virtualrouter_id=None):
         """
-        Change url to include path to virtualrouter
-        : param virtualrouter_id: uuid of virtualrouter
+        helper that changes url to include path to virtualrouter
+        : param virtualrouter_id: uuid of virtualrouter resource
         : return: adapted url that points to specified virtualrouter, same url if no virtualrouter is specified
         """
         if virtualrouter_id:
@@ -97,9 +97,9 @@ class Client(object):
 
     def _filter(self, items=None):
         """
-        Get filter string from list of key, value pairs
-        : param items: list of key value pairs used to build filter string
-        : return: valid filter string
+        helper that generates a filter string from a list of key,value pairs
+        : param items: list of key value pairs in dict format used to build filter string
+        : return: valid filter string or an empty filter string if items passed are invalid
         """
         if items:
             filter_str = ''
@@ -111,7 +111,9 @@ class Client(object):
 
     def _params(self, params: Dict):
         """
-        Filter out empty params
+        helper that filters out params with empty values
+        : param params: request params in dict format
+        : return: new params dictionary that only includes valid entries or an empty dict if params was empty
         """
         if isinstance(params, dict):
             return {k: v for k, v in params.items() if v is not None and v != ''}
@@ -119,6 +121,15 @@ class Client(object):
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
+        """
+        base operations used for all http api calls to firepower management center
+        : param method: http operations in string format (post, get, put, delete)
+        : param url: url to api resource in string format
+        : param params: dictionary of additional params that should be passed to the request. Defaults to `None`
+        : param auth: credentials in base64 format. Defaults to `None`
+        : param data: request body in dict format. Defaults to `None`
+        : return: requests.response object
+        """
         response = self.session.request(
             method=method,
             url=url,
@@ -149,10 +160,11 @@ class Client(object):
 
     def _get(self, url: str, params=None, items=None):
         """
-        GET operation with paging support
+        get operation with pagination support. Returned results are automatically
+        squashed in a single result
         : param url: request that should be performed
-        : param params: dict of parameters for http request
-        : return: dictionary or list containing api objects
+        : param params: dict of parameters for http request. Defaults to `None`
+        : return: dictionary or list of returned api objects
         """
         if not utils.is_getbyid_operation(url) and items is None:
             if params is None:
@@ -175,7 +187,9 @@ class Client(object):
 
     def _login(self):
         """
-        Login to fmc rest api
+        basic authentication to firepower management center rest api
+        in case authentication is successful an access and refresh token are being saved to
+        the `Client` object which will be used for subsequent api calls for authentication
         """
         logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
         url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
@@ -188,7 +202,7 @@ class Client(object):
     def _refresh(self):
         """
         Refresh authorization token. This operation is performed for up to three
-        times, afterwards a re-authentication using _login() will be performed
+        times, afterwards a re-authentication using `_login()` will be performed
         """
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
             logger.info('Access token is invalid. Refreshing authentication token')
@@ -204,42 +218,44 @@ class Client(object):
 
     def _delete(self, url: str, params=None):
         """
-        DELETE operation
+        delete operation
         : param url: request that should be performed
         : param params: dict of parameters for http request
-        : return: requests.Response object
+        : return: requests.response object
         """
         return self._request('delete', url, params=params)
 
     def _post(self, url: str, data: Dict, params=None):
         """
-        CREATE operation
+        create operation that takes a payload as `dict` which is sent
+        to the specified url to create a new resource
         : param url: request that should be performed
-        : param json: dictionary of data that will be sent to the api
+        : param data: dict of data that will be sent to the api
         : param params: dict of parameters for http request
-        : return: requests.Response object
+        : return: requests.response object
         """
         data = self._sanitize('post', data)
         return self._request('post', url, params=params, data=data)
 
     def _put(self, url: str, data: Dict, params=None):
         """
-        UPDATE operation
+        put operation that updates existing resources according to the payload provided
         : param url: request that should be performed
-        : param json: dictionary of data that will be sent to the api
+        : param json: dict of data that will be sent to the api
         : param params: dict of parameters for http request
-        : return: requests.Response object
+        : return: requests.response object
         """
         data = self._sanitize('put', data)
         return self._request('put', url, data=data, params=params)
 
     def _sanitize(self, method: str, payload: Dict):
         """
-        Sanitize json object for api operation
+        sanitize json object for api operation
         This is neccesarry since fmc api cannot handle json objects with some
-        fields that are received from GET (e.g. link, metadata)
-        : param payload: api object in json format
-        : return: sanitized api object in json format
+        fields that are received via get operations (e.g. link, metadata). The provided
+        payload will be copied to ensure the provided data is not manipulated by `_sanitize`
+        : param payload: api object in dict format
+        : return: sanitized api object in dict format
         """
         sanitized_payload = deepcopy(payload)
         if not isinstance(payload, list):
@@ -477,8 +493,7 @@ class Client(object):
             if domain['name'] == domain_name:
                 return domain['uuid']
         logger.error(
-            'Could not find domain with name %s. Make sure full path is provided',
-            domain_name,
+            'Could not find domain with name %s. Make sure full path is provided', domain_name,
         )
         available_domains = ', '.join((domain['name'] for domain in self.domains))
         logger.debug('Available Domains: %s', available_domains)
@@ -494,8 +509,7 @@ class Client(object):
             if domain['uuid'] == domain_id:
                 return domain['name']
         logger.error(
-            'Could not find domain with id %s. Make sure full path is provided',
-            domain_id,
+            'Could not find domain with id %s. Make sure full path is provided', domain_id,
         )
         available_domains = ', '.join((domain['uuid'] for domain in self.domains))
         logger.debug('Available Domains: %s', available_domains)
@@ -532,7 +546,7 @@ class Client(object):
 
     @utils.validate_object_type
     @utils.minimum_version_required(defaults.API_RELEASE_610)
-    def create_object(self, object_type: str, data: Union[list, dict]):
+    def create_objects(self, object_type: str, data: Union[list, dict]):
         params = {'bulk': True if isinstance(data, list) else False}
         url = self._url(defaults.API_CONFIG_NAME, f'/object/{object_type}')
         return self._post(url, data, params)
@@ -1184,13 +1198,7 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_prefilterpolicy_rules(
-        self,
-        policy_id: str,
-        data: Union[dict, list],
-        section='',
-        category='',
-        insert_before=None,
-        insert_after=None,
+        self, policy_id: str, data: Union[dict, list], section='', category='', insert_before=None, insert_after=None,
     ):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         params = {

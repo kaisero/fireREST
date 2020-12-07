@@ -52,13 +52,25 @@ def test_get_domain_name_by_id_with_incorrect_id(api):
     assert expected_result == actual_result
 
 
-def test_create_object(api):
+def test_create_objects_with_single_network(api):
     payload = {
         'name': 'firerest_test_netobj',
         'value': '198.18.0.0/24',
     }
 
-    actual_result = api.create_object('network', payload).status_code
+    actual_result = api.create_objects('network', payload).status_code
+    expected_result = 201
+
+    assert expected_result == actual_result
+
+
+def test_create_objects_with_multiple_networks(api):
+    payload = [
+        {'name': 'firerest_test_create_multiple_netobj_1', 'value': '198.18.0.0/24'},
+        {'name': 'firerest_test_create_multiple_netobj_2', 'value': '198.18.1.0/24'},
+    ]
+
+    actual_result = api.create_objects('network', payload).status_code
     expected_result = 201
 
     assert expected_result == actual_result
@@ -93,13 +105,21 @@ def test_update_object(api):
     assert expected_description == actual_description
 
 
-def test_delete_object(api):
-    object_id = api.get_object_id('network', 'firerest_test_netobj')
+def test_delete_network_objects(api):
+    object_ids = [
+        api.get_object_id('network', 'firerest_test_netobj'),
+        api.get_object_id('network', 'firerest_test_create_multiple_netobj_1'),
+        api.get_object_id('network', 'firerest_test_create_multiple_netobj_2'),
+    ]
 
-    actual_result = api.delete_object('network', object_id).status_code
+    results = []
+    for item in object_ids:
+        results.append(api.delete_object('network', item).status_code)
+
     expected_result = 200
 
-    assert expected_result == actual_result
+    for actual_result in results:
+        assert expected_result == actual_result
 
 
 def test_get_device_id_with_correct_name(api, constants):
