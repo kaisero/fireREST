@@ -4,7 +4,8 @@
    contain the root `toctree` directive.
 
 FireREST Documentation
-====================================
+======================
+
 FireREST is a python library for Cisco Firepower Management Center. The goal of
 FireREST is to provide a simple interface to interact with FMCs REST API without
 much overhead.
@@ -22,8 +23,11 @@ much overhead.
 Since FireREST does not try to provide a python object model nearly all api
 calls up to version 6.7.0
 
-.. toctree::
-   :maxdepth: 2
+Installation
+============
+
+Usage
+=====
 
 Module
 ======

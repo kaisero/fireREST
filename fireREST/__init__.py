@@ -25,8 +25,7 @@ logger.addHandler(logging.NullHandler())
 
 
 class Client(object):
-    """API Client for Firepower Management Center REST API
-    """
+    """API Client for Firepower Management Center REST API"""
 
     def __init__(
         self,
@@ -69,7 +68,7 @@ class Client(object):
         self._login()
         self.domain_name = domain
         self.domain = self.get_domain_id(domain)
-        self.version = version.parse(self.get_system_version()[0]['serverVersion'].split(' ')[0])
+        self.version = version.parse(self.get_system_version()['serverVersion'].split(' ')[0])
 
     def _url(self, namespace='base', path=''):
         """helper to generate url for requests to fmc rest api
@@ -496,7 +495,8 @@ class Client(object):
             if domain['name'] == domain_name:
                 return domain['uuid']
         logger.error(
-            'Could not find domain with name %s. Make sure full path is provided', domain_name,
+            'Could not find domain with name %s. Make sure full path is provided',
+            domain_name,
         )
         available_domains = ', '.join((domain['name'] for domain in self.domains))
         logger.debug('Available Domains: %s', available_domains)
@@ -512,7 +512,8 @@ class Client(object):
             if domain['uuid'] == domain_id:
                 return domain['name']
         logger.error(
-            'Could not find domain with id %s. Make sure full path is provided', domain_id,
+            'Could not find domain with id %s. Make sure full path is provided',
+            domain_id,
         )
         available_domains = ', '.join((domain['uuid'] for domain in self.domains))
         logger.debug('Available Domains: %s', available_domains)
@@ -520,13 +521,71 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_system_version(self):
+        """get system version of fmc
+
+        :return: serverversion
+        :rtype: dict
+        :Example:
+                >>> client.get_system_version()
+                {
+                    'serverVersion': '6.7.0 (build 65)',
+                    'geoVersion': '2020-11-24-002',
+                    'vdbVersion': 'build 338 ( 2020-09-24 12:58:48 )',
+                    'sruVersion': '2020-08-18-001-vrt',
+                    'type': 'ServerVersion'
+                }
+        """
         url = self._url(defaults.API_PLATFORM_NAME, '/info/serverversion')
-        return self._get(url)
+        return self._get(url)['items'][0]
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_audit_records(
         self, record_id=None, username=None, subsystem=None, source=None, start_time=None, end_time=None
     ):
+        """get audit records
+
+        :param record_id: uuid of audit record to retrieve a single audit record
+        :param username: filter auditrecords by username
+        :param subsystem: filter auditrecords by subsystem
+        :param source: filter auditrecords by source (ipaddress)
+        :param start_time: filter auditrecords by start_time
+        :param end_time: filter auditrecords by end_time
+        :return: audit records
+        :rtype: list
+        :Examples:
+
+        Get a list of most recent audit records
+
+            >>> client.get_audit_records()
+            [
+                    {
+                        'time': 1607376368,
+                        'message': 'OK (200) - The request has succeeded',
+                        'auditId': '00505699-76B7-0ed3-0000-000000036716',
+                        'subSystem': 'API'
+                    },
+                    {
+                        'time': 1607376309,
+                        'message': 'OK (200) - The request has succeeded',
+                        'auditId': '00505699-76B7-0ed3-0000-000000036714',
+                        'subSystem': 'API'
+                    }
+            ]
+
+        Get a specified audit record by uuid
+
+            >>> client.get_audit_records('00505699-76B7-0ed3-0000-000000036716')
+                        {
+                                'time': 1607376368,
+                                'message': 'OK (200) - The request has succeeded',
+                                'username': 'api',
+                                'auditId': '00505699-76B7-0ed3-0000-000000036716',
+                                'subSystem': 'API',
+                                'source': '172.21.100.103',
+                                'domain': 'B76FF587922465C7D2AF000000000000'
+                        }
+
+        """
         params = {
             'username': username,
             'subsystem': subsystem,
@@ -534,7 +593,7 @@ class Client(object):
             'starttime': start_time,
             'endtime': end_time,
         }
-        url = self._url(defaults.API_CONFIG_NAME, f'/audit/auditrecords/{record_id}')
+        url = self._url(defaults.API_PLATFORM_NAME, f'/audit/auditrecords/{record_id}')
         return self._get(url, params)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
@@ -1201,7 +1260,13 @@ class Client(object):
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
     def create_prefilterpolicy_rules(
-        self, policy_id: str, data: Union[dict, list], section='', category='', insert_before=None, insert_after=None,
+        self,
+        policy_id: str,
+        data: Union[dict, list],
+        section='',
+        category='',
+        insert_before=None,
+        insert_after=None,
     ):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/prefilterpolicies/{policy_id}/prefilterrules')
         params = {
