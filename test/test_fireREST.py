@@ -64,14 +64,14 @@ def test_create_object(api):
     assert expected_result == actual_result
 
 
-def test_get_object(api):
+def test_get_objects_with_object_id(api):
     object_id = api.get_object_id('network', 'firerest_test_netobj')
     expected_object = {
         'id': object_id,
         'name': 'firerest_test_netobj',
         'value': '198.18.0.0/24',
     }
-    actual_object = api.get_object('network', object_id)
+    actual_object = api.get_objects('network', object_id)
 
     assert expected_object['id'] == actual_object['id']
     assert expected_object['name'] == actual_object['name']
@@ -83,11 +83,11 @@ def test_update_object(api):
     expected_description = 'test_update_object'
 
     object_id = api.get_object_id('network', 'firerest_test_netobj')
-    payload = api.get_object('network', object_id)
+    payload = api.get_objects('network', object_id)
     payload['description'] = expected_description
 
     actual_response = api.update_object('network', object_id, payload).status_code
-    actual_description = api.get_object('network', object_id)['description']
+    actual_description = api.get_objects('network', object_id)['description']
 
     assert expected_response == actual_response
     assert expected_description == actual_description
