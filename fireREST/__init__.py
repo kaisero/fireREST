@@ -716,6 +716,33 @@ class Client(object):
         return self._delete(url)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def create_device_virtualswitch(self, device_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualswitches')
+        return self._post(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def get_device_virtualswitches(self, device_id: str, virtualswitch_id=None, virtualswitch_name=None):
+        params = {'name': virtualswitch_name}
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualswitches/{virtualswitch_id}'
+        )
+        return self._get(url, params)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def update_device_virtualswitch(self, device_id: str, virtualswitch_id: str, data: Dict):
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualswitches/{virtualswitch_id}'
+        )
+        return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
+    def delete_device_virtualswitch(self, device_id: str, virtualswitch_id: str):
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualswitches/{virtualswitch_id}'
+        )
+        return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_device_etherchannelinterface(self, device_id: str, data: Dict):
         url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces')
         return self._post(url, data)
@@ -739,6 +766,33 @@ class Client(object):
     def delete_device_etherchannelinterface(self, device_id: str, interface_id: str):
         url = self._url(
             defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/etherchannelinterfaces/{interface_id}'
+        )
+        return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def create_device_virtualtunnelinterface(self, device_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualtunnelinterfaces')
+        return self._post(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_device_virtualtunnelinterfaces(self, device_id: str, interface_id=None, interface_name=None):
+        params = {'name': interface_name}
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualtunnelinterfaces/{interface_id}'
+        )
+        return self._get(url, params)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def update_device_virtualtunnelinterface(self, device_id: str, interface_id: str, data: Dict):
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualtunnelinterfaces/{interface_id}'
+        )
+        return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def delete_device_virtualtunnelinterface(self, device_id: str, interface_id: str):
+        url = self._url(
+            defaults.API_CONFIG_NAME, f'/devices/devicerecords/{device_id}/virtualtunnelinterfaces/{interface_id}'
         )
         return self._delete(url)
 
@@ -953,10 +1007,35 @@ class Client(object):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/filepolicies/{policy_id}')
         return self._get(url)
 
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def create_intrusionpolicy(self, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, '/policy/intrusionpolicies')
+        return self._post(url, data)
+
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def get_intrusionpolicies(self, policy_id=None):
         url = self._url(defaults.API_CONFIG_NAME, f'/policy/intrusionpolicies/{policy_id}')
         return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def update_intrusionpolicy(self, policy_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/intrusionpolicies/{policy_id}')
+        return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def delete_intrusionpolicy(self, policy_id: str):
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/intrusionpolicies/{policy_id}')
+        return self._delete(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_intrusionpolicy_rules(self, policy_id: str, rule_id=None):
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/intrusionpolicies/{policy_id}/intrusionrules/{rule_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def update_intrusionpolicy_rule(self, policy_id: str, rule_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/policy/intrusionpolicies/{policy_id}/intrusionrules/{rule_id}')
+        return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_610)
     def create_accesspolicy(self, data: Dict):
@@ -1279,6 +1358,16 @@ class Client(object):
         url = self._url(defaults.API_PLATFORM_NAME, '/updates/upgrades')
         return self._post(url)
 
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def retry_upgrade(self, data: Dict):
+        url = self._url(defaults.API_PLATFORM_NAME, '/updates/retryupgrades')
+        return self._post(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def cancel_upgrade(self, data: Dict):
+        url = self._url(defaults.API_PLATFORM_NAME, '/updates/cancelupgrades')
+        return self._post(url)
+
     @utils.minimum_version_required(defaults.API_RELEASE_640)
     def get_cloudeventsconfigs(self, object_id=None):
         url = self._url(defaults.API_CONFIG_NAME, f'/integration/cloudeventsconfigs/{object_id}')
@@ -1302,6 +1391,16 @@ class Client(object):
     @utils.minimum_version_required(defaults.API_RELEASE_640)
     def update_externallookup(self, object_id: str, data: Dict):
         url = self._url(defaults.API_CONFIG_NAME, f'/integration/externallookups/{object_id}')
+        return self._put(url, data)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def get_externalstorage(self, object_id=None):
+        url = self._url(defaults.API_CONFIG_NAME, f'/integration/externalstorage/{object_id}')
+        return self._get(url)
+
+    @utils.minimum_version_required(defaults.API_RELEASE_670)
+    def update_externalstorage(self, object_id: str, data: Dict):
+        url = self._url(defaults.API_CONFIG_NAME, f'/integration/externalstorage/{object_id}')
         return self._put(url, data)
 
     @utils.minimum_version_required(defaults.API_RELEASE_650)
