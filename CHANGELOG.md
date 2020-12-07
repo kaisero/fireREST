@@ -1,3 +1,13 @@
+# 0.1.8
+
+## Bugfixes
+
+Fixed various s2svpn related operations that missed string interpolation
+
+## Enhancements
+
+Added filtering options to all supported api calls
+
 # 0.1.7
 
 ## Bugfixes

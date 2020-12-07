@@ -12,7 +12,6 @@ A simple wrapper for firepower management center restful api.
 * Automatic squashing of paginated api payloads
 * Sanitization of api payloads received via GET operations and used for PUT/POST operations
 * Debug logging for api calls using logger module
-* Result caching for various operations
 
 ## Requirements
 
@@ -52,22 +51,24 @@ to find pre-existing objects by the name defined in fmc.
 
 ```python
 name = 'NET_OBJ'
-uuid = client.get_object_id_by_name('network', name)
+uuid = client.get_object_id('network', name)
 ```
 
 #### Access Control Policy Name to ID
 
 ```python
-name = 'DEV-ACCESS-CONTROL-POLICY'
-uuid = client.get_acp_id_by_name(name)
+accesspolicy = 'ACCESSPOLICY'
+accesspolicy_id = client.get_accesspolicy_id(name)
 ```
 
 #### Access Control Policy Rule Name to ID
 
 ```python
-acp = 'DEV-ACCESS-CONTROL-POLICY'
-acp_rule = 'PERMIT-INTERNET-ACCESS'
-uuid = client.get_object_id_by_name(acp, acp_rule)
+accesspolicy = 'DEV-ACCESS-CONTROL-POLICY'
+accessrule = 'PERMIT-INTERNET-ACCESS'
+
+accesspolicy_id = client.get_accesspolicy_id(accesspolicy)
+accessrule_id = client.get_accesspolicy_rule_id(accesspolicy_id, accessrule)
 ```
 
 ### Objects
@@ -87,15 +88,16 @@ response = client.create_object('network', net_obj)
 
 ```python
 obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
-obj_payload = client.get_object('network', obj_id)
+obj_id = client.get_object_id('network', obj_name)
+
+obj = client.get_objects('network', obj_id)
 ```
 
 #### Update Network Object
 
 ```python
 obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
+obj_id = client.get_object_id('network', 'NetObjViaAPI')
 
 net_obj = {
     'id': obj_id,
@@ -110,7 +112,8 @@ response = client.update_object('network', obj_id, net_obj)
 
 ```python
 obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
+obj_id = client.get_object_id('network', 'NetObjViaAPI')
+
 response = client.delete_object('network', obj_id)
 ```
 
