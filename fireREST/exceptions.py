@@ -4,99 +4,77 @@ from . import defaults
 
 
 class GenericApiError(Exception):
-    """
-    generic api error exception
-    """
+    """generic api error"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class InvalidNamespaceError(Exception):
-    """
-    exeption thrown when invalid namespace is being passed to api
-    """
+    """invalid namespace is being passed"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class AuthError(Exception):
-    """
-    generic api authentication failure exception
-    """
+    """generic authentication failure"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class AuthRefreshError(Exception):
-    """
-    exception used when api token refresh fails
-    """
+    """api token refresh cannot be refreshed"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class RateLimitException(Exception):
-    """
-    exception used when fmc rate limiter kicks in
-    """
+    """fmc rate limiter kicks in"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class UnsupportedOperationError(Exception):
-    """
-    exception used when unsupported operation is being performed
-    """
+    """unsupported operation is being performed"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class UnsupportedObjectTypeError(Exception):
-    """
-    exception used when unsupported object type is being used
-    """
+    """unsupported object type is being used"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
 class UnprocessableEntityError(Exception):
-    """
-    exception used when unprocessable entity was passed to api call
-    """
+    """unprocessable entity passed to fmc rest api"""
 
-    msg = (
+    MSG = (
         'The payload contains an unprocessable or unreadable entity'
         'such as a invalid attribute name or incorrect JSON syntax'
     )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.msg, *args, **kwargs)
+    def __init__(self, msg=MSG, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)
 
 
 class PayloadLimitExceededError(Exception):
-    """
-    exception used when size limit of api payload is exceeded
-    """
+    """size limit of api payload is exceeded"""
 
-    msg = f'Payload exceeds maximum size of {defaults.API_PAYLOAD_SIZE_MAX}'
+    MSG = f'Payload exceeds maximum size of {defaults.API_PAYLOAD_SIZE_MAX}'
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.msg, *args, **kwargs)
+    def __init__(self, msg=MSG, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)
 
 
 class ResourceNotFoundError(Exception):
-    """
-    exception used when http 404 error occurs
-    """
+    """requested resource cannot not be found"""
 
-    msg = f'Resource not found (404)'
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(self.msg, *args, **kwargs)
+    def __init__(self, msg, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)

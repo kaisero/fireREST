@@ -267,3 +267,7 @@ STATE = {
     True: 'Enabled',
     False: 'Disabled',
 }
+
+FILTERS = {'name': 'name', 'name_or_value': 'nameOrValue', 'unused_only': 'unusedOnly'}
+
+PARAMS = {'override_target_id': 'overrideTargetId'}
