@@ -256,12 +256,13 @@ def raise_for_status(response):
         500: exc.GenericApiError,
     }
     errors = {
+        400: [{'msg': 'Duplicate Name', 'exception': exc.ResourceAlreadyExistsError}],
         401: [{'msg': 'User authentication failed', 'exception': exc.AuthError}],
     }
     if status_code in errors:
         for error in errors[status_code]:
             if error['msg'] in response.text:
-                raise error['exception'](msg=error['msg'])
+                raise error['exception'](msg=response.json()['error']['messages'][0]['description'])
     try:
         raise exceptions.get(status_code, HTTPError)(msg=response.json()['error']['messages'][0]['description'])
     except ValueError:
@@ -303,7 +304,7 @@ def fix_url(url: str):
     return re.sub(r'\/None$', '', url).rstrip('/')
 
 
-def sanitize_payload(method: str, payload: Dict):
+def sanitize_payload(method: str, payload: Dict, ignore_fields=None, recursive=False):
     """sanitize json object for api operation
     This is neccesarry since fmc api cannot handle json objects with some
     fields that are received via get operations (e.g. link, metadata). The provided
@@ -312,16 +313,16 @@ def sanitize_payload(method: str, payload: Dict):
     :param payload: api object in dict format
     :return: sanitized api object in dict format
     """
-    sanitized_payload = deepcopy(payload)
+    if not recursive:
+        payload = deepcopy(payload)
     if not isinstance(payload, list):
-        sanitized_payload.pop('metadata', None)
-        sanitized_payload.pop('links', None)
+        payload.pop('metadata', None)
+        payload.pop('links', None)
+        for item in ignore_fields:
+            payload.pop(item, None)
         if method.lower() == 'post':
-            sanitized_payload.pop('id', None)
+            payload.pop('id', None)
     else:
-        for item in sanitized_payload:
-            item.pop('metadata', None)
-            item.pop('links', None)
-            if method.lower() == 'post':
-                item.pop('id', None)
-    return sanitized_payload
+        for item in payload:
+            item = sanitize_payload(method, item, ignore_fields, recursive=True)
+    return payload

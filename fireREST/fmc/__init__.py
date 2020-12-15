@@ -139,7 +139,7 @@ class Connection:
         """
         return self._request('delete', url, params=params)
 
-    def post(self, url: str, data: Dict, params=None):
+    def post(self, url: str, data: Dict, params=None, ignore_fields=None):
         """create operation that takes a payload as `dict` which is sent
         to the specified url to create a new resource
 
@@ -148,10 +148,10 @@ class Connection:
         :param params: dict of parameters for http request
         :return: requests.response object
         """
-        data = utils.sanitize_payload('post', data)
+        data = utils.sanitize_payload('post', data, ignore_fields)
         return self._request('post', url, params=params, data=data)
 
-    def put(self, url: str, data: Dict, params=None):
+    def put(self, url: str, data: Dict, params=None, ignore_fields=None):
         """put operation that updates existing resources according to the payload provided
 
         :param url: request that should be performed
@@ -159,7 +159,7 @@ class Connection:
         :param params: dict of parameters for http request
         :return: requests.response object
         """
-        data = utils.sanitize_payload('put', data)
+        data = utils.sanitize_payload('put', data, ignore_fields)
         return self._request('put', url, data=data, params=params)
 
     def login(self):
@@ -217,6 +217,8 @@ class Resource:
     PATH = '/'
     SUPPORTED_FILTERS = []
     SUPPORTED_OPERATIONS = []
+    IGNORE_FOR_CREATE = []
+    IGNORE_FOR_UPDATE = []
 
     def __init__(
         self,
@@ -228,7 +230,7 @@ class Resource:
         """
         self.conn = conn
 
-    def _url(self, path, namespace='base'):
+    def _url(self, path, namespace=None):
         """helper to generate url for requests to fmc rest api
 
         :return: url as string
@@ -251,16 +253,16 @@ class Resource:
             params = {}
         if isinstance(params, list):
             params['bulk'] = True
-        return self.conn.post(url, data, params)
+        return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
     def get(self, uuid=None, name=None, params=None):
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.get(url, params)
 
-    def update(self, data: Dict):
+    def update(self, data: Dict, params=None):
         url = self._url(self.PATH.format(uuid=data['id']))
-        return self.conn.update(url)
+        return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     def delete(self, uuid=None, name=None):
@@ -280,7 +282,7 @@ class ChildResource(Resource):
             params = {}
         if isinstance(params, list):
             params['bulk'] = True
-        return self.conn.post(url, data, params)
+        return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
     def get(self, container_uuid=None, container_name=None, uuid=None, name=None, params=None):
@@ -288,9 +290,9 @@ class ChildResource(Resource):
         return self.conn.get(url, params)
 
     @utils.resolve_by_name
-    def update(self, data: Dict, container_uuid=None, container_name=None):
+    def update(self, data: Dict, container_uuid=None, container_name=None, params=None):
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
-        return self.conn.update(url)
+        return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     def delete(self, container_uuid=None, container_name=None, uuid=None, name=None):
