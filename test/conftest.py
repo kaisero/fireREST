@@ -2,7 +2,8 @@
 
 import pytest
 
-from fireREST import Client
+from fireREST import FMC
+from fireREST.fmc import Connection
 
 
 @pytest.fixture(scope='module')
@@ -11,7 +12,7 @@ def constants():
         'hostname': 'fmc.example.com',
         'username': 'firerest',
         'password': 'ChangeMeForSecurity123!',
-        'domain': 'Global/DEV',
+        'domain': {'name': 'Global/DEV'},
         'devicehapair': 'ftd01.example.com',
         'devicehapair_id': '6dd24c5c-0971-11eb-bde5-8c24580c007a',
         'device': 'ftd01.example.com',
@@ -32,10 +33,20 @@ def constants():
 
 
 @pytest.fixture(scope='module')
-def api(constants):
-    return Client(
+def conn(constants):
+    return Connection(
         hostname=constants['hostname'],
         username=constants['username'],
         password=constants['password'],
-        domain=constants['domain'],
+        domain=constants['domain']['name'],
+    )
+
+
+@pytest.fixture(scope='module')
+def fmc(constants):
+    return FMC(
+        hostname=constants['hostname'],
+        username=constants['username'],
+        password=constants['password'],
+        domain=constants['domain']['name'],
     )

@@ -78,3 +78,10 @@ class ResourceNotFoundError(Exception):
 
     def __init__(self, msg, *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
+
+
+class DomainNotFoundError(Exception):
+    """domain could not be found by name"""
+
+    def __init__(self, msg, *args, **kwargs):
+        super().__init__(msg, *args, **kwargs)

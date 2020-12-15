@@ -28,6 +28,10 @@ logger.addHandler(logging.NullHandler())
 
 
 class FMC(Resource):
+
+    NAMESPACE = 'platform'
+    PATH = '/'
+
     def __init__(
         self,
         hostname: str,
@@ -38,6 +42,8 @@ class FMC(Resource):
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
     ):
-        self._conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout)
-        self.object = Object(self._conn)
-        self.policy = Policy(self._conn)
+        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout)
+        self.domain = self.conn.domain
+        self.version = self.conn.version
+        self.object = Object(self.conn)
+        self.policy = Policy(self.conn)
