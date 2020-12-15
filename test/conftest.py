@@ -6,6 +6,9 @@ from fireREST import FMC
 from fireREST.fmc import Connection
 
 
+STATE = dict()
+
+
 @pytest.fixture(scope='module')
 def constants():
     return {

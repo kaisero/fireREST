@@ -30,7 +30,7 @@ def test_initialization(fmc, constants):
 
 def test_default_url_with_trailing_slash(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}/test'
-    actual_url = fmc._url(path='/test/')
+    actual_url = fmc._url(path='/test/', namespace='base')
     assert actual_url == expected_url
 
 
