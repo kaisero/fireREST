@@ -1,5 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import uuid
+
+import pytest
+
+import fireREST.exceptions as exc
+
 from fireREST.fmc.policy.accesspolicy import AccessRule
 from test.conftest import STATE
 
@@ -20,6 +26,18 @@ def test_create_accesspolicy(fmc):
     assert expected_result == actual_result
 
 
+def test_create_accesspolicy_with_name_that_already_exists(fmc):
+    with pytest.raises(exc.ResourceAlreadyExistsError):
+        data = {'name': STATE['name'], 'defaultAction': {'action': 'BLOCK'}}
+        fmc.policy.accesspolicy.create(data)
+
+
+def test_create_accesspolicy_with_invalid_payload(fmc):
+    with pytest.raises(exc.UnprocessableEntityError):
+        data = {'invalid': 'payload'}
+        fmc.policy.accesspolicy.create(data)
+
+
 def test_get_accesspolicies(fmc):
     expected_result = STATE['name']
     actual_result = None
@@ -38,12 +56,23 @@ def test_get_accesspolicy_by_name(fmc):
     assert expected_result == actual_result
 
 
+def test_get_accesspolicy_by_name_with_nonexisting_name(fmc):
+    with pytest.raises(exc.ResourceNotFoundError):
+        fmc.policy.accesspolicy.get(name='InvalidAccessPolicy')
+
+
 def test_get_accesspolicy_by_id(fmc):
     expected_result = STATE['name']
     accesspolicy_id = fmc.policy.accesspolicy.get(name=STATE['name'])['id']
     actual_result = fmc.policy.accesspolicy.get(uuid=accesspolicy_id)['name']
 
     assert expected_result == actual_result
+
+
+def test_get_accesspolicy_by_uuid_with_nonexisting_uuid(fmc):
+    with pytest.raises(exc.ResourceNotFoundError):
+        nonexisting_uuid = uuid.uuid1()
+        fmc.policy.accesspolicy.get(uuid=nonexisting_uuid)
 
 
 def test_update_accesspolicy(fmc):

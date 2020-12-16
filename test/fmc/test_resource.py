@@ -2,6 +2,8 @@
 
 import pytest
 
+import fireREST.exceptions as exc
+
 from requests.auth import HTTPBasicAuth
 
 from fireREST.fmc import Resource
@@ -56,3 +58,8 @@ def test_refresh_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}{API_REFRESH_URL}'
     actual_url = fmc._url(path='/test', namespace='refresh')
     assert actual_url == expected_url
+
+
+def test_url_with_invalid_namespace(fmc):
+    with pytest.raises(exc.InvalidNamespaceError):
+        fmc._url(path='/test', namespace='nonExistingNamespace')

@@ -45,22 +45,10 @@ class UnsupportedOperationError(Exception):
         super().__init__(msg, *args, **kwargs)
 
 
-class UnsupportedObjectTypeError(Exception):
-    """unsupported object type is being used"""
-
-    def __init__(self, msg='', *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
-
-
 class UnprocessableEntityError(Exception):
     """unprocessable entity passed to fmc rest api"""
 
-    MSG = (
-        'The payload contains an unprocessable or unreadable entity'
-        'such as a invalid attribute name or incorrect JSON syntax'
-    )
-
-    def __init__(self, msg=MSG, *args, **kwargs):
+    def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
