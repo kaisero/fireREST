@@ -66,14 +66,20 @@ class Connection:
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
-        """base operations used for all http api calls to firepower management center
+        """base operation used for all http api calls to firepower management center
 
-        :param method: http operations in string format (post, get, put, delete)
-        :param url: url to api resource in string format
-        :param params: dictionary of additional params that should be passed to the request. Defaults to `None`
-        :param auth: credentials in base64 format. Defaults to `None`
-        :param data: request body in dict format. Defaults to `None`
-        :return: requests.response object
+        :param method: http operation (post, get, put, delete)
+        :type method: str
+        :param url: url to api resource
+        :type url: str
+        :param params: additional http params that should be passed to the request
+        :type params: dict, optional
+        :param auth: credentials in base64 format
+        :type auth: HTTPBasicAuth, optional
+        :param data: request body (api payload)
+        :type data: dict, optional
+        :return: api response
+        :rtype: requests.Response
         """
         response = self.session.request(
             method=method,
@@ -104,12 +110,15 @@ class Connection:
         return response
 
     def get(self, url: str, params=None, items=None):
-        """get operation with pagination support. Returned results are automatically
-        squashed in a single result
+        """get operation with pagination support. If multiple requests are required to
+        get all items responses are squashed a single response
 
-        :param url: request that should be performed
+        :param url: path to resource that will be queried
+        :type url: str
         :param params: dict of parameters for http request. Defaults to `None`
+        :type params: dict, optional
         :return: dictionary or list of returned api objects
+        :rtype: Union[dict, list]
         """
         if not utils.is_getbyid_operation(url) and items is None:
             if params is None:
@@ -131,21 +140,26 @@ class Connection:
         return payload
 
     def delete(self, url: str, params=None):
-        """delete operation
+        """delete the specified api resource
 
-        :param url: request that should be performed
+        :param url: path to resource that will be deleted
+        :type url: str
         :param params: dict of parameters for http request
-        :return: requests.response object
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
         """
         return self._request('delete', url, params=params)
 
     def post(self, url: str, data: Dict, params=None, ignore_fields=None):
-        """create operation that takes a payload as `dict` which is sent
-        to the specified url to create a new resource
+        """post operation that is mostly used to create new resources or trigger tasks
 
-        :param url: request that should be performed
-        :param data: dict of data that will be sent to the api
+        :param url: path to resource on which POST operation will be performed
+        :type url: str
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
         :param params: dict of parameters for http request
+        :type params: dict, optional
         :return: requests.response object
         """
         data = utils.sanitize_payload('post', data, ignore_fields)
@@ -154,18 +168,23 @@ class Connection:
     def put(self, url: str, data: Dict, params=None, ignore_fields=None):
         """put operation that updates existing resources according to the payload provided
 
-        :param url: request that should be performed
-        :param json: dict of data that will be sent to the api
+        :param url: path to resource on which POST operation will be performed
+        :type url: str
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
         :param params: dict of parameters for http request
-        :return: requests.response object
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
         """
         data = utils.sanitize_payload('put', data, ignore_fields)
         return self._request('put', url, data=data, params=params)
 
     def login(self):
         """basic authentication to firepower management center rest api
-        in case authentication is successful an access and refresh token are being saved to
-        the `Connection` object which will be used for subsequent api calls
+        in case authentication is successful an access and refresh token will be saved to
+        the `Connection` object. Subsequent api calls will be performed using the access token
+
         """
         logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
         url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
@@ -178,6 +197,7 @@ class Connection:
     def refresh(self):
         """refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using `self.login()` will be performed
+
         """
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
             logger.info('Access token is invalid. Refreshing authentication token')
@@ -192,7 +212,11 @@ class Connection:
             self.login()
 
     def get_version(self):
-        """Get version of fmc"""
+        """Get version of fmc
+
+        :return: server version of firepower management center
+        :rtype: version.Version
+        """
         url = f'{self.protocol}://{self.hostname}{defaults.API_PLATFORM_URL}/info/serverversion'
         return version.parse(self._request('get', url).json()['items'][0]['serverVersion'].split(' ')[0])
 
@@ -200,11 +224,14 @@ class Connection:
         """helper function to retrieve domain id from list of domains
 
         :param name: name of the domain
+        :type name: str
         :return: domain uuid
+        :rtype: str
         """
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
+
         domains = ', '.join((domain['name'] for domain in self.domains))
         msg = f'Could not find domain with name {name}. Available Domains: {domains}'
         raise exc.DomainNotFoundError(msg=msg)
@@ -236,9 +263,9 @@ class Resource:
         self,
         conn,
     ):
-        """initialize api object (make sure to use a dedicated api user)
-
-        :param conn: FireREST.Connection object
+        """initialize api object
+        :param conn: connection object used for api calls
+        :type conn: fireREST.fmc.Connection
         """
         self.conn = conn
         self.version = conn.version
@@ -246,7 +273,12 @@ class Resource:
     def _url(self, path, namespace=None):
         """helper to generate url for requests to fmc rest api
 
-        :return: url as string
+        :param path: relative path to api resource
+        :type path: str
+        :param namespace: namespace to which api call should be routed
+        :type namespace: str, optional
+        :return: formatted url used for api call
+        :rtype: str
         """
         if not namespace:
             namespace = self.NAMESPACE
@@ -290,7 +322,10 @@ class Resource:
 class ChildResource(Resource):
     """base class for api resources located within a container"""
 
+    # name of container class that hosts the ChildResource
     CONTAINER_NAME = 'Resource'
+
+    # path to container class that hosts the ChildResource
     CONTAINER_PATH = '/'
 
     @utils.minimum_version_required
