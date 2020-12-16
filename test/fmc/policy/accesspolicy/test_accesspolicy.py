@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import uuid
+import packaging
 
 import pytest
 
@@ -73,6 +75,13 @@ def test_get_accesspolicy_by_uuid_with_nonexisting_uuid(fmc):
     with pytest.raises(exc.ResourceNotFoundError):
         nonexisting_uuid = uuid.uuid1()
         fmc.policy.accesspolicy.get(uuid=nonexisting_uuid)
+
+
+def test_get_accesspolicies_with_incompatible_fmc_release(fmc):
+    accesspolicy = copy.deepcopy(fmc.policy.accesspolicy)
+    accesspolicy.version = packaging.version.parse('6.0.0')
+    with pytest.raises(exc.UnsupportedOperationError):
+        accesspolicy.get()
 
 
 def test_update_accesspolicy(fmc):
