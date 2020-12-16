@@ -35,15 +35,23 @@ class Connection:
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
     ):
-        """Initialize connection object
+        """initialize connection object. It is highly recommended to use a
+        dedicated user for api operations
 
         :param hostname: ip address or fqdn of firepower management center
-        :param username: login username
-        :param password: login password
+        :type hostname: str
+        :param username: username used for api authentication
+        :type username: str
+        :param password: password used for api authentication
+        :type password: str
         :param protocol: protocol used to access fmc rest api. Defaults to `https`
+        :type protocol: str, optional
         :param verify_cert: check https certificate for validity. Defaults to `False`
+        :type verify_cert: bool, optional
         :param domain: name of the domain to access. Defaults to `Global`
+        :type domain: str
         :param timeout: timeout value for http requests. Defaults to `120` seconds
+        :type timeout: int, optional
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -238,7 +246,11 @@ class Connection:
 
 
 class Resource:
-    """base class for api resources"""
+    """Base class for api resources. `Resource` can be used for all api resources
+    that are not part of another container. A valid example would be an AccessPolicy
+    an invalid example would be an AccessRule which existing within a container (AccessPolicy
+
+    """
 
     # namespace of api resource. options: base, config, platform, refresh
     NAMESPACE = 'config'
@@ -263,7 +275,8 @@ class Resource:
         self,
         conn,
     ):
-        """initialize api object
+        """Initialize Resource object
+
         :param conn: connection object used for api calls
         :type conn: fireREST.fmc.Connection
         """
@@ -271,7 +284,7 @@ class Resource:
         self.version = conn.version
 
     def _url(self, path, namespace=None):
-        """helper to generate url for requests to fmc rest api
+        """Generate url for requests to fmc rest api
 
         :param path: relative path to api resource
         :type path: str
@@ -294,6 +307,14 @@ class Resource:
 
     @utils.minimum_version_required
     def create(self, data: Union[dict, list], params=None):
+        """Create api resource
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
+        """
         url = self._url(self.PATH.format(uuid=None))
         if not params:
             params = {}
@@ -304,23 +325,54 @@ class Resource:
     @utils.resolve_by_name
     @utils.minimum_version_required
     def get(self, uuid=None, name=None, params=None):
+        """Get api resource in json format. If no name or uuid is provided
+        a list of all available resources will be returned
+
+        :param uuid: id of resource
+        :type uuid: str, optional
+        :param name: name of resource
+        :type name: str, optional
+        :return: api response
+        :rtype: Union[dict, list]
+        """
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.get(url, params)
 
     @utils.minimum_version_required
     def update(self, data: Dict, params=None):
+        """Update existing api resource. Existing data will be overriden with
+        the provided payload. The request will be routed to the correct resource
+        by extracting the `id` within the payload
+
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
+        """
         url = self._url(self.PATH.format(uuid=data['id']))
         return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
     def delete(self, uuid=None, name=None):
+        """Delete existing api resource. Either `name` or `uuid` must
+        be provided to delete an existing resource
+
+        :param uuid: id of resource
+        :type uuid: str, optional
+        :param name: name of resource
+        :type name: str, optional
+        :return: api response
+        :rtype: requests.Response
+        """
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.delete(url)
 
 
 class ChildResource(Resource):
-    """base class for api resources located within a container"""
+    """Base class for api resources located within a container"""
 
     # name of container class that hosts the ChildResource
     CONTAINER_NAME = 'Resource'
@@ -329,7 +381,21 @@ class ChildResource(Resource):
     CONTAINER_PATH = '/'
 
     @utils.minimum_version_required
-    def create(self, container_uuid: str, data: Union[dict, list], params=None):
+    def create(self, data: Union[dict, list], container_uuid=None, container_name=None, params=None):
+        """Create api resource. Either name or uuid of container resource must be provided
+        to create the resource within the provided scope
+
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
+        """
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=None))
         if not params:
             params = {}
@@ -340,17 +406,61 @@ class ChildResource(Resource):
     @utils.resolve_by_name
     @utils.minimum_version_required
     def get(self, container_uuid=None, container_name=None, uuid=None, name=None, params=None):
+        """Get api resource in json format. Either name or uuid of container resource must
+        be provided to search for resources within the container scope
+        If no name or uuid is provided a list of all available resources will be returned
+
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param uuid: id of resource
+        :type uuid: str, optional
+        :param name: name of resource
+        :type name: str, optional
+        :return: api response
+        :rtype: Union[dict, list]
+        """
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=uuid))
         return self.conn.get(url, params)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
     def update(self, data: Dict, container_uuid=None, container_name=None, params=None):
+        """Update existing api resource. Either name or uuid of container resource must be provided
+        Existing data will be overriden with the provided payload. The request will be routed
+        to the correct resource by extracting the `id` within the payload
+
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
+        """
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
         return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
     def delete(self, container_uuid=None, container_name=None, uuid=None, name=None):
+        """Delete existing api resource. Either name or uuid of container resource must be provided
+        Either `name` or `uuid` must be provided to delete an existing resource
+
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param uuid: id of resource
+        :type uuid: str, optional
+        :param name: name of resource
+        :type name: str, optional
+        :return: api response
+        :rtype: requests.Response
+        """
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.delete(url)

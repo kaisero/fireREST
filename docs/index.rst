@@ -32,14 +32,9 @@ Usage
 Module
 ======
 
-.. automodule:: fireREST
-    :members:
-    :undoc-members:
-    :private-members:
+:ref:`modindex`
 
-Indices and tables
+Index
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
