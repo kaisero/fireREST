@@ -213,12 +213,24 @@ class Connection:
 class Resource:
     """base class for api resources"""
 
+    # namespace of api resource. options: base, config, platform, refresh
     NAMESPACE = 'config'
+    # path to api resource within a namespace. e.g. /policy/accesspolicy
     PATH = '/'
+    # supported filter arguments for GET operations
     SUPPORTED_FILTERS = []
-    SUPPORTED_OPERATIONS = []
+    # ignore fields for create operations
     IGNORE_FOR_CREATE = []
+    # ignore fields for put operations
     IGNORE_FOR_UPDATE = []
+    # minimum version required for create()
+    MINIMUM_VERSION_REQUIRED_CREATE = '99.99.99'
+    # minimum version required for get()
+    MINIMUM_VERSION_REQUIRED_GET = '99.99.99'
+    # minimum version required for update()
+    MINIMUM_VERSION_REQUIRED_UPDATE = '99.99.99'
+    # minimum version required for delete()
+    MINIMUM_VERSION_REQUIRED_DELETE = '99.99.99'
 
     def __init__(
         self,
@@ -229,6 +241,7 @@ class Resource:
         :param conn: FireREST.Connection object
         """
         self.conn = conn
+        self.version = conn.version
 
     def _url(self, path, namespace=None):
         """helper to generate url for requests to fmc rest api
@@ -247,6 +260,7 @@ class Resource:
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
         return utils.fix_url(options[namespace])
 
+    @utils.minimum_version_required
     def create(self, data: Union[dict, list], params=None):
         url = self._url(self.PATH.format(uuid=None))
         if not params:
@@ -256,15 +270,18 @@ class Resource:
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
+    @utils.minimum_version_required
     def get(self, uuid=None, name=None, params=None):
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.get(url, params)
 
+    @utils.minimum_version_required
     def update(self, data: Dict, params=None):
         url = self._url(self.PATH.format(uuid=data['id']))
         return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
+    @utils.minimum_version_required
     def delete(self, uuid=None, name=None):
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.delete(url)
@@ -276,6 +293,7 @@ class ChildResource(Resource):
     CONTAINER_NAME = 'Resource'
     CONTAINER_PATH = '/'
 
+    @utils.minimum_version_required
     def create(self, container_uuid: str, data: Union[dict, list], params=None):
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=None))
         if not params:
@@ -285,16 +303,19 @@ class ChildResource(Resource):
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
+    @utils.minimum_version_required
     def get(self, container_uuid=None, container_name=None, uuid=None, name=None, params=None):
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=uuid))
         return self.conn.get(url, params)
 
     @utils.resolve_by_name
+    @utils.minimum_version_required
     def update(self, data: Dict, container_uuid=None, container_name=None, params=None):
         url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
         return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
+    @utils.minimum_version_required
     def delete(self, container_uuid=None, container_name=None, uuid=None, name=None):
         url = self._url(self.PATH.format(uuid=uuid))
         return self.conn.delete(url)

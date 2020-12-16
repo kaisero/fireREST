@@ -1,13 +1,13 @@
 import re
+import packaging
 import sys
 
 from copy import deepcopy
 from http.client import responses as http_responses
-from functools import lru_cache, wraps
+from functools import lru_cache, partial, wraps
 from logging import getLogger
 from requests.exceptions import HTTPError
 from retry import retry
-from packaging import version
 from time import sleep
 from typing import Dict
 from uuid import UUID, uuid4
@@ -96,27 +96,36 @@ def log_request(action):
     return inner_function
 
 
-def minimum_version_required(minimum_version):
+def minimum_version_required(f=None, version=None):
     """
     decorator that specifies the minimal required software version to use the operation
     """
-    minimum_version = version.parse(minimum_version)
 
     def inner_function(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
-            try:
-                installed_version = args[0].version
-            except AttributeError:
-                return f(*args, **kwargs)
-            if installed_version < minimum_version:
+            if version:
+                min_version = packaging.version.parse(version)
+            else:
+                operations = {
+                    'create': args[0].MINIMUM_VERSION_REQUIRED_CREATE,
+                    'get': args[0].MINIMUM_VERSION_REQUIRED_GET,
+                    'update': args[0].MINIMUM_VERSION_REQUIRED_UPDATE,
+                    'delete': args[0].MINIMUM_VERSION_REQUIRED_DELETE,
+                }
+                min_version = packaging.version.parse(operations[f.__name__])
+
+            installed_version = args[0].version
+            if installed_version < min_version:
                 raise exc.UnsupportedOperationError(
-                    f'{f.__name__} requires fmc software version {minimum_version}. Installed version: {installed_version}',
+                    f'{f.__name__} operation for resource {args[0].__class__.__name__} is not supported on Firepower Management Center version {installed_version}',
                 )
             return f(*args, **kwargs)
 
         return wrapper
 
+    if f:
+        return inner_function(f)
     return inner_function
 
 
@@ -318,8 +327,9 @@ def sanitize_payload(method: str, payload: Dict, ignore_fields=None, recursive=F
     if not isinstance(payload, list):
         payload.pop('metadata', None)
         payload.pop('links', None)
-        for item in ignore_fields:
-            payload.pop(item, None)
+        if ignore_fields:
+            for item in ignore_fields:
+                payload.pop(item, None)
         if method.lower() == 'post':
             payload.pop('id', None)
     else:
