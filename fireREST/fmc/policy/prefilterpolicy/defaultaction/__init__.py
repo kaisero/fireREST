@@ -1,10 +1,10 @@
 from fireREST.fmc import ChildResource
 
 
-class InheritanceSettings(ChildResource):
+class DefaultAction(ChildResource):
     CONTAINER_NAME = 'AccessPolicy'
-    CONTAINER_PATH = '/policy/accesspolicies/{uuid}'
-    PATH = '/policy/accesspolicies/{container_uuid}/inheritancesettings/{uuid}'
+    CONTAINER_PATH = '/policy/prefilterpolicies/{uuid}'
+    PATH = '/policy/prefilterpolicies/{container_uuid}/defaultactions/{uuid}'
     SUPPORTED_FILTERS = []
     SUPPORTED_PARAMS = []
     IGNORE_FOR_CREATE = []

@@ -268,6 +268,19 @@ STATE = {
     False: 'Disabled',
 }
 
-FILTERS = {'name': 'name', 'name_or_value': 'nameOrValue', 'unused_only': 'unusedOnly'}
+FILTERS = {
+    'name': 'name',
+    'name_or_value': 'nameOrValue',
+    'unused_only': 'unusedOnly',
+    'rule_ids': 'ids',
+    'device_id': 'deviceId',
+}
 
-PARAMS = {'override_target_id': 'overrideTargetId'}
+PARAMS = {
+    'override_target_id': 'overrideTargetId',
+    'above_category': 'aboveCategory',
+    'section': 'section',
+    'category': 'category',
+    'insert_before': 'insertBefore',
+    'insert_after': 'insertAfter',
+}

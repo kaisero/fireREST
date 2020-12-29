@@ -1,14 +1,15 @@
-from typing import Dict
-
 from fireREST import utils
 from fireREST.defaults import API_CONFIG_NAME
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
+from fireREST.fmc.policy.accesspolicy.category import Category
+from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
+from fireREST.fmc.policy.accesspolicy.inheritancesettings import InheritanceSettings
+from fireREST.fmc.policy.accesspolicy.operational import Operational
 
 
 class AccessPolicy(Resource):
     PATH = '/policy/accesspolicies/{uuid}'
-    SUPPORTED_OPERATIONS = ['create', 'get', 'update', 'delete']
     IGNORE_FOR_UPDATE = ['rules']
     MINIMUM_VERSION_REQUIRED_CREATE = '6.1.0'
     MINIMUM_VERSION_REQUIRED_GET = '6.1.0'
@@ -19,3 +20,7 @@ class AccessPolicy(Resource):
         super().__init__(conn)
 
         self.accessrule = AccessRule(conn)
+        self.category = Category(conn)
+        self.defaultaction = DefaultAction(conn)
+        self.inheritancesettings = InheritanceSettings(conn)
+        self.operational = Operational(conn)
