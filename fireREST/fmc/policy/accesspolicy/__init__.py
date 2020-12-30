@@ -15,6 +15,7 @@ class AccessPolicy(Resource):
     MINIMUM_VERSION_REQUIRED_GET = '6.1.0'
     MINIMUM_VERSION_REQUIRED_UPDATE = '6.1.0'
     MINIMUM_VERSION_REQUIRED_DELETE = '6.1.0'
+    SUPPORTED_PARAMS = ['name']
 
     def __init__(self, conn: Connection):
         super().__init__(conn)

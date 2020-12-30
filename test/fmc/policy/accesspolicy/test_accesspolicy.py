@@ -8,15 +8,23 @@ import pytest
 
 import fireREST.exceptions as exc
 
-from fireREST.fmc.policy.accesspolicy import AccessRule
+from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
+from fireREST.fmc.policy.accesspolicy.category import Category
+from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
+from fireREST.fmc.policy.accesspolicy.inheritancesettings import InheritanceSettings
+from fireREST.fmc.policy.accesspolicy.operational import Operational
 from test.conftest import STATE
 
 STATE['name'] = 'FireREST-AccessPolicy'
 
 
 def test_initialization(fmc):
-    actual_accessrule = fmc.policy.accesspolicy.accessrule
-    assert isinstance(actual_accessrule, AccessRule)
+    accesspolicy = fmc.policy.accesspolicy
+    assert isinstance(accesspolicy.accessrule, AccessRule)
+    assert isinstance(accesspolicy.category, Category)
+    assert isinstance(accesspolicy.defaultaction, DefaultAction)
+    assert isinstance(accesspolicy.inheritancesettings, InheritanceSettings)
+    assert isinstance(accesspolicy.operational, Operational)
 
 
 def test_create_accesspolicy(fmc):

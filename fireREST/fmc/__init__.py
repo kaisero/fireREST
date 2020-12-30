@@ -258,6 +258,8 @@ class Resource:
     PATH = '/'
     # supported filter arguments for GET operations
     SUPPORTED_FILTERS = []
+    # supported param arguments for operations
+    SUPPORTED_PARAMS = []
     # ignore fields for create operations
     IGNORE_FOR_CREATE = []
     # ignore fields for put operations
@@ -272,8 +274,7 @@ class Resource:
     MINIMUM_VERSION_REQUIRED_DELETE = '99.99.99'
 
     def __init__(
-        self,
-        conn,
+        self, conn,
     ):
         """Initialize Resource object
 
