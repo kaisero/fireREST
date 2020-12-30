@@ -1,5 +1,4 @@
 from fireREST import utils
-from fireREST.defaults import API_CONFIG_NAME
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 from fireREST.fmc.policy.accesspolicy.category import Category
@@ -25,3 +24,7 @@ class AccessPolicy(Resource):
         self.defaultaction = DefaultAction(conn)
         self.inheritancesettings = InheritanceSettings(conn)
         self.operational = Operational(conn)
+
+    @utils.support_params
+    def get(self, uuid=None, name=None, params=None):
+        super().get(uuid=uuid, name=name, params=params)
