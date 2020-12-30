@@ -13,7 +13,7 @@ from typing import Dict
 from uuid import UUID, uuid4
 
 from . import exceptions as exc
-from .mapping import FILTERS, PARAMS, OBJECT_TYPE
+from .mapping import FILTERS, PARAMS
 
 logger = getLogger(__name__)
 
@@ -127,30 +127,6 @@ def minimum_version_required(f=None, version=None):
     if f:
         return inner_function(f)
     return inner_function
-
-
-def validate_object_type(f):
-    """
-    decorator that validates object type and transforms input if neccessary
-    """
-
-    @wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            object_type = kwargs.get('object_type', None)
-            if object_type:
-                kwargs['object_type'] = OBJECT_TYPE[object_type.lower()]
-            else:
-                args = list(args)
-                object_type = args[1]
-                args[1] = OBJECT_TYPE[object_type.lower()]
-        except KeyError:
-            if object_type in OBJECT_TYPE.values():
-                return f(*args, **kwargs)
-            raise exc.UnsupportedObjectTypeError(f'{object_type} is not a valid object type')
-        return f(*args, **kwargs)
-
-    return wrapper
 
 
 def resolve_by_name(f):
