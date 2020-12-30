@@ -138,6 +138,7 @@ def resolve_by_name(f):
         container_name = kwargs.get('container_name', None)
         container_uuid = kwargs.get('container_uuid', None)
         name = kwargs.get('name', None)
+        uuid = kwargs.get('uuid', None)
 
         if container_name and not container_uuid:
             url = resource._url(resource.CONTAINER_PATH.format(uuid=None))
@@ -149,9 +150,8 @@ def resolve_by_name(f):
                 raise exc.ResourceNotFoundError(
                     msg=f'Resource of type {resource.CONTAINER_PATH} with name "{resource.CONTAINER_NAME}" does not exist'
                 )
-        x = 'name' not in resource.SUPPORTED_FILTERS
-        y = 'name' not in resource.SUPPORTED_PARAMS
-        if name is not None and 'name' not in resource.SUPPORTED_FILTERS and 'name' not in resource.SUPPORTED_PARAMS:
+
+        if name and not uuid:
             for item in resource.get.__wrapped__(*args, **kwargs):
                 if item['name'] == name:
                     if f.__name__ == 'get':
