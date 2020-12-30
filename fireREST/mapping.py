@@ -227,6 +227,7 @@ PARAMS = {
     'above_category': 'aboveCategory',
     'section': 'section',
     'category': 'category',
+    'name': 'name',
     'insert_before': 'insertBefore',
     'insert_after': 'insertAfter',
     'target_index': 'targetIndex',
