@@ -6,7 +6,16 @@ from fireREST import FMC
 from fireREST.fmc import Connection
 
 
-STATE = dict()
+STATE = {
+    'policy': {
+        'accesspolicy': {
+            'name': 'FireREST-AccessPolicy',
+            'accessrule': {
+                'name': 'FireREST-AccessRule'
+            }
+        }
+    }
+}
 
 
 @pytest.fixture(scope='module')
