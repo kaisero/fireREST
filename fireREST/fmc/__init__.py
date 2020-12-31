@@ -2,20 +2,18 @@
 
 import json
 import logging
-import re
+from http.client import responses as http_responses
+from typing import Dict, Union
+from urllib.parse import urlencode
+
 import requests
 import urllib3
+from packaging import version
+from requests.auth import HTTPBasicAuth
 
 from fireREST import defaults
 from fireREST import exceptions as exc
 from fireREST import utils
-
-from copy import deepcopy
-from http.client import responses as http_responses
-from requests.auth import HTTPBasicAuth
-from packaging import version
-from typing import Dict, List, Union
-from urllib.parse import urlencode
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -35,7 +33,7 @@ class Connection:
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
     ):
-        """initialize connection object. It is highly recommended to use a
+        """Initialize connection object. It is highly recommended to use a
         dedicated user for api operations
 
         :param hostname: ip address or fqdn of firepower management center
@@ -74,7 +72,7 @@ class Connection:
 
     @utils.handle_errors
     def _request(self, method: str, url: str, params=None, auth=None, data=None):
-        """base operation used for all http api calls to firepower management center
+        """Base operation used for all http api calls to firepower management center
 
         :param method: http operation (post, get, put, delete)
         :type method: str
@@ -117,18 +115,20 @@ class Connection:
 
         return response
 
-    def get(self, url: str, params=None, items=None):
-        """get operation with pagination support. If multiple requests are required to
+    def get(self, url: str, params=None, _items=None):
+        """GET operation with pagination support. If multiple requests are required to
         get all items responses are squashed a single response
 
         :param url: path to resource that will be queried
         :type url: str
         :param params: dict of parameters for http request. Defaults to `None`
         :type params: dict, optional
+        :param _items: list of items if response includes multiple pages. Used internally for recursion
+        :type _items: list, optional
         :return: dictionary or list of returned api objects
         :rtype: Union[dict, list]
         """
-        if not utils.is_getbyid_operation(url) and items is None:
+        if not utils.is_getbyid_operation(url) and _items is None:
             if params is None:
                 params = {}
             params['limit'] = defaults.API_PAGING_LIMIT
@@ -138,17 +138,17 @@ class Connection:
         payload = response.json()
 
         if 'paging' in payload:
-            if items is None:
-                items = []
+            if _items is None:
+                _items = []
             if 'items' in payload:
-                items.extend(payload['items'])
+                _items.extend(payload['items'])
                 if 'next' in payload['paging']:
-                    items = self.get(payload['paging']['next'][0], params=None, items=items)
-            return items
+                    _items = self.get(payload['paging']['next'][0], params=None, _items=_items)
+            return _items
         return payload
 
     def delete(self, url: str, params=None):
-        """delete the specified api resource
+        """DELETE specified api resource
 
         :param url: path to resource that will be deleted
         :type url: str
@@ -160,7 +160,7 @@ class Connection:
         return self._request('delete', url, params=params)
 
     def post(self, url: str, data: Dict, params=None, ignore_fields=None):
-        """post operation that is mostly used to create new resources or trigger tasks
+        """POST operation that is mostly used to create new resources or trigger tasks
 
         :param url: path to resource on which POST operation will be performed
         :type url: str
@@ -168,13 +168,15 @@ class Connection:
         :type data: Union[list, dict], optional
         :param params: dict of parameters for http request
         :type params: dict, optional
+        :param ignore_fields: list of fields that should be stripped from payload before performing operation
+        :type ignore_fields: list, optional
         :return: requests.response object
         """
         data = utils.sanitize_payload('post', data, ignore_fields)
         return self._request('post', url, params=params, data=data)
 
     def put(self, url: str, data: Dict, params=None, ignore_fields=None):
-        """put operation that updates existing resources according to the payload provided
+        """PUT operation that updates existing resources according to the payload provided
 
         :param url: path to resource on which POST operation will be performed
         :type url: str
@@ -182,6 +184,8 @@ class Connection:
         :type data: Union[list, dict], optional
         :param params: dict of parameters for http request
         :type params: dict, optional
+        :param ignore_fields: list of fields that should be stripped from payload before performing operation
+        :type ignore_fields: list, optional
         :return: api response
         :rtype: requests.Response
         """
@@ -189,7 +193,7 @@ class Connection:
         return self._request('put', url, data=data, params=params)
 
     def login(self):
-        """basic authentication to firepower management center rest api
+        """Basic authentication to firepower management center rest api
         in case authentication is successful an access and refresh token will be saved to
         the `Connection` object. Subsequent api calls will be performed using the access token
 
@@ -203,7 +207,7 @@ class Connection:
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def refresh(self):
-        """refresh authorization token. This operation is performed for up to three
+        """Refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using `self.login()` will be performed
 
         """
@@ -298,7 +302,8 @@ class Resource:
             namespace = self.NAMESPACE
         options = {
             'base': f'{self.conn.protocol}://{self.conn.hostname}{path}',
-            'config': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_CONFIG_URL}/domain/{self.conn.domain["id"]}{path}',
+            'config': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_CONFIG_URL}/domain/'
+                      f'{self.conn.domain["id"]}{path}',
             'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
         }
@@ -333,6 +338,8 @@ class Resource:
         :type uuid: str, optional
         :param name: name of resource
         :type name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
         :return: api response
         :rtype: Union[dict, list]
         """
@@ -341,7 +348,7 @@ class Resource:
 
     @utils.minimum_version_required
     def update(self, data: Dict, params=None):
-        """Update existing api resource. Existing data will be overriden with
+        """Update existing api resource. Existing data will be overridden with
         the provided payload. The request will be routed to the correct resource
         by extracting the `id` within the payload
 
@@ -429,7 +436,7 @@ class ChildResource(Resource):
     @utils.minimum_version_required
     def update(self, data: Dict, container_uuid=None, container_name=None, params=None):
         """Update existing api resource. Either name or uuid of container resource must be provided
-        Existing data will be overriden with the provided payload. The request will be routed
+        Existing data will be overridden with the provided payload. The request will be routed
         to the correct resource by extracting the `id` within the payload
 
         :param data: data that will be sent to the api endpoint

@@ -2,12 +2,11 @@
 
 import copy
 import uuid
-import packaging
 
+import packaging
 import pytest
 
 import fireREST.exceptions as exc
-
 from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 from fireREST.fmc.policy.accesspolicy.category import Category
 from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
