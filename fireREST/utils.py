@@ -139,12 +139,14 @@ def resolve_by_name(f):
         container_uuid = kwargs.get('container_uuid', None)
         name = kwargs.get('name', None)
         uuid = kwargs.get('uuid', None)
+        params = kwargs.get('params', None)
 
         if container_name and not container_uuid:
-            url = resource._url(resource.CONTAINER_PATH.format(uuid=None))
-            for item in resource._get(url):
+            url = resource.url(resource.CONTAINER_PATH.format(uuid=None))
+            for item in resource.conn.get(url=url, params=params):
                 if item['name'] == container_name:
-                    kwargs['container_uuid'] = item['id']
+                    container_uuid = item['id']
+                    kwargs['container_uuid'] = container_uuid
                     break
             else:
                 raise exc.ResourceNotFoundError(
@@ -152,7 +154,8 @@ def resolve_by_name(f):
                 )
 
         if name and not uuid:
-            for item in resource.get.__wrapped__(*args, **kwargs):
+            url = resource.url(resource.PATH.format(container_uuid=container_uuid, uuid=None))
+            for item in resource.conn.get(url=url, params=params):
                 if item['name'] == name:
                     if f.__name__ == 'get':
                         kwargs['result'] = item
@@ -192,7 +195,7 @@ def support_params(f):
                 elif k in resource.SUPPORTED_PARAMS:
                     params[PARAMS[k]] = v
         params['filter'] = search_filter(filters)
-        kwargs['params'] = {**kwargs['params'], **params} if kwargs['params'] else params
+        kwargs['params'] = {**kwargs['params'], **params} if 'params' in kwargs else params
         return f(*args, **kwargs)
 
     return wrapper

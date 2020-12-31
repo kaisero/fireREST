@@ -27,4 +27,4 @@ class AccessPolicy(Resource):
 
     @utils.support_params
     def get(self, uuid=None, name=None, params=None):
-        super().get(uuid=uuid, name=name, params=params)
+        return super().get(uuid=uuid, name=name, params=params)

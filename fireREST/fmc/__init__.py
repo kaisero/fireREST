@@ -284,7 +284,7 @@ class Resource:
         self.conn = conn
         self.version = conn.version
 
-    def _url(self, path, namespace=None):
+    def url(self, path, namespace=None):
         """Generate url for requests to fmc rest api
 
         :param path: relative path to api resource
@@ -316,7 +316,7 @@ class Resource:
         :return: api response
         :rtype: requests.Response
         """
-        url = self._url(self.PATH.format(uuid=None))
+        url = self.url(self.PATH.format(uuid=None))
         if not params:
             params = {}
         if isinstance(params, list):
@@ -336,7 +336,7 @@ class Resource:
         :return: api response
         :rtype: Union[dict, list]
         """
-        url = self._url(self.PATH.format(uuid=uuid))
+        url = self.url(self.PATH.format(uuid=uuid))
         return self.conn.get(url, params)
 
     @utils.minimum_version_required
@@ -352,7 +352,7 @@ class Resource:
         :return: api response
         :rtype: requests.Response
         """
-        url = self._url(self.PATH.format(uuid=data['id']))
+        url = self.url(self.PATH.format(uuid=data['id']))
         return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
@@ -368,7 +368,7 @@ class Resource:
         :return: api response
         :rtype: requests.Response
         """
-        url = self._url(self.PATH.format(uuid=uuid))
+        url = self.url(self.PATH.format(uuid=uuid))
         return self.conn.delete(url)
 
 
@@ -397,7 +397,7 @@ class ChildResource(Resource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=None))
+        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=None))
         if not params:
             params = {}
         if isinstance(params, list):
@@ -422,7 +422,7 @@ class ChildResource(Resource):
         :return: api response
         :rtype: Union[dict, list]
         """
-        url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=uuid))
+        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=uuid))
         return self.conn.get(url, params)
 
     @utils.resolve_by_name
@@ -443,7 +443,7 @@ class ChildResource(Resource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self._url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
+        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
         return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
@@ -463,5 +463,5 @@ class ChildResource(Resource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self._url(self.PATH.format(uuid=uuid))
+        url = self.url(self.PATH.format(uuid=uuid))
         return self.conn.delete(url)

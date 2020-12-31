@@ -32,34 +32,34 @@ def test_initialization(fmc, constants):
 
 def test_default_url_with_trailing_slash(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}/test'
-    actual_url = fmc._url(path='/test/', namespace='base')
+    actual_url = fmc.url(path='/test/', namespace='base')
     assert actual_url == expected_url
 
 
 def test_default_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}/test'
-    actual_url = fmc._url(path='/test', namespace='base')
+    actual_url = fmc.url(path='/test', namespace='base')
     assert actual_url == expected_url
 
 
 def test_config_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}{API_CONFIG_URL}/domain/{fmc.conn.domain["id"]}/test'
-    actual_url = fmc._url(path='/test', namespace='config')
+    actual_url = fmc.url(path='/test', namespace='config')
     assert actual_url == expected_url
 
 
 def test_platform_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}{API_PLATFORM_URL}/test'
-    actual_url = fmc._url(path='/test', namespace='platform')
+    actual_url = fmc.url(path='/test', namespace='platform')
     assert actual_url == expected_url
 
 
 def test_refresh_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}{API_REFRESH_URL}'
-    actual_url = fmc._url(path='/test', namespace='refresh')
+    actual_url = fmc.url(path='/test', namespace='refresh')
     assert actual_url == expected_url
 
 
 def test_url_with_invalid_namespace(fmc):
     with pytest.raises(exc.InvalidNamespaceError):
-        fmc._url(path='/test', namespace='nonExistingNamespace')
+        fmc.url(path='/test', namespace='nonExistingNamespace')
