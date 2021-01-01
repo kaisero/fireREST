@@ -1,36 +1,25 @@
 # -*- coding: utf-8 -*-
 
-import json
 import logging
-import re
-import requests
-import urllib3
 
 from . import defaults
 from . import exceptions as exc
 from . import utils
 from .fmc import Connection, Resource
+from .fmc.assignment import Assignment
+from.fmc.audit import Audit
+from .fmc.integration import Integration
 from .fmc.object import Object
 from .fmc.policy import Policy
+from .fmc.system import System
+from .fmc.user import User
 
-from copy import deepcopy
-from http.client import responses as http_responses
-from packaging import version
-from requests.auth import HTTPBasicAuth
-from requests.exceptions import ConnectionError
-from time import sleep
-from typing import Dict, List, Union
-from urllib.parse import urlencode
-from uuid import UUID
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
 class FMC(Resource):
-
-    NAMESPACE = 'platform'
-    PATH = '/'
 
     def __init__(
         self,
@@ -45,5 +34,10 @@ class FMC(Resource):
         self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout)
         self.domain = self.conn.domain
         self.version = self.conn.version
+        self.assignment = Assignment(self.conn)
+        self.audit = Audit(self.conn)
+        self.integration = Integration(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
+        self.system = System(self.conn)
+        self.user = User(self.conn)
