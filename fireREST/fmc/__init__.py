@@ -324,8 +324,6 @@ class Resource:
         url = self.url(self.PATH.format(uuid=None))
         if not params:
             params = {}
-        if isinstance(params, list):
-            params['bulk'] = True
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
@@ -407,8 +405,6 @@ class ChildResource(Resource):
         url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=None))
         if not params:
             params = {}
-        if isinstance(params, list):
-            params['bulk'] = True
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
@@ -470,5 +466,5 @@ class ChildResource(Resource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(uuid=uuid))
+        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=uuid))
         return self.conn.delete(url)

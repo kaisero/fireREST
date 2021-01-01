@@ -102,9 +102,33 @@ def test_update_accesspolicy(fmc):
     assert expected_result == actual_result
 
 
+def test_update_accesspolicy_with_duplicate_resource(fmc):
+    data = fmc.policy.accesspolicy.get(name=name)
+    data['id'] = 'AccessPolicyThatDoesNotExist'
+
+    with pytest.raises(exc.ResourceAlreadyExistsError):
+        fmc.policy.accesspolicy.update(data)
+
+
 def test_delete_accesspolicy(fmc):
     expected_result = 200
     accesspolicy_id = fmc.policy.accesspolicy.get(name=name)['id']
     actual_result = fmc.policy.accesspolicy.delete(uuid=accesspolicy_id).status_code
+
+    assert expected_result == actual_result
+
+
+def test_delete_accesspolicy_with_invalid_uuid(fmc):
+    with pytest.raises(exc.ResourceNotFoundError):
+        fmc.policy.accesspolicy.delete(uuid=uuid.uuid4())
+
+
+def test_delete_accesspolicy_by_name(fmc):
+    expected_result = 200
+    policy_name = 'FireREST-AccessPolicyDeleteByName'
+    data = {'name': policy_name, 'defaultAction': {'action': 'BLOCK'}}
+    fmc.policy.accesspolicy.create(data)
+
+    actual_result = fmc.policy.accesspolicy.delete(name=policy_name).status_code
 
     assert expected_result == actual_result
