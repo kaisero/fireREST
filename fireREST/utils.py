@@ -124,6 +124,8 @@ def resolve_by_name(f):
                         kwargs['result'] = item
                     else:
                         kwargs['uuid'] = item['id']
+                        # Make sure name param is not passed to !GET api request
+                        kwargs['name'] = None
                     break
             else:
                 raise exc.ResourceNotFoundError(

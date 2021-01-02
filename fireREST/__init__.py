@@ -8,6 +8,7 @@ from . import utils
 from .fmc import Connection, Resource
 from .fmc.assignment import Assignment
 from .fmc.audit import Audit
+from .fmc.device import Device
 from .fmc.devicecluster import DeviceCluster
 from .fmc.devicehapair import DeviceHAPair
 from .fmc.devicegroup import DeviceGroup
@@ -44,6 +45,7 @@ class FMC(Resource):
         self.assignment = Assignment(self.conn)
         self.audit = Audit(self.conn)
         self.deployment = Deployment(self.conn)
+        self.device = Device(self.conn)
         self.devicecluster = DeviceCluster(self.conn)
         self.devicehapair = DeviceHAPair(self.conn)
         self.devicegroup = DeviceGroup(self.conn)
