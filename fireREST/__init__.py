@@ -7,11 +7,16 @@ from . import exceptions as exc
 from . import utils
 from .fmc import Connection, Resource
 from .fmc.assignment import Assignment
-from.fmc.audit import Audit
+from .fmc.audit import Audit
+from .fmc.devicecluster import DeviceCluster
+from .fmc.devicegroup import DeviceGroup
+from .fmc.deployment import Deployment
+from .fmc.health import Health
 from .fmc.integration import Integration
 from .fmc.object import Object
 from .fmc.policy import Policy
 from .fmc.system import System
+from .fmc.update import Update
 from .fmc.user import User
 
 
@@ -36,8 +41,13 @@ class FMC(Resource):
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)
         self.audit = Audit(self.conn)
+        self.deployment = Deployment(self.conn)
+        self.devicecluster = DeviceCluster(self.conn)
+        self.devicegroup = DeviceGroup(self.conn)
+        self.health = Health(self.conn)
         self.integration = Integration(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)
+        self.update = Update(self.conn)
         self.user = User(self.conn)

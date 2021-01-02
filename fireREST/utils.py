@@ -256,7 +256,7 @@ def search_filter(items=None):
     return ''
 
 
-def filter_params(params: Dict):
+def fix_params(params: Dict):
     """filter out params with empty values
 
     :param params: request params

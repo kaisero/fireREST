@@ -1,7 +1,7 @@
 from typing import Union
 
 from fireREST import utils
-from fireREST.fmc import Connection, ChildResource
+from fireREST.fmc import ChildResource
 
 
 class AccessRule(ChildResource):

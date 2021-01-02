@@ -90,7 +90,7 @@ class Connection:
         response = self.session.request(
             method=method,
             url=url,
-            params=utils.filter_params(params),
+            params=utils.fix_params(params),
             data=json.dumps(data),
             auth=auth,
             headers=self.headers,
@@ -322,8 +322,6 @@ class Resource:
         :rtype: requests.Response
         """
         url = self.url(self.PATH.format(uuid=None))
-        if not params:
-            params = {}
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
@@ -403,8 +401,6 @@ class ChildResource(Resource):
         :rtype: requests.Response
         """
         url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=None))
-        if not params:
-            params = {}
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
