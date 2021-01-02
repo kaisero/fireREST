@@ -9,10 +9,12 @@ from .fmc import Connection, Resource
 from .fmc.assignment import Assignment
 from .fmc.audit import Audit
 from .fmc.devicecluster import DeviceCluster
+from .fmc.devicehapair import DeviceHAPair
 from .fmc.devicegroup import DeviceGroup
 from .fmc.deployment import Deployment
 from .fmc.health import Health
 from .fmc.integration import Integration
+from .fmc.intelligence import Intelligence
 from .fmc.object import Object
 from .fmc.policy import Policy
 from .fmc.system import System
@@ -43,9 +45,11 @@ class FMC(Resource):
         self.audit = Audit(self.conn)
         self.deployment = Deployment(self.conn)
         self.devicecluster = DeviceCluster(self.conn)
+        self.devicehapair = DeviceHAPair(self.conn)
         self.devicegroup = DeviceGroup(self.conn)
         self.health = Health(self.conn)
         self.integration = Integration(self.conn)
+        self.intelligence = Intelligence(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)

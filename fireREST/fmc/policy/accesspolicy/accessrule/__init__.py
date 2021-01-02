@@ -8,10 +8,7 @@ class AccessRule(ChildResource):
     CONTAINER_NAME = 'AccessPolicy'
     CONTAINER_PATH = '/policy/accesspolicies/{uuid}'
     PATH = '/policy/accesspolicies/{container_uuid}/accessrules/{uuid}'
-    SUPPORTED_FILTERS = []
     SUPPORTED_PARAMS = ['category', 'section', 'insert_before', 'insert_after']
-    IGNORE_FOR_CREATE = []
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_CREATE = '6.2.1'
     MINIMUM_VERSION_REQUIRED_GET = '6.1.0'
     MINIMUM_VERSION_REQUIRED_UPDATE = '6.1.0'
