@@ -22,4 +22,3 @@ class Routing:
         self.ospfv3interface = Ospfv3Interface(conn)
         self.staticroute = StaticRoute(conn)
         self.virtualrouter = VirtualRouter(conn)
-
