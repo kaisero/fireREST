@@ -251,9 +251,10 @@ def search_filter(items=None):
     """
     if items:
         filter_str = ''
-        for k, v in items.items():
-            if v:
-                filter_str += f'{k}:{v};'
+        for item in items:
+            for k, v in item.items():
+                if v:
+                    filter_str += f'{k}:{v};'
         return filter_str.rstrip(';')
     return ''
 
