@@ -136,25 +136,25 @@ def test_sanitize_with_valid_list_payload_and_post_operation():
 
 def test_search_filter_with_single_item():
     expected_filter = 'deviceId:457d932a-3dfb-11ea-9b36-8a42de410c5c'
-    actual_filter = utils.search_filter(items={'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c'})
+    actual_filter = utils.search_filter(items=[{'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c'}])
     assert actual_filter == expected_filter
 
 
 def test_search_filter_with_multiple_items():
     expected_filter = 'deviceId:457d932a-3dfb-11ea-9b36-8a42de410c5c;ids:00505699-76B7-0ed3-0000-000268437535'
     actual_filter = utils.search_filter(
-        items={'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c', 'ids': '00505699-76B7-0ed3-0000-000268437535'}
+        items=[{'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c'}, {'ids': '00505699-76B7-0ed3-0000-000268437535'}]
     )
     assert actual_filter == expected_filter
 
 
 def test_search_filter_with_empty_input():
     expected_filter = ''
-    actual_filter = utils.search_filter(items={})
+    actual_filter = utils.search_filter(items=[])
     assert actual_filter == expected_filter
 
 
 def test_search_filter_with_invalid_input():
     expected_filter = ''
-    actual_filter = utils.search_filter(items={'EmptyValue': None})
+    actual_filter = utils.search_filter(items=[{'EmptyValue': None}])
     assert actual_filter == expected_filter
