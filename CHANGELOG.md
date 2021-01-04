@@ -1,3 +1,26 @@
+# 1.0.0
+
+1.0.0 is a major overhaul of the existing FireREST codebase. I decided to
+refactor the whole project to provide a more structured way to interact with
+FMC. Before 1.0.0 all calls to FMC were provided by a `Client` object which was
+replaced by `FMC` that provides a hierarchical access to all resources on FMC.
+
+## Enhancements
+
+Replaced `Client` object with `FMC`
+Provide structured access to api objects. e.g. `fmc.policy.accesspolicy.get`
+Provide more granular error handling using custom exceptions
+
+# 0.1.8
+
+## Bugfixes
+
+Fixed various s2svpn related operations that missed string interpolation
+
+## Enhancements
+
+Added filtering options to all supported api calls
+
 # 0.1.7
 
 ## Bugfixes

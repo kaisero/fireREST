@@ -20,6 +20,9 @@ API_PLATFORM_NAME = 'platform'
 API_CONFIG_URL = '/api/fmc_config/v1'
 API_CONFIG_NAME = 'config'
 
+#: url used to access threat intelligence director related api calls
+API_TID_URL = '/api/fmc_tid/v1'
+
 #: content type. as of 6.6.0 FMC only supports json
 API_CONTENT_TYPE = 'application/json'
 

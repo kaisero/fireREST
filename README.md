@@ -3,16 +3,17 @@
 
 # FireREST
 
-A simple wrapper for firepower management center restful api.
+FireREST is a python library to interface with Cisco Firepower Management Center REST API.
 
 ## Features
 
-* Authentication and automatic session refresh
-* Rate-limit handling with automatic retry operation
+* Authentication and automatic session refresh / re-authentication
+* Rate-limit detection and automatic backoff and retry behavior
 * Automatic squashing of paginated api payloads
-* Sanitization of api payloads received via GET operations and used for PUT/POST operations
-* Debug logging for api calls using logger module
-* Result caching for various operations
+* Sanitization of api payloads for create and update operations
+* Detailed logging of api calls
+* API specific error handling using various custom exceptions
+* Support for resource lookup by name instead of uuid for all CRUD operations
 
 ## Requirements
 
@@ -29,50 +30,25 @@ pip install fireREST
 ### Import api client
 
 ```python
-from fireREST import Client
+from fireREST import FMC
 ```
 
 ### Authentication
 
-FireREST uses basic authentication to authenticate with fmc. In case your authentication token times out the api client
-will automatically try to re-authenticate 3 times and handle any intermediate authentication exceptions.
-
-#### Basic Authentication
-
-```python
-client = Client(hostname='fmc.example.com', username='firerest', password='Cisco123')
-```
-
-### Helper
-
-A variety of helper functions can be used to translate object names to their respective UUID values. Since fmc rest api uses uuid values this is neccessary
-to find pre-existing objects by the name defined in fmc.
-
-#### Object Name to ID
+FireREST uses basic authentication. In case your authentication
+token times out, the api client will automatically refresh the session and retry
+a failed operation. In case all 3 refresh tokens have been the connection object will try to
+re-authenticate again automatically.
 
 ```python
-name = 'NET_OBJ'
-uuid = client.get_object_id_by_name('network', name)
+fmc = FMC(hostname='fmc.example.com', username='firerest', password='Cisco123', domain='Global')
 ```
 
-#### Access Control Policy Name to ID
-
-```python
-name = 'DEV-ACCESS-CONTROL-POLICY'
-uuid = client.get_acp_id_by_name(name)
-```
-
-#### Access Control Policy Rule Name to ID
-
-```python
-acp = 'DEV-ACCESS-CONTROL-POLICY'
-acp_rule = 'PERMIT-INTERNET-ACCESS'
-uuid = client.get_object_id_by_name(acp, acp_rule)
-```
+> **_NOTE:_**  By default `Global` is used as domain
 
 ### Objects
 
-#### Create Network Object
+#### Create network object
 
 ```python
 net_obj = {
@@ -80,40 +56,218 @@ net_obj = {
     'value': '198.18.1.0/24',
 }
 
-response = client.create_object('network', net_obj)
+response = fmc.object.network.create(data=net_obj)
 ```
 
-#### Get Network Object
+> **_NOTE:_**  In case a resource supports the `bulk` option `FireREST` will automatically append `bulk=True` to
+> params if the `data` provided is of type `list` and not `dict`
+
+#### Get all network objects
 
 ```python
-obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
-obj_payload = client.get_object('network', obj_id)
+net_objects = fmc.object.network.get()
 ```
 
-#### Update Network Object
+#### Get specific network object
 
 ```python
-obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
-
-net_obj = {
-    'id': obj_id,
-    'name': 'NetObjViaAPI',
-    'value': '198.18.2.0/24',
-}
-
-response = client.update_object('network', obj_id, net_obj)
+net_objects = fmc.object.network.get(name='NetObjViaAPI')
 ```
 
-#### Delete Network Object
+> **_NOTE:_** You can access resource either by `name` or `uuid`. If a name is specified FireREST will use
+> a filter if supported by the api resource of iterate through all existing resources to find a match
+
+#### Update network object
 
 ```python
-obj_name = 'NetObjViaAPI'
-obj_id = client.get_object_id_by_name('network', 'NetObjViaAPI')
-response = client.delete_object('network', obj_id)
+net_obj = fmc.object.network.get(name='NetObjViaAPI')
+net_obj['name'] = 'RenamedNetObjViaAPI'
+response = fmc.object.network.update(data=net_obj)
 ```
 
+> **_NOTE:_**  FireREST automatically extracts the `id` field of the provided data `dict` to update the correct resource
+
+#### Delete network object
+
+```python
+response = fmc.object.network.delete(name='NetObjViaAPI')
+```
+
+## Supported operations
+
+Since FireREST does not try to provide a python object model nearly all api
+calls up to version 6.7.0 are available which includes but is not limited to
+the following CRUD operations:
+
+```
+├── assignment
+│   ├── policyassignment
+├── audit
+│   ├── auditrecord
+├── deployment
+│   ├── deployabledevice
+│   │   ├── deployment
+│   │   ├── pendingchanges
+│   ├── deploymentrequest
+│   ├── jobhistory
+│   └── rollbackrequest
+├── device
+│   ├── devicerecord
+│   │   ├── bridgegroupinterface
+│   │   ├── etherchannelinterface
+│   │   ├── fpinterfacestatistics
+│   │   ├── fplogicalinterface
+│   │   ├── fpphysicalinterface
+│   │   ├── inlineset
+│   │   ├── interfaceevent
+│   │   ├── operational
+│   │   │   ├── command
+│   │   │   ├── metric
+│   │   ├── physicalinterface
+│   │   ├── redundantinterface
+│   │   ├── routing
+│   │   │   ├── bgp
+│   │   │   ├── bgpgeneralsettings
+│   │   │   ├── ipv4staticroute
+│   │   │   ├── ipv6staticroute
+│   │   │   ├── ospfinterface
+│   │   │   ├── ospfv2route
+│   │   │   ├── ospfv3interface
+│   │   │   ├── staticroute
+│   │   │   └── virtualrouter
+│   │   ├── subinterface
+│   │   ├── virtualswitch
+│   │   ├── virtualtunnelinterface
+│   │   └── vlaninterface
+├── devicecluster
+│   ├── ftddevicecluster
+├── devicegroup
+│   ├── devicegrouprecord
+├── devicehapair
+│   ├── ftddevicehapair
+│   │   ├── failoverinterfacemacaddressconfig
+│   │   ├── monitoredinterface
+├── health
+│   ├── alert
+│   ├── metric
+├── integration
+│   ├── cloudeventsconfig
+│   ├── cloudregion
+│   ├── externallookup
+│   ├── externalstorage
+├── intelligence
+│   ├── taxiiconfig
+│   │   ├── collection
+│   │   ├── discoveryinfo
+│   └── tid
+│       ├── element
+│       ├── incident
+│       ├── indicator
+│       ├── observable
+│       ├── setting
+│       └── source
+├── job
+│   └── taskstatus
+├── object
+│   ├── anyprotocolportobject
+│   ├── application
+│   ├── applicationcategory
+│   ├── applicationfilter
+│   ├── applicationproductivities
+│   ├── applicationrisk
+│   ├── applicationtag
+│   ├── applicationtype
+│   ├── aspathlist
+│   ├── certenrollment
+│   ├── communitylist
+│   ├── continent
+│   ├── country
+│   ├── dnsservergroup
+│   ├── endpointdevicetype
+│   ├── expandedcommunitylist
+│   ├── extendedaccesslist
+│   ├── fqdn
+│   ├── geolocation
+│   ├── globaltimezone
+│   ├── host
+│   ├── icmpv4object
+│   ├── icmpv6object
+│   ├── ikev1ipsecproposal
+│   ├── ikev1policy
+│   ├── ikev2ipsecproposal
+│   ├── ikev2policy
+│   ├── interface
+│   ├── interfacegroup
+│   ├── ipv4prefixlist
+│   ├── ipv6prefixlist
+│   ├── isesecuritygrouptag
+│   ├── keychain
+│   ├── network
+│   ├── networkaddress
+│   ├── networkgroup
+│   ├── policylist
+│   ├── port
+│   ├── portobjectgroup
+│   ├── protocolportobject
+│   ├── range
+│   ├── realmuser
+│   ├── realmusergroup
+│   ├── routemap
+│   ├── securitygrouptag
+│   ├── securityzone
+│   ├── siurlfeed
+│   ├── siurllist
+│   ├── slamonitor
+│   ├── standardaccesslist
+│   ├── standardcommunitylist
+│   ├── timerange
+│   ├── timezone
+│   ├── tunneltag
+│   ├── url
+│   ├── urlcategory
+│   ├── urlgroup
+│   ├── variableset
+│   ├── vlangrouptag
+│   └── vlantag
+├── policy
+│   ├── accesspolicy
+│   │   ├── accessrule
+│   │   ├── category
+│   │   ├── defaultaction
+│   │   ├── inheritancesettings
+│   │   ├── loggingsettings
+│   │   ├── operational
+│   │   │   ├── hitcounts
+│   ├── filepolicy
+│   ├── ftdnatpolicy
+│   │   ├── autonatrule
+│   │   ├── manualnatrule
+│   │   ├── natrule
+│   ├── ftds2svpn
+│   │   ├── advancedsettings
+│   │   ├── endpoint
+│   │   ├── ikesettings
+│   │   ├── ipsecsettings
+│   ├── intrusionpolicy
+│   │   ├── intrusionrule
+│   ├── prefilterpolicy
+│   │   ├── defaultaction
+│   │   ├── operational
+│   │   │   ├── hitcounts
+│   │   ├── prefilterrule
+│   ├── snmpalert
+│   └── syslogalert
+├── system
+│   ├── info
+│   │   ├── domain
+│   │   └── serverversion
+├── update
+│   └── upgradepackage
+│       ├── applicabledevice
+└── user
+    ├── authrole
+    └── ssoconfig
+```
 
 ## Authors
 
