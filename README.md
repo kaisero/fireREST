@@ -62,11 +62,20 @@ response = fmc.object.network.create(data=net_obj)
 > **_NOTE:_**  In case a resource supports the `bulk` option `FireREST` will automatically append `bulk=True` to
 > params if the `data` provided is of type `list` and not `dict`
 
-#### Get network object
+#### Get all network objects
 
 ```python
-net_obj = fmc.object.network.get(name='NetObjViaAPI')
+net_objects = fmc.object.network.get()
 ```
+
+#### Get specific network object
+
+```python
+net_objects = fmc.object.network.get(name='NetObjViaAPI')
+```
+
+> **_NOTE:_** You can access resource either by `name` or `uuid`. If a name is specified FireREST will use
+> a filter if supported by the api resource of iterate through all existing resources to find a match
 
 #### Update network object
 
@@ -126,11 +135,6 @@ the following CRUD operations:
 │   │   │   ├── ospfv3interface
 │   │   │   ├── staticroute
 │   │   │   └── virtualrouter
-│   │   │       ├── bgp
-│   │   │       ├── ipv4staticroute
-│   │   │       ├── ipv6staticroute
-│   │   │       ├── ospfinterface
-│   │   │       ├── ospfv2route
 │   │   ├── subinterface
 │   │   ├── virtualswitch
 │   │   ├── virtualtunnelinterface
