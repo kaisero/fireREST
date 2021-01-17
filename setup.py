@@ -22,7 +22,7 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/kaisero/fireREST.git',
     packages=setuptools.find_packages(),
-    install_requires=['packaging>=20.3', 'requests>=2.23.0', 'retry>=0.9.2', 'urllib3>=1.25.8'],
+    install_requires=['packaging>=20.3', 'requests>=2.23.0', 'retry>=0.9.2', 'simplejson>=3.17.2', 'urllib3>=1.25.8'],
     setup_requires=[],
     tests_require=['pytest>=5.4.1', 'pytest-runner>=52'],
     classifiers=[
