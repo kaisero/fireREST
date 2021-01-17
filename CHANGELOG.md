@@ -1,3 +1,11 @@
+# 1.0.1
+
+## Bugfixes
+
+Fixed an issue where simplejson installation cause FireREST to be unusable
+due to requests library using simplejson instead of built-in json library
+causing simplejson exception to be thrown instead of json.DecodeError exception
+
 # 1.0.0
 
 1.0.0 is a major overhaul of the existing FireREST codebase. I decided to

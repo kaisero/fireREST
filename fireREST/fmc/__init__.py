@@ -2,6 +2,7 @@
 
 import json
 import logging
+import simplejson
 from http.client import responses as http_responses
 from typing import Dict, Union
 from urllib.parse import urlencode
@@ -111,6 +112,8 @@ class Connection:
             try:
                 logger.debug('\n"response": %s', json.dumps(response.json(), sort_keys=True, indent=4))
             except json.JSONDecodeError:
+                pass
+            except simplejson.errors.JSONDecodeError:
                 pass
 
         return response
@@ -278,7 +281,8 @@ class Resource:
     MINIMUM_VERSION_REQUIRED_DELETE = '99.99.99'
 
     def __init__(
-        self, conn,
+        self,
+        conn,
     ):
         """Initialize Resource object
 
@@ -303,7 +307,7 @@ class Resource:
         options = {
             'base': f'{self.conn.protocol}://{self.conn.hostname}{path}',
             'config': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_CONFIG_URL}/domain/'
-                      f'{self.conn.domain["id"]}{path}',
+            f'{self.conn.domain["id"]}{path}',
             'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
