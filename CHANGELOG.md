@@ -1,3 +1,9 @@
+# 1.0.2
+
+## Enhancements
+
+Added `Override` resource to all objects that support object overrides
+
 # 1.0.1
 
 ## Bugfixes
