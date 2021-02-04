@@ -187,7 +187,9 @@ def handle_errors(f):
         try:
             validate_data(kwargs.get('method', args[1]), kwargs.get('data', args[-1]))
             response = f(*args, **kwargs)
-            response.raise_for_status()
+            # only applicable if dry_run is disabled
+            if not args[0].dry_run:
+                response.raise_for_status()
         except HTTPError:
             if response.status_code == 401 and 'Access token invalid' in response.text:
                 # Invalid access token detected. Refresh authorization token
