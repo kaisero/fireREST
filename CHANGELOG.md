@@ -1,3 +1,14 @@
+# 1.0.3
+
+## Enhancements
+
+Added dry_mode switch to FMC object. When using dry_mode PUT, POST and DELETE
+operations are not executed and only logged to FireREST logger
+
+## Bugfixes
+
+Added missing `Override` reference to host object
+
 # 1.0.2
 
 ## Enhancements

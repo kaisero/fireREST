@@ -30,6 +30,19 @@ def test_authentication_with_correct_credentials(conn):
     assert 'X-auth-refresh-token' in conn.headers
 
 
+def test_authentication_with_correct_credentials_and_dry_run_enabled(conn):
+    conn.domains = None
+    conn.dry_run = True
+    del conn.headers['X-auth-access-token']
+    del conn.headers['X-auth-refresh-token']
+
+    conn.login()
+
+    assert conn.domains is not None
+    assert 'X-auth-access-token' in conn.headers
+    assert 'X-auth-refresh-token' in conn.headers
+
+
 def test_authentication_with_incorrect_credentials(connection):
     connection.cred = HTTPBasicAuth('firerest', 'incorrect-password')
     with pytest.raises(exc.AuthError):
@@ -57,6 +70,17 @@ def test_authentication_refresh_counter_incrementing(conn):
 
 def test_re_authentication(conn):
     conn.refresh_counter = 3
+    conn.refresh()
+
+    expected_counter = 0
+    actual_counter = conn.refresh_counter
+
+    assert actual_counter == expected_counter
+
+
+def test_re_authentication_with_dry_run_enabled(conn):
+    conn.refresh_counter = 3
+    conn.dry_run = True
     conn.refresh()
 
     expected_counter = 0

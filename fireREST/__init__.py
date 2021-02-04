@@ -27,8 +27,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 
-class FMC(Resource):
-
+class FMC:
     def __init__(
         self,
         hostname: str,
@@ -38,8 +37,9 @@ class FMC(Resource):
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
+        dry_run=defaults.DRY_RUN,
     ):
-        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout)
+        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run)
         self.domain = self.conn.domain
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)
