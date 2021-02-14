@@ -29,7 +29,6 @@ class NatRule(ChildResource):
     @utils.support_params
     def get(
         self,
-        data: Union[dict, list],
         container_uuid=None,
         container_name=None,
         uuid=None,
