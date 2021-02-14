@@ -62,9 +62,8 @@ from fireREST.fmc.object.vlangrouptag import VlanGroupTag
 from fireREST.fmc.object.vlantag import VlanTag
 
 
-class Object(Resource):
+class Object:
     def __init__(self, conn: Connection):
-        super().__init__(conn)
         self.anyprotocolportobject = AnyProtocolPortObject(conn)
         self.application = Application(conn)
         self.applicationcategory = ApplicationCategory(conn)

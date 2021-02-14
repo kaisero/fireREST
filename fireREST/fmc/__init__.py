@@ -33,6 +33,7 @@ class Connection:
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
+        dry_run=defaults.DRY_RUN,
     ):
         """Initialize connection object. It is highly recommended to use a
         dedicated user for api operations
@@ -51,6 +52,8 @@ class Connection:
         :type domain: str
         :param timeout: timeout value for http requests. Defaults to `120` seconds
         :type timeout: int, optional
+        :param dry_run: only log POST,PUT and DELETE api calls
+        :type dry_run: bool, optional
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -65,6 +68,7 @@ class Connection:
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
         self.session = requests.Session()
         self.timeout = timeout
+        self.dry_run = dry_run
         self.verify_cert = verify_cert
         self.domains = None
         self.login()
@@ -88,34 +92,47 @@ class Connection:
         :return: api response
         :rtype: requests.Response
         """
-        response = self.session.request(
-            method=method,
-            url=url,
-            params=utils.fix_params(params),
-            data=json.dumps(data),
-            auth=auth,
-            headers=self.headers,
-            timeout=self.timeout,
-            verify=self.verify_cert,
-        )
-        msg = {
-            'method': method.upper(),
-            'url': url,
-            'params': urlencode(params) if params else '',
-            'data': data if data else '',
-            'status': f'{http_responses[response.status_code]} ({response.status_code})',
-        }
-        if response.status_code >= 400:
-            logger.error('\n%s', json.dumps(msg, indent=4))
+        params = utils.fix_params(params)
+        response = None
+        # dry_run only affects PUT, POST and DELETE operations
+        # dry_run is not applicable for authentication related operations (login/refresh)
+        if self.dry_run and method.lower() != 'get' and not '/v1/auth/' in url:
+            msg = {
+                'method': method.upper(),
+                'url': url,
+                'params': urlencode(params) if params else '',
+                'data': data if data else '',
+                'dry_run': True,
+            }
+            logger.info(msg)
         else:
-            logger.info('\n%s', json.dumps(msg, indent=4))
-            try:
-                logger.debug('\n"response": %s', json.dumps(response.json(), sort_keys=True, indent=4))
-            except json.JSONDecodeError:
-                pass
-            except simplejson.errors.JSONDecodeError:
-                pass
-
+            response = self.session.request(
+                method=method,
+                url=url,
+                params=params,
+                data=json.dumps(data),
+                auth=auth,
+                headers=self.headers,
+                timeout=self.timeout,
+                verify=self.verify_cert,
+            )
+            msg = {
+                'method': method.upper(),
+                'url': url,
+                'params': urlencode(params) if params else '',
+                'data': data if data else '',
+                'status': f'{http_responses[response.status_code]} ({response.status_code})',
+            }
+            if response.status_code >= 400:
+                logger.error('\n%s', json.dumps(msg, indent=4))
+            else:
+                logger.info('\n%s', json.dumps(msg, indent=4))
+                try:
+                    logger.debug('\n"response": %s', json.dumps(response.json(), sort_keys=True, indent=4))
+                except json.JSONDecodeError:
+                    pass
+                except simplejson.errors.JSONDecodeError:
+                    pass
         return response
 
     def get(self, url: str, params=None, _items=None):

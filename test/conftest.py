@@ -7,12 +7,22 @@ from fireREST.fmc import Connection
 
 
 STATE = {
+    'object': {
+        'network': {
+            'name': 'FireREST-NetworkObj'
+        }
+    },
     'policy': {
         'accesspolicy': {
             'name': 'FireREST-AccessPolicy',
             'accessrule': {
                 'name': 'FireREST-AccessRule'
             }
+        }
+    },
+    'device': {
+        'devicerecord': {
+            'name': 'ftd01.example.com'
         }
     }
 }
