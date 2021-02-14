@@ -5,6 +5,7 @@ from fireREST.fmc.device.devicerecord.fpinterfacestatistics import FpInterfaceSt
 from fireREST.fmc.device.devicerecord.fplogicalinterface import FpLogicalInterface
 from fireREST.fmc.device.devicerecord.fpphysicalinterface import FpPhysicalInterface
 from fireREST.fmc.device.devicerecord.inlineset import InlineSet
+from fireREST.fmc.device.devicerecord.interfaceevent import InterfaceEvent
 from fireREST.fmc.device.devicerecord.operational import Operational
 from fireREST.fmc.device.devicerecord.redundantinterface import RedundantInterface
 from fireREST.fmc.device.devicerecord.routing import Routing
@@ -31,6 +32,7 @@ class DeviceRecord(Resource):
         self.fplogicalinterface = FpLogicalInterface(conn)
         self.fpphysicalinterface = FpPhysicalInterface(conn)
         self.inlineset = InlineSet(conn)
+        self.interfaceevent = InterfaceEvent(conn)
         self.operational = Operational(conn)
         self.redundantinterface = RedundantInterface(conn)
         self.routing = Routing(conn)
