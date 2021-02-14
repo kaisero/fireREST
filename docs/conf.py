@@ -368,3 +368,9 @@ epub_exclude_files = ['search.html']
 
 # If false, no index is generated.
 # epub_use_index = True
+
+# apidoc
+apidoc_module_dir = '../fireREST'
+apidoc_output_dir = 'reference'
+apidoc_excluded_paths = ['test']
+apidoc_separate_modules = True
