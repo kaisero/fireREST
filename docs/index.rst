@@ -1,8 +1,3 @@
-.. FireREST documentation master file, created by
-   sphinx-quickstart on Mon Dec  7 17:24:47 2020.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
 .. toctree::
    :maxdepth: 3
 
@@ -55,9 +50,12 @@ a failed operation. If all 3 refresh tokens have been used up the connection obj
 
    By default domain is set to `Global`
 
+===============
 CRUD Operations
+===============
 
 Objects
+-------
 
 Create network object
 
@@ -106,7 +104,7 @@ Update network object
 
    FireREST automatically extracts the `id` field of the provided data `dict` to update the correct resource.
 
-##### Delete network object
+Delete network object
 
 .. code-block:: python
 
