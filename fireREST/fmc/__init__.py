@@ -440,6 +440,8 @@ class ChildResource(Resource):
         :type uuid: str, optional
         :param name: name of resource
         :type name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
         :return: api response
         :rtype: Union[dict, list]
         """

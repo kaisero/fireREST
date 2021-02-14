@@ -101,7 +101,7 @@ def resolve_by_name(f):
         container_uuid = kwargs.get('container_uuid', None)
         name = kwargs.get('name', None)
         uuid = kwargs.get('uuid', None)
-        params = kwargs.get('params', None)
+        params = deepcopy(kwargs.get('params', None))
 
         if container_name and not container_uuid:
             url = resource.url(resource.CONTAINER_PATH.format(uuid=None))
@@ -112,8 +112,7 @@ def resolve_by_name(f):
                     break
             else:
                 raise exc.ResourceNotFoundError(
-                    msg=f'Resource of type {resource.CONTAINER_PATH} '
-                        f'with name "{resource.CONTAINER_NAME}" does not exist'
+                    msg=f'Resource of type {resource.CONTAINER_NAME} with name "{container_name}" does not exist'
                 )
 
         if name and not uuid:
@@ -232,13 +231,15 @@ def raise_for_status(response):
     errors = {
         400: [{'msg': 'Duplicate Name', 'exception': exc.ResourceAlreadyExistsError}],
         401: [{'msg': 'User authentication failed', 'exception': exc.AuthError}],
+        405: [{'msg': 'is not supported', 'exception': exc.UnsupportedOperationError}]
     }
     if status_code in errors:
         for error in errors[status_code]:
             if error['msg'] in response.text:
                 raise error['exception'](msg=response.json()['error']['messages'][0]['description'])
     try:
-        raise exceptions.get(status_code, HTTPError)(msg=response.json()['error']['messages'][0]['description'])
+        raise exceptions.get(status_code,
+                             exc.GenericApiError)(msg=response.json()['error']['messages'][0]['description'])
     except ValueError:
         raise exceptions.get(status_code, HTTPError)()
 
