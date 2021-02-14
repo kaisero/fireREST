@@ -21,7 +21,7 @@ class NatRule(ChildResource):
         'translated_source_port',
         'translated_destination_port',
     ]
-    SUPPORTED_PARAMS = ['']
+    SUPPORTED_PARAMS = []
     IGNORE_FOR_CREATE = []
     IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_GET = '6.2.3'
