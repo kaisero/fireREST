@@ -8,6 +8,8 @@ operations are not executed and only logged to FireREST logger
 ## Bugfixes
 
 Added missing `Override` reference to host object
+Fixed issue with container name resolution that caused incorrect params to be passed to GET_BY_ID operations
+Fixed an issue where HTTPErrors where incorrectly raised, causing confusing exceptions
 
 # 1.0.2
 
