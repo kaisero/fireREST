@@ -96,7 +96,7 @@ class Connection:
         response = None
         # dry_run only affects PUT, POST and DELETE operations
         # dry_run is not applicable for authentication related operations (login/refresh)
-        if self.dry_run and method.lower() != 'get' and not '/v1/auth/' in url:
+        if self.dry_run and method.lower() != 'get' and '/v1/auth/' not in url:
             msg = {
                 'method': method.upper(),
                 'url': url,
@@ -151,8 +151,10 @@ class Connection:
         if not utils.is_getbyid_operation(url) and _items is None:
             if params is None:
                 params = {}
-            params['limit'] = defaults.API_PAGING_LIMIT
-            params['expanded'] = defaults.API_EXPANSION_MODE
+            if 'limit' not in params:
+                params['limit'] = defaults.API_PAGING_LIMIT
+            if 'expanded' not in params:
+                params['expanded'] = defaults.API_EXPANSION_MODE
 
         response = self._request('get', url, params=params)
         payload = response.json()
@@ -298,8 +300,7 @@ class Resource:
     MINIMUM_VERSION_REQUIRED_DELETE = '99.99.99'
 
     def __init__(
-        self,
-        conn,
+        self, conn,
     ):
         """Initialize Resource object
 
@@ -406,6 +407,7 @@ class ChildResource(Resource):
     # path to container class that hosts the ChildResource
     CONTAINER_PATH = '/'
 
+    @utils.resolve_by_name
     @utils.minimum_version_required
     def create(self, data: Union[dict, list], container_uuid=None, container_name=None, params=None):
         """Create api resource. Either name or uuid of container resource must be provided

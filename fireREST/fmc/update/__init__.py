@@ -6,6 +6,7 @@ from fireREST.fmc.update.upgradepackage import UpgradePackage
 
 
 class Update(Resource):
+    NAMESPACE = 'platform'
     PATH = '/updates/{uuid}'
 
     def __init__(self, conn):

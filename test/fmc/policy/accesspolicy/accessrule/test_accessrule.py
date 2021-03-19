@@ -17,6 +17,7 @@ def accesspolicy(request, fmc):
 
     def teardown():
         fmc.policy.accesspolicy.delete(uuid=policy['id'])
+
     request.addfinalizer(teardown)
 
     return policy
@@ -40,10 +41,7 @@ def test_create_accessrule(fmc, accesspolicy):
 
 def test_create_accessrules_using_bulk_operation(fmc, accesspolicy):
     expected_result = 201
-    data = [
-        {'name': 'BulkRule01', 'action': 'ALLOW'},
-        {'name': 'BulkRule02', 'action': 'ALLOW'}
-    ]
+    data = [{'name': 'BulkRule01', 'action': 'ALLOW'}, {'name': 'BulkRule02', 'action': 'ALLOW'}]
 
     response = fmc.policy.accesspolicy.accessrule.create(container_uuid=accesspolicy['id'], data=data)
     actual_result = response.status_code
@@ -55,9 +53,9 @@ def test_create_accessrule_in_mandatory_section(fmc, accesspolicy):
     expected_result = 201
     data = {'name': 'MandatoryAccessRule', 'action': 'ALLOW'}
 
-    actual_result = fmc.policy.accesspolicy.accessrule.create(container_uuid=accesspolicy['id'],
-                                                              section='Mandatory',
-                                                              data=data).status_code
+    actual_result = fmc.policy.accesspolicy.accessrule.create(
+        container_uuid=accesspolicy['id'], section='Mandatory', data=data
+    ).status_code
 
     assert expected_result == actual_result
 
@@ -66,20 +64,22 @@ def test_create_accessrule_in_default_section(fmc, accesspolicy):
     expected_result = 201
     data = {'name': 'DefaultAccessRule', 'action': 'ALLOW'}
 
-    actual_result = fmc.policy.accesspolicy.accessrule.create(container_uuid=accesspolicy['id'],
-                                                              section='Default',
-                                                              data=data).status_code
+    actual_result = fmc.policy.accesspolicy.accessrule.create(
+        container_uuid=accesspolicy['id'], section='Default', data=data
+    ).status_code
 
     assert expected_result == actual_result
 
 
 def test_create_accessrule_with_invalid_section_should_fail_with_generic_api_error(fmc, accesspolicy):
     with pytest.raises(exc.GenericApiError) as excinfo:
+
         def f():
             data = {'name': 'DefaultAccessRule', 'action': 'ALLOW'}
-            actual_result = fmc.policy.accesspolicy.accessrule.create(container_uuid=accesspolicy['id'],
-                                                                      section='InvalidSection',
-                                                                      data=data)
+            fmc.policy.accesspolicy.accessrule.create(
+                container_uuid=accesspolicy['id'], section='InvalidSection', data=data
+            )
+
         f()
 
     assert str(excinfo.value) == 'Only mandatory and default are the allowed option in parameter section'
@@ -110,8 +110,9 @@ def get_accessrules_by_accesspolicy_name(fmc, accesspolicy):
 def test_get_accessrule_by_name(fmc, accesspolicy):
     accessrule = STATE['policy']['accesspolicy']['accessrule']
     expected_result = STATE['policy']['accesspolicy']['accessrule']['name']
-    actual_result = fmc.policy.accesspolicy.accessrule.get(container_uuid=accesspolicy['id'],
-                                                           name=accessrule['name'])['name']
+    actual_result = fmc.policy.accesspolicy.accessrule.get(container_uuid=accesspolicy['id'], name=accessrule['name'])[
+        'name'
+    ]
 
     assert expected_result == actual_result
 
@@ -123,10 +124,12 @@ def test_get_accessrule_by_name_with_nonexisting_name(fmc, accesspolicy):
 
 def test_get_accessrule_by_uuid(fmc, accesspolicy):
     expected_result = STATE['policy']['accesspolicy']['accessrule']['name']
-    accessrule_id = fmc.policy.accesspolicy.accessrule.get(container_uuid=accesspolicy['id'],
-                                                           name=STATE['policy']['accesspolicy']['accessrule']['name'])['id']
-    actual_result = fmc.policy.accesspolicy.accessrule.get(container_uuid=accesspolicy['id'],
-                                                           uuid=accessrule_id)['name']
+    accessrule_id = fmc.policy.accesspolicy.accessrule.get(
+        container_uuid=accesspolicy['id'], name=STATE['policy']['accesspolicy']['accessrule']['name']
+    )['id']
+    actual_result = fmc.policy.accesspolicy.accessrule.get(container_uuid=accesspolicy['id'], uuid=accessrule_id)[
+        'name'
+    ]
 
     assert expected_result == actual_result
 
@@ -157,8 +160,8 @@ def test_update_accessrule(fmc, accesspolicy):
 def test_delete_accessrule(fmc, accesspolicy):
     expected_result = 200
     actual_result = fmc.policy.accesspolicy.accessrule.delete(
-        container_uuid=accesspolicy['id'],
-        uuid=STATE['policy']['accesspolicy']['accessrule']['id']).status_code
+        container_uuid=accesspolicy['id'], uuid=STATE['policy']['accesspolicy']['accessrule']['id']
+    ).status_code
 
     assert expected_result == actual_result
 

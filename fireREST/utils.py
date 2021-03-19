@@ -105,7 +105,7 @@ def resolve_by_name(f):
 
         if container_name and not container_uuid:
             url = resource.url(resource.CONTAINER_PATH.format(uuid=None))
-            for item in resource.conn.get(url=url, params=params):
+            for item in resource.conn.get(url=url, params=None):
                 if item['name'] == container_name:
                     container_uuid = item['id']
                     kwargs['container_uuid'] = container_uuid
@@ -229,17 +229,22 @@ def raise_for_status(response):
         500: exc.GenericApiError,
     }
     errors = {
-        400: [{'msg': 'Duplicate Name', 'exception': exc.ResourceAlreadyExistsError}],
+        400: [
+            {'msg': 'Duplicate Name', 'exception': exc.ResourceAlreadyExistsError},
+            {'msg': 'You do not have the required authorization', 'exception': exc.AuthorizationError},
+        ],
         401: [{'msg': 'User authentication failed', 'exception': exc.AuthError}],
-        405: [{'msg': 'is not supported', 'exception': exc.UnsupportedOperationError}]
+        403: [{'msg': 'The user is not authorized', 'exception': exc.AuthorizationError}],
+        405: [{'msg': 'is not supported', 'exception': exc.UnsupportedOperationError}],
     }
     if status_code in errors:
         for error in errors[status_code]:
             if error['msg'] in response.text:
                 raise error['exception'](msg=response.json()['error']['messages'][0]['description'])
     try:
-        raise exceptions.get(status_code,
-                             exc.GenericApiError)(msg=response.json()['error']['messages'][0]['description'])
+        raise exceptions.get(status_code, exc.GenericApiError)(
+            msg=response.json()['error']['messages'][0]['description']
+        )
     except ValueError:
         raise exceptions.get(status_code, HTTPError)()
 

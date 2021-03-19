@@ -11,7 +11,6 @@ from fireREST.fmc.device.devicerecord.routing.virtualrouter import VirtualRouter
 
 
 class Routing:
-
     def __init__(self, conn: Connection):
         self.bgp = Bgp(conn)
         self.bgpgeneralsettings = BgpGeneralSettings(conn)

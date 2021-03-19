@@ -26,7 +26,6 @@ from fireREST.fmc.object.ikev1ipsecproposal import Ikev1IpsecProposal
 from fireREST.fmc.object.ikev1policy import Ikev1Policy
 from fireREST.fmc.object.ikev2ipsecproposal import Ikev2IpsecProposal
 from fireREST.fmc.object.ikev2policy import Ikev2Policy
-from fireREST.fmc.object.interfacegroup import InterfaceGroup
 from fireREST.fmc.object.interface import Interface
 from fireREST.fmc.object.interfacegroup import InterfaceGroup
 from fireREST.fmc.object.ipv4prefixlist import Ipv4PrefixList

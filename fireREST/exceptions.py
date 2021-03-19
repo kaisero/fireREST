@@ -4,79 +4,67 @@ from . import defaults
 
 
 class GenericApiError(Exception):
-    """generic api error"""
+    """Generic api error"""
 
     def __init__(self, msg='', *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
+        self.__dict__.update(kwargs)
+        super().__init__(msg, *args)
 
 
 class InvalidNamespaceError(Exception):
-    """invalid namespace is being passed"""
+    """Invalid api namespace specified"""
+
+    def __init__(self, msg='', *args, **kwargs):
+        self.__dict__.update(kwargs)
+        super().__init__(msg, *args)
+
+
+class AuthError(GenericApiError):
+    """Authentication failure"""
+
+
+class AuthorizationError(GenericApiError):
+    """Authorization failure"""
+
+
+class AuthRefreshError(GenericApiError):
+    """Api token refresh cannot be refreshed"""
+
+
+class RateLimitException(GenericApiError):
+    """API rate limiter kicked in"""
+
+
+class UnsupportedOperationError(GenericApiError):
+    """Unsupported operation is being performed"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
-class AuthError(Exception):
-    """generic authentication failure"""
+class UnprocessableEntityError(GenericApiError):
+    """Uprocessable entity passed to fmc"""
 
     def __init__(self, msg='', *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
-class AuthRefreshError(Exception):
-    """api token refresh cannot be refreshed"""
+class PayloadLimitExceededError(GenericApiError):
+    """Size limit of api payload is exceeded"""
 
-    def __init__(self, msg='', *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
-
-
-class RateLimitException(Exception):
-    """fmc rate limiter kicks in"""
-
-    def __init__(self, msg='', *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
-
-
-class UnsupportedOperationError(Exception):
-    """unsupported operation is being performed"""
-
-    def __init__(self, msg='', *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
-
-
-class UnprocessableEntityError(Exception):
-    """unprocessable entity passed to fmc rest api"""
-
-    def __init__(self, msg='', *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
-
-
-class PayloadLimitExceededError(Exception):
-    """size limit of api payload is exceeded"""
-
-    MSG = f'Payload exceeds maximum size of {defaults.API_PAYLOAD_SIZE_MAX}'
+    MSG = f'Payload exceeds maximum size of {defaults.API_PAYLOAD_SIZE_MAX} bytes'
 
     def __init__(self, msg=MSG, *args, **kwargs):
         super().__init__(msg, *args, **kwargs)
 
 
-class ResourceNotFoundError(Exception):
-    """requested resource cannot not be found"""
-
-    def __init__(self, msg, *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
+class ResourceNotFoundError(GenericApiError):
+    """Requested resource cannot not be found"""
 
 
-class ResourceAlreadyExistsError(Exception):
-    """create operations failed because a resource with the same name already exists"""
-
-    def __init__(self, msg, *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
+class ResourceAlreadyExistsError(GenericApiError):
+    """Create operation failed because a resource with the same name already exists"""
 
 
-class DomainNotFoundError(Exception):
-    """domain could not be found by name"""
-
-    def __init__(self, msg, *args, **kwargs):
-        super().__init__(msg, *args, **kwargs)
+class DomainNotFoundError(GenericApiError):
+    """FMC domain could not be found"""

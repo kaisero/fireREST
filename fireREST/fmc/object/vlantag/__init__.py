@@ -12,4 +12,3 @@ class VlanTag(Resource):
     def __init__(self, conn: Connection):
         super().__init__(conn)
         self.override = Override(conn)
-
