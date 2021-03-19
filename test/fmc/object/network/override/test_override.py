@@ -10,25 +10,20 @@ def setup(fmc):
     try:
         device = fmc.device.devicerecord.get(name=STATE['device']['devicerecord']['name'])
         net_obj = {
-                'name': 'FireREST-NetworkObj',
-                'value': '198.18.1.0/24',
-                'overridable': True,
+            'name': 'FireREST-NetworkObj',
+            'value': '198.18.1.0/24',
+            'overridable': True,
         }
         STATE['object']['network'] = fmc.object.network.create(data=net_obj).json()
 
         net_override = {
             'overrides': {
-                'target': {
-                    'type': 'Device',
-                    'id': device['id']
-                },
-                'parent': {
-                    'id': STATE['object']['network']['id']
-                }
+                'target': {'type': 'Device', 'id': device['id']},
+                'parent': {'id': STATE['object']['network']['id']},
             },
             'value': '198.18.100.0/24',
             'name': STATE['object']['network']['name'],
-            'id': STATE['object']['network']['id']
+            'id': STATE['object']['network']['id'],
         }
         STATE['object']['network']['override'] = fmc.object.network.update(data=net_override).json()
 

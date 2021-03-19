@@ -14,16 +14,12 @@ class PhysicalInterface(ChildResource):
 
     @utils.support_params
     def get(self, container_uuid=None, container_name=None, uuid=None, name=None, params=None):
-        return super().get(container_uuid=container_uuid,
-                           container_name=container_name,
-                           uuid=uuid,
-                           name=name,
-                           params=params)
+        return super().get(
+            container_uuid=container_uuid, container_name=container_name, uuid=uuid, name=name, params=params
+        )
 
     @utils.support_params
     def update(self, data: Dict, container_uuid=None, container_name=None, uuid=None, name=None, params=None):
-        return super().update(container_uuid=container_uuid,
-                              container_name=container_name,
-                              uuid=uuid,
-                              name=name,
-                              params=params)
+        return super().update(
+            container_uuid=container_uuid, container_name=container_name, uuid=uuid, name=name, params=params
+        )

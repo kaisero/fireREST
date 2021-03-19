@@ -1,7 +1,8 @@
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.devicehapair.ftddevicehapair.monitoredinterface import MonitoredInterface
-from fireREST.fmc.devicehapair.ftddevicehapair.failoverinterfacemacaddressconfig \
-    import FailoverInterfaceMacAddressConfig
+from fireREST.fmc.devicehapair.ftddevicehapair.failoverinterfacemacaddressconfig import (
+    FailoverInterfaceMacAddressConfig,
+)
 
 
 class FtdHAPair(Resource):

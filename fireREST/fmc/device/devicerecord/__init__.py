@@ -40,4 +40,3 @@ class DeviceRecord(Resource):
         self.virtualswitch = VirtualSwitch(conn)
         self.virtualtunnelinterface = VirtualTunnelInterface(conn)
         self.vlaninterface = VlanInterface(conn)
-

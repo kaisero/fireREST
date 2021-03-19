@@ -2,25 +2,26 @@
 
 import logging
 
-from . import defaults
-from . import exceptions as exc
-from . import utils
-from .fmc import Connection, Resource
-from .fmc.assignment import Assignment
-from .fmc.audit import Audit
-from .fmc.device import Device
-from .fmc.devicecluster import DeviceCluster
-from .fmc.devicehapair import DeviceHAPair
-from .fmc.devicegroup import DeviceGroup
-from .fmc.deployment import Deployment
-from .fmc.health import Health
-from .fmc.integration import Integration
-from .fmc.intelligence import Intelligence
-from .fmc.object import Object
-from .fmc.policy import Policy
-from .fmc.system import System
-from .fmc.update import Update
-from .fmc.user import User
+from fireREST import defaults
+from fireREST import exceptions as exc
+from fireREST import utils
+from fireREST.fmc import Connection, Resource
+from fireREST.fmc.assignment import Assignment
+from fireREST.fmc.audit import Audit
+from fireREST.fmc.deployment import Deployment
+from fireREST.fmc.device import Device
+from fireREST.fmc.devicecluster import DeviceCluster
+from fireREST.fmc.devicehapair import DeviceHAPair
+from fireREST.fmc.devicegroup import DeviceGroup
+from fireREST.fmc.health import Health
+from fireREST.fmc.integration import Integration
+from fireREST.fmc.intelligence import Intelligence
+from fireREST.fmc.job import Job
+from fireREST.fmc.object import Object
+from fireREST.fmc.policy import Policy
+from fireREST.fmc.system import System
+from fireREST.fmc.update import Update
+from fireREST.fmc.user import User
 
 
 logger = logging.getLogger(__name__)
@@ -47,11 +48,12 @@ class FMC:
         self.deployment = Deployment(self.conn)
         self.device = Device(self.conn)
         self.devicecluster = DeviceCluster(self.conn)
-        self.devicehapair = DeviceHAPair(self.conn)
         self.devicegroup = DeviceGroup(self.conn)
+        self.devicehapair = DeviceHAPair(self.conn)
         self.health = Health(self.conn)
         self.integration = Integration(self.conn)
         self.intelligence = Intelligence(self.conn)
+        self.job = Job(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)

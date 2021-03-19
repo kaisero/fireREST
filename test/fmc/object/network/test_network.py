@@ -4,7 +4,6 @@ from fireREST.fmc.object.network.override import Override
 from test.conftest import STATE
 
 
-
 def test_initialization(fmc):
     network = fmc.object.network
     assert isinstance(network.override, Override)

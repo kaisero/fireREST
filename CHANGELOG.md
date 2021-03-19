@@ -1,34 +1,45 @@
+# 1.0.5 [2020-03-19]
+
+## Fixed
+
+* `ChildResource` missing uuid by name lookup functionality (#45)
+* Custom params causing container lookup by name to fail (#45)
+* `job.taskstatuses` accessibility from `fmc` object (#47)
+* Incorrect Namespace references in `update`, `upgradepackage` and `deployabledevices` Resources (#46)
+
+## Fixed
+
 # 1.0.4
 
-## Bugfixes
+## Fixed
 
-Fixed issue with container name resolution that caused incorrect params to be passed to GET_BY_ID operations
-Fixed an issue where HTTPErrors where incorrectly raised, causing confusing exceptions
+* Fixed issue with container name resolution that caused incorrect params to be passed to GET_BY_ID operations
+* Fixed an issue where HTTPErrors where incorrectly raised, causing confusing exceptions
 
 # 1.0.3
 
-## Enhancements
+## Changed
 
-Added dry_mode switch to FMC object. When using dry_mode PUT, POST and DELETE
-operations are not executed and only logged to FireREST logger
+* Added dry_mode switch to FMC object. When using dry_mode PUT, POST and DELETE
+* Operations are not executed and only logged to FireREST logger
 
-## Bugfixes
+## Fixed
 
-Added missing `Override` reference to host object
+* Added missing `Override` reference to host object
 
 # 1.0.2
 
-## Enhancements
+## New
 
-Added `Override` resource to all objects that support object overrides
+* Added `Override` resource to all objects that support object overrides
 
 # 1.0.1
 
-## Bugfixes
+## Fixed
 
-Fixed an issue where simplejson installation cause FireREST to be unusable
-due to requests library using simplejson instead of built-in json library
-causing simplejson exception to be thrown instead of json.DecodeError exception
+* Fixed an issue where simplejson installation cause FireREST to be unusable
+  due to requests library using simplejson instead of built-in json library
+  causing simplejson exception to be thrown instead of json.DecodeError exception
 
 # 1.0.0
 
@@ -37,140 +48,142 @@ refactor the whole project to provide a more structured way to interact with
 FMC. Before 1.0.0 all calls to FMC were provided by a `Client` object which was
 replaced by `FMC` that provides a hierarchical access to all resources on FMC.
 
-## Enhancements
+## Changed
 
-Replaced `Client` object with `FMC`
-Provide structured access to api objects. e.g. `fmc.policy.accesspolicy.get`
-Provide more granular error handling using custom exceptions
+* Replaced `Client` object with `FMC`
+* Provide structured access to api objects. e.g. `fmc.policy.accesspolicy.get`
+* Provide more granular error handling using custom exceptions
 
 # 0.1.8
 
-## Bugfixes
+## New
 
-Fixed various s2svpn related operations that missed string interpolation
+* Filtering options to all supported api calls
 
-## Enhancements
+## Fixed
 
-Added filtering options to all supported api calls
+* Various s2svpn related operations that missed string interpolation
 
 # 0.1.7
 
-## Bugfixes
+## New
 
-Fixed issue where reauth was not triggered correctly
+* Health alert api calls for 6.7.0
+* Additional id_by_name operations
+* Better logging for requests
 
-## Enhancements
+## Fixed
 
-Added health alert api calls for 6.7.0
-Added additional id_by_name operations
-Added better logging for requests
+* Reauth was not triggered correctly when authentication failed
+
 
 # 0.1.6
 
-## Bugfixes
+## New
 
-Fixed issue with incorrect default id values
+* ResourceNotFound exception for 404 errors
+* Additional api calls
+  * S2svpn
+  * vlaninterfaces
+  * interfaceevents
+  * devicecopyrequests
+  * virtualrouter
+  * inlinesets
+  * prefilterpolicy
+  * prefilterpolicy rules
+  * accesspolicy defaultaction
+  * device metrics
+  * device commands
 
-## Enhancements
+## Fixed
 
-Added ResourceNotFound exception for 404 errors
+* Issue with incorrect default id values
 
-Added additional api calls
-* s2svpn
-* vlaninterfaces
-* interfaceevents
-* devicecopyrequests
-* virtualrouter
-* inlinesets
-* prefilterpolicy
-* prefilterpolicy rules
-* accesspolicy defaultaction
-* device metrics
-* device commands
-
-Added vrf support for applicable device api calls
-
-Renamed get_id functions (removed _by_name suffix)
 
 # 0.1.5
 
-## Bugfixes
+## Changed
 
-Fixed issue with id_by_name helper functions caused by incorrect cache impl (#28)
-Fixed missing interface_id param for interface PUT operations (#30)
+* Added additional unit tests for id_by_name operations
+* Merged and enhanced hitcount implementation by @arnydo (#29)
 
-## Enhancements
+## Fixed
 
-Added additional unit tests for id_by_name operations
-Merged and enhanced hitcount implementation by @arnydo (#29)
+* Issue with id_by_name helper functions caused by incorrect cache impl (#28)
+* Nissing interface_id param for interface PUT operations (#30)
 
 # 0.1.4
 
-## Bugfixes
+## Changed
 
-Added a fix to correctly sanitize payloads for put operations
-Corrected cache_result condition that did not match correctly
+* Added various tests for better qa
 
-## Enhancements
+## Fixed
 
-Added various tests for better qa
+* Correctly sanitize payloads for put operations
+* Corrected cache_result condition that did not match correctly
+
 
 # 0.1.3
 
-## Bugfixes
+## Fixed
 
-Fixed missing conversion from dict to json in _request helper
+* Missing conversion from dict to json in _request helper
 
 # 0.1.2
 
-## Bugfixes
+## Fixed
 
-Corrected api call for getting audit records (#24)
-Corrected incorrect base api calls by removing positional args (#23)
+* Api call for getting audit records (#24)
+* Incorrect base api calls by removing positional args (#23)
 
 # 0.1.1
 
-## Enhancements
+## Changed
 
-Changed dependency version pinning to minimum required software versions
+* Dependency version pinning to minimum required software versions
 
 # 0.1.0
 
-## Bugfixes
+## Fixed
 
-Fixed a KeyError that occured when get request was launched that yielded an empty result (no items)
-Fixed a incorrect function call that caused getter for obj overrides to fail
+* KeyError that occured when get request was launched that yielded an empty result (no items)
+* Incorrect function call that caused getter for obj overrides to fail
 
 # 0.0.9
 
-## Bugfixes
+## Changed
 
-Fixed issue mentioned in (#19)
+* Added version pinning for all dependencies
+* Added tox integration for testing new releases
+* Added cache option for costly getbyid operations using cache flag
+* Added sessions so tcp connections are being reused for subsequent api calls
+* Added better error handling and better retrying for rate limiting exception
+* Added prefilterpolicy related crud operations
+* Added minimum version requirements to api calls
+* Rewrote tests with pytest instead of unittest
+* Restructured project and moved default, exceptions and utils into their own files
+* Renamed accesscontrolpolicy related crud operations
 
-## Enhancements
+## Fixed
 
-Added version pinning for all dependencies
-Added tox integration for testing new releases
-Added cache option for costly getbyid operations using cache flag
-Added sessions so tcp connections are being reused for subsequent api calls
-Added better error handling and better retrying for rate limiting exception
-Added prefilterpolicy related crud operations
-Added minimum version requirements to api calls
-Rewrote tests with pytest instead of unittest
-Restructured project and moved default, exceptions and utils into their own files
-Renamed accesscontrolpolicy related crud operations
+* #19
 
 # 0.0.4
 
-## Bugfixes
+## New
 
-* getbyid operations fails due to incorrect limit param
-* api calls for ftd ipv4/ipv6 static routing fails due to incorrect URLs
-* update ftd sub interface fails due to missing param
+* Changelog for new software releases
+* Api calls for hapair monitoredinterfaces (read, update)
+* Helper function to get primary device id from hapair
+* Expandable option for get_depoyable_deployable_devices
 
-## Enhancements
+## Changed
 
-* Add api calls for hapair monitoredinterfaces (read, update)
-* Add helper function to get primary device id from hapair
-* Add expandable option for get_depoyable_deployable_devices
 * Default paging change from 25 to 100
+
+## Fixed
+
+* Getbyid operations fails due to incorrect limit param
+* Api calls for ftd ipv4/ipv6 static routing fails due to incorrect URLs
+* Update ftd sub interface fails due to missing param

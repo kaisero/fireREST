@@ -7,24 +7,12 @@ from fireREST.fmc import Connection
 
 
 STATE = {
-    'object': {
-        'network': {
-            'name': 'FireREST-NetworkObj'
-        }
-    },
+    'object': {'network': {'name': 'FireREST-NetworkObj'}},
     'policy': {
-        'accesspolicy': {
-            'name': 'FireREST-AccessPolicy',
-            'accessrule': {
-                'name': 'FireREST-AccessRule'
-            }
-        }
+        'accesspolicy': {'name': 'FireREST-AccessPolicy', 'accessrule': {'name': 'FireREST-AccessRule'}},
+        'ftdnatpolicy': {'name': 'FireREST-NatPolicy', 'manualnatrule': {'name': 'FireREST-ManualNatRule'}},
     },
-    'device': {
-        'devicerecord': {
-            'name': 'ftd01.example.com'
-        }
-    }
+    'device': {'devicerecord': {'name': 'ftd01.example.com'}},
 }
 
 
