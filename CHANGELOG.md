@@ -1,3 +1,10 @@
+# 1.0.6 [2020-04-01]
+
+## Fixed
+
+* Bulk create/update failed due to bulk param not being set automatically for some resources
+* RateLimiter error was not handled correctly leading to retry operations not being tried
+
 # 1.0.5 [2020-03-19]
 
 ## Fixed

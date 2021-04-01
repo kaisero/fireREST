@@ -140,8 +140,7 @@ def resolve_by_name(f):
 def support_params(f):
     """Apply `Resource` specific params to api operation
 
-    decorator that adds support for specified filter or params options. If a list is passed
-    in PUT or POST operations the `bulk` param is automatically set. Available filters and params
+    decorator that adds support for specified filter or params options. Available filters and params
     are checked against `Resource.SUPPORTED_FILTERS` and `Resource.SUPPORTED_PARAMS`. If a match is found
     params are set accordingly and passed to the operations implementation
     """
@@ -149,13 +148,8 @@ def support_params(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         resource = args[0]
-        data = kwargs.get('data', None)
         filters = []
         params = {}
-
-        # if payload is of type list the bulk param should be set automatically
-        if isinstance(data, list):
-            params['bulk'] = True
 
         # search through function kwargs to locate filter and param arguments
         for k, v in kwargs.items():
@@ -245,6 +239,8 @@ def raise_for_status(response):
         raise exceptions.get(status_code, exc.GenericApiError)(
             msg=response.json()['error']['messages'][0]['description']
         )
+    except KeyError:
+        raise exceptions.get(status_code, exc.GenericApiError)(msg=response.text)
     except ValueError:
         raise exceptions.get(status_code, HTTPError)()
 
