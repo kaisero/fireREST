@@ -92,8 +92,15 @@ class Connection:
         :return: api response
         :rtype: requests.Response
         """
+
         params = utils.fix_params(params)
+
+        # if payload is of type list the bulk param should be set automatically
+        if isinstance(data, list):
+            params['bulk'] = True
+
         response = None
+
         # dry_run only affects PUT, POST and DELETE operations
         # dry_run is not applicable for authentication related operations (login/refresh)
         if self.dry_run and method.lower() != 'get' and '/v1/auth/' not in url:

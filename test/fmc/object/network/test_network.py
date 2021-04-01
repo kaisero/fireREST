@@ -20,6 +20,20 @@ def test_create_network_object(fmc):
     assert expected_result == actual_result
 
 
+def test_create_network_object_bulk(fmc):
+    expected_result = 201
+    data = [
+        {'name': 'FireREST-NetworkObjBulk1', 'value': '198.18.1.0/24'},
+        {'name': 'FireREST-NetworkObjBulk2', 'value': '198.18.2.0/24'}
+    ]
+
+    actual_result = fmc.object.network.create(data)
+    STATE['object']['network']['bulk'] = actual_result.json()
+    actual_result = actual_result.status_code
+
+    assert expected_result == actual_result
+
+
 def test_get_network_objects(fmc):
     expected_result = 'FireREST-NetworkObj'
     actual_result = None
@@ -60,3 +74,12 @@ def test_delete_network_object(fmc):
     actual_result = fmc.object.network.delete(uuid=obj_id).status_code
 
     assert expected_result == actual_result
+
+
+def test_delete_network_object_bulk(fmc):
+    expected_result = 200
+    actual_result_first = fmc.object.network.delete(name='FireREST-NetworkObjBulk1').status_code
+    actual_result_second = fmc.object.network.delete(name='FireREST-NetworkObjBulk2').status_code
+
+    assert expected_result == actual_result_first
+    assert expected_result == actual_result_second
