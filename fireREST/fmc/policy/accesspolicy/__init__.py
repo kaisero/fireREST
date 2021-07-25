@@ -5,6 +5,7 @@ from fireREST.fmc.policy.accesspolicy.category import Category
 from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
 from fireREST.fmc.policy.accesspolicy.inheritancesettings import InheritanceSettings
 from fireREST.fmc.policy.accesspolicy.operational import Operational
+from fireREST.fmc.policy.accesspolicy.securityintelligencepolicy import SecurityIntelligencePolicy
 
 
 class AccessPolicy(Resource):
@@ -24,6 +25,7 @@ class AccessPolicy(Resource):
         self.defaultaction = DefaultAction(conn)
         self.inheritancesettings = InheritanceSettings(conn)
         self.operational = Operational(conn)
+        self.securityintelligencepolicy = SecurityIntelligencePolicy(conn)
 
     @utils.support_params
     def get(self, uuid=None, name=None, params=None):

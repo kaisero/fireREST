@@ -176,7 +176,7 @@ def handle_errors(f):
     @wraps(f)
     @retry(exceptions=exc.RateLimitException, tries=6, delay=10, logger=logger)
     def wrapper(*args, **kwargs):
-        fmc = args[0]
+        conn = args[0]
         try:
             validate_data(kwargs.get('method', args[1]), kwargs.get('data', args[-1]))
             response = f(*args, **kwargs)
@@ -186,7 +186,7 @@ def handle_errors(f):
         except HTTPError:
             if response.status_code == 401 and 'Access token invalid' in response.text:
                 # Invalid access token detected. Refresh authorization token
-                fmc.conn.refresh()
+                conn.refresh()
             else:
                 raise_for_status(response)
         return response

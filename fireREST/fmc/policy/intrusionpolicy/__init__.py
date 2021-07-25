@@ -1,6 +1,6 @@
-from fireREST import utils
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.intrusionpolicy.intrusionrule import IntrusionRule
+from fireREST.fmc.policy.intrusionpolicy.intrusionrulegroup import IntrusionRuleGroup
 
 
 class IntrusionPolicy(Resource):
@@ -15,3 +15,4 @@ class IntrusionPolicy(Resource):
         super().__init__(conn)
 
         self.intrusionrule = IntrusionRule(conn)
+        self.intrusionrulegroup = IntrusionRuleGroup(conn)
