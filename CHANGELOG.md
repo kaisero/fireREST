@@ -1,11 +1,63 @@
-# 1.0.6 [2020-04-01]
+# 1.0.7 [2021-07-25]
+
+## New
+
+* Added support for FMC 7.0.0 api calls
+  * GET integration.fmchastatus
+  * GET integration.securexconfig
+  * GET object.anyconnectcustomattribute
+  * GET object.anyconnectpackage
+  * GET object.anyconnectprofile
+  * CREATE, UPDATE, DELETE object.applicationfilter
+  * GET object.certificatemap
+  * CREATE, UPDATE, DELETE object.dnsservergroup
+  * CREATE, GET, UPDATE, DELETE object.dynamicobject
+  * CREATE, UPDATE, DELETE object.geolocation
+  * GET object.grouppolicy
+  * GET object.hostscanpackage
+  * CREATE, GET, UPDATE, DELETE object.intrusionrule
+  * CREATE, GET, UPDATE, DELETE object.intrusionrulegroup
+  * GET object.ipv4addresspool
+  * GET object.ipv6addresspool
+  * CREATE, GET, UPDATE, DELETE object.localrealmuser
+  * GET object.radiusservergroup
+  * CREATE, GET, UPDATE, DELETE object.realm
+  * GET object.sidnsfeed
+  * GET object.sidnslist
+  * GET object.sinetworkfeed
+  * GET object.sinetworklist
+  * GET object.sinkhole
+  * GET object.ssoserver
+  * GET bject.usage
+  * GET policy.accesspolicy.securityintelligencepolicy
+  * GET policy.dnspolicy
+  * GET policy.dnspolicy.allowdnsrule
+  * GET policy.dnspolicy.blockdnsrule
+  * GET policy.dynamicaccesspolicy
+  * GET policy.identitypolicy
+  * CREATE, UPDATE, DELETE policy.intrusionpolicy
+  * GET, UPDATE policy.intrusionpolicy.intrusionrulegroup
+  * GET, UPDATE policy.intrusionpolicy.intrusionrule
+  * CREATE, GET, UPDATE, DELETE policy.networkanalysispolicy
+  * GET, UPDATE, DELETE policy.networkanalysispolicy.inspectorconfig
+  * GET, UPDATE, DELETE policy.networkanalysispolicy.inspectoroverrideconfig
+  * GET policy.ravpn
+  * GET policy.ravpn.addressassignmensettings
+  * GET policy.ravpn.certificatemapsettings
+  * GET policy.ravpn.connectionprofile
+  
+## Fixed
+
+* Authentication refresh failed due to incorrect object reference in utils.py
+
+# 1.0.6 [2021-04-01]
 
 ## Fixed
 
 * Bulk create/update failed due to bulk param not being set automatically for some resources
 * RateLimiter error was not handled correctly leading to retry operations not being tried
 
-# 1.0.5 [2020-03-19]
+# 1.0.5 [2021-03-19]
 
 ## Fixed
 

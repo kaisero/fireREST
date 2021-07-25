@@ -205,8 +205,18 @@ STATE = {
 }
 
 FILTERS = {
+    'current_security_level': 'currentSecurityLevel',
+    'show_only_parents': 'showonlyparents',
+    'include_count': 'includeCount',
+    'gid': 'gid',
+    'sid': 'sid',
+    'overrides': 'overrides',
+    'ips_policy': 'ipspolicy',
+    'fts': 'fts',
+    'realm': 'realm',
     'name': 'name',
     'name_or_value': 'nameOrValue',
+    'obj_type': 'type',
     'unused_only': 'unusedOnly',
     'rule_ids': 'ids',
     'device_id': 'deviceId',
