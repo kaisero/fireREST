@@ -1,4 +1,4 @@
-from fireREST.fmc import Connection, Resource
+from fireREST.fmc import Connection
 from fireREST.fmc.object.anyprotocolportobject import AnyProtocolPortObject
 from fireREST.fmc.object.anyconnectcustomattribute import AnyconnectCustomAttribute
 from fireREST.fmc.object.anyconnectpackage import AnyconnectPackage
