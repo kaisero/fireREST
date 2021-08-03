@@ -258,6 +258,7 @@ def search_filter(items=None):
         for item in items:
             for k, v in item.items():
                 if v:
+                    v = str(v).lower() if type(v) == bool else v
                     filter_str += f'{k}:{v};'
         return filter_str.rstrip(';')
     return ''

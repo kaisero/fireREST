@@ -230,6 +230,8 @@ FILTERS = {
     'original_destination_port': 'originalDestinationPort',
     'translated_source_port': 'translatedSourcePort',
     'translated_destination_port': 'translatedDestinationPort',
+    'ids': 'ids',
+    'fetch_zero_hitcount': 'fetchZeroHitCount',
 }
 
 PARAMS = {
