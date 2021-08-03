@@ -1,3 +1,10 @@
+# 1.0.8 [2021-08-03]
+
+## Fixed
+
+* boolean filter values were not parsed correctly resulted in incorrect filters being passed to FMC API
+* added missing filter operations to `policy.accesspolicy.operational.hitcounts` `get` operation
+
 # 1.0.7 [2021-07-25]
 
 ## New
@@ -45,7 +52,7 @@
   * GET policy.ravpn.addressassignmensettings
   * GET policy.ravpn.certificatemapsettings
   * GET policy.ravpn.connectionprofile
-  
+
 ## Fixed
 
 * Authentication refresh failed due to incorrect object reference in utils.py

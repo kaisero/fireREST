@@ -24,7 +24,7 @@ def test_create_network_object_bulk(fmc):
     expected_result = 201
     data = [
         {'name': 'FireREST-NetworkObjBulk1', 'value': '198.18.1.0/24'},
-        {'name': 'FireREST-NetworkObjBulk2', 'value': '198.18.2.0/24'}
+        {'name': 'FireREST-NetworkObjBulk2', 'value': '198.18.2.0/24'},
     ]
 
     actual_result = fmc.object.network.create(data)
