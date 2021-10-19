@@ -1,3 +1,11 @@
+# 1.0.9 [2021-10-19]
+
+## Fixed
+
+* requests were not retried when authentication token was refreshed (#53)
+* `accesspolicy.category` exposed incorrect param before_category (#54)
+* various devicerecord update calls incorrectly overrode the update function causing update calls to fail
+
 # 1.0.8 [2021-08-03]
 
 ## Fixed
