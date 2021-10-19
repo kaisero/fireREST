@@ -12,6 +12,7 @@ class IntrusionRuleGroup(Resource):
     SUPPORTED_FILTERS = ['name', 'current_security_level', 'show_only_parents', 'include_count']
 
     @utils.support_params
-    def get(self, uuid=None, name=None, current_security_level=None,
-            show_only_parents=None, include_count=None, params=None):
+    def get(
+        self, uuid=None, name=None, current_security_level=None, show_only_parents=None, include_count=None, params=None
+    ):
         return super().get(uuid=uuid, name=name, params=params)

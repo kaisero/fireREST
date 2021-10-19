@@ -13,6 +13,5 @@ class IntrusionRule(Resource):
     SUPPORTED_FILTERS = ['gid', 'sid', 'overrides', 'ips_policy', 'fts']
 
     @utils.support_params
-    def get(self, uuid=None, name=None, gid=None, sid=None,
-            overrides=None, ips_policy=None, fts=None, params=None):
+    def get(self, uuid=None, name=None, gid=None, sid=None, overrides=None, ips_policy=None, fts=None, params=None):
         return super().get(uuid=uuid, name=name, params=params)

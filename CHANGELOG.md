@@ -1,3 +1,18 @@
+# 1.0.9 [2021-10-19]
+
+## Fixed
+
+* requests were not retried when authentication token was refreshed (#53)
+* `accesspolicy.category` exposed incorrect param before_category (#54)
+* various devicerecord update calls incorrectly overrode the update function causing update calls to fail
+
+# 1.0.8 [2021-08-03]
+
+## Fixed
+
+* boolean filter values were not parsed correctly resulted in incorrect filters being passed to FMC API
+* added missing filter operations to `policy.accesspolicy.operational.hitcounts` `get` operation
+
 # 1.0.7 [2021-07-25]
 
 ## New
@@ -45,7 +60,7 @@
   * GET policy.ravpn.addressassignmensettings
   * GET policy.ravpn.certificatemapsettings
   * GET policy.ravpn.connectionprofile
-  
+
 ## Fixed
 
 * Authentication refresh failed due to incorrect object reference in utils.py

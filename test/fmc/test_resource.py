@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import pytest
 
 import fireREST.exceptions as exc
@@ -7,7 +6,6 @@ import fireREST.exceptions as exc
 from requests.auth import HTTPBasicAuth
 
 from fireREST import defaults
-from fireREST.fmc import Resource
 from fireREST.defaults import API_REFRESH_URL, API_PLATFORM_URL, API_CONFIG_URL
 
 

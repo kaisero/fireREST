@@ -19,4 +19,3 @@ class DnsServerGroup(Resource):
     @utils.support_params
     def get(self, uuid=None, name=None, override_target_id=None, params=None):
         return super().get(uuid=uuid, name=name, params=params)
-
