@@ -1,4 +1,4 @@
-import re
+from re import sub
 import sys
 from copy import deepcopy
 from functools import wraps
@@ -12,6 +12,7 @@ from retry import retry
 
 from . import exceptions as exc
 from .mapping import FILTERS, PARAMS
+
 
 logger = getLogger(__name__)
 
@@ -59,6 +60,7 @@ def minimum_version_required(func=None, version=None):
         @wraps(f)
         def wrapper(*args, **kwargs):
             if version:
+                # noinspection PyUnresolvedReferences
                 min_version = packaging.version.parse(version)
             else:
                 operations = {
@@ -67,6 +69,7 @@ def minimum_version_required(func=None, version=None):
                     'update': args[0].MINIMUM_VERSION_REQUIRED_UPDATE,
                     'delete': args[0].MINIMUM_VERSION_REQUIRED_DELETE,
                 }
+                # noinspection PyUnresolvedReferences
                 min_version = packaging.version.parse(operations[f.__name__])
 
             installed_version = args[0].version
@@ -184,9 +187,13 @@ def handle_errors(f):
             if not args[0].dry_run:
                 response.raise_for_status()
         except HTTPError:
-            if response.status_code == 401 and 'Access token invalid' in response.text:
+            if response.status_code == 401 and ('Access token invalid' in response.text
+                                                or 'Invalid access token' in response.text):
                 # Invalid access token detected. Refresh authorization token
                 conn.refresh()
+
+                # Repeat request with valid authentication token
+                response = f(*args, **kwargs)
             else:
                 raise_for_status(response)
         return response
@@ -284,7 +291,7 @@ def fix_url(url: str):
     :return: fixed url
     :rtype: str
     """
-    return re.sub(r'/None$', '', url).rstrip('/')
+    return sub(r'/None$', '', url).rstrip('/')
 
 
 def sanitize_payload(method: str, payload: Dict, ignore_fields=None, _recursive=False):
