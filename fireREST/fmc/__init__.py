@@ -2,12 +2,12 @@
 
 import json
 import logging
-import simplejson
 from http.client import responses as http_responses
 from typing import Dict, Union
 from urllib.parse import urlencode
 
 import requests
+import simplejson
 import urllib3
 from packaging import version
 from requests.auth import HTTPBasicAuth
@@ -496,4 +496,122 @@ class ChildResource(Resource):
         :rtype: requests.Response
         """
         url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=uuid))
+        return self.conn.delete(url)
+
+
+class NestedChildResource(ChildResource):
+    """Base class for api resources located within a ChildResource"""
+
+    # name of container class that hosts the VrfResource
+    CHILD_CONTAINER_NAME = ''
+
+    # path to container class that hosts the VrfResource
+    CHILD_CONTAINER_PATH = ''
+
+    @utils.resolve_by_name
+    @utils.minimum_version_required
+    def create(self, data: Union[dict, list], container_uuid=None, container_name=None,
+               child_container_name=None, child_container_uuid=None, params=None):
+        """Create api resource. Either name or uuid for container and child_container must be provided
+        to create the resource within the provided scope
+
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param child_container_uuid: uuid of child container resource
+        :type child_container_uuid: str, optional
+        :param child_container_name: name of child container resource
+        :type child_container_name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
+        """
+        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
+                                        uuid=None))
+        return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
+
+    @utils.resolve_by_name
+    @utils.minimum_version_required
+    def get(self, container_uuid=None, container_name=None, child_container_name=None, child_container_uuid=None,
+            uuid=None, name=None, params=None):
+        """Get api resource in json format. Either name or uuid of container resource must
+        be provided to search for resources within the container scope
+        If no name or uuid is provided a list of all available resources will be returned
+
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param child_container_uuid: uuid of child container resource
+        :type child_container_uuid: str, optional
+        :param child_container_name: name of child container resource
+        :type child_container_name: str, optional
+        :param uuid: id of resource
+        :type uuid: str, optional
+        :param name: name of resource
+        :type name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: Union[dict, list]
+        """
+        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
+                                        uuid=uuid))
+        return self.conn.get(url, params)
+
+    @utils.resolve_by_name
+    @utils.minimum_version_required
+    def update(self, data: Dict, container_uuid=None, container_name=None,
+               child_container_name=None, child_container_uuid=None, params=None):
+        """Update existing api resource. Either name or uuid of container resource must be provided
+        Existing data will be overridden with the provided payload. The request will be routed
+        to the correct resource by extracting the `id` within the payload
+
+        :param data: data that will be sent to the api endpoint
+        :type data: Union[list, dict], optional
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param child_container_uuid: uuid of child container resource
+        :type child_container_uuid: str, optional
+        :param child_container_name: name of child container resource
+        :type child_container_name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
+        :return: api response
+        :rtype: requests.Response
+        """
+        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
+                                        uuid=data['id']))
+        return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
+
+    @utils.resolve_by_name
+    @utils.minimum_version_required
+    def delete(self, container_uuid=None, container_name=None, child_container_name=None, child_container_uuid=None,
+               uuid=None, name=None):
+        """Delete existing api resource. Either name or uuid of container resource must be provided
+        Either `name` or `uuid` must be provided to delete an existing resource
+
+        :param container_uuid: uuid of container resource
+        :type container_uuid: str, optional
+        :param container_name: name of container resource
+        :type container_name: str, optional
+        :param child_container_uuid: uuid of child container resource
+        :type child_container_uuid: str, optional
+        :param child_container_name: name of child container resource
+        :type child_container_name: str, optional
+        :param uuid: id of resource
+        :type uuid: str, optional
+        :param name: name of resource
+        :type name: str, optional
+        :return: api response
+        :rtype: requests.Response
+        """
+        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
+                                        uuid=uuid))
         return self.conn.delete(url)

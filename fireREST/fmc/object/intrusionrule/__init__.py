@@ -1,14 +1,14 @@
 from fireREST import utils
-from fireREST.fmc import Resource, Connection
-from fireREST.fmc.object.host.override import Override
+from fireREST.defaults import API_RELEASE_700
+from fireREST.fmc import Resource
 
 
 class IntrusionRule(Resource):
     PATH = '/object/intrusionrules/{uuid}'
-    MINIMUM_VERSION_REQUIRED_CREATE = '7.0.0'
-    MINIMUM_VERSION_REQUIRED_GET = '7.0.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '7.0.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '7.0.0'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_700
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_700
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_700
 
     SUPPORTED_FILTERS = ['gid', 'sid', 'overrides', 'ips_policy', 'fts']
 

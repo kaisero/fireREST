@@ -1,7 +1,6 @@
-from typing import Union
-
 from fireREST import utils
-from fireREST.fmc import Connection, ChildResource
+from fireREST.defaults import API_RELEASE_640
+from fireREST.fmc import ChildResource
 
 
 class Hitcount(ChildResource):
@@ -10,9 +9,9 @@ class Hitcount(ChildResource):
     PATH = '/policy/accesspolicies/{container_uuid}/operational/hitcounts/{uuid}'
     SUPPORTED_FILTERS = ['device_id', 'ids', 'fetch_zero_hitcount']
     SUPPORTED_PARAMS = []
-    MINIMUM_VERSION_REQUIRED_GET = '6.4.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.4.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.4.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_640
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_640
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_640
 
     @utils.support_params
     def update(self):

@@ -1,6 +1,7 @@
 from typing import Union
 
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_650
 from fireREST.fmc import ChildResource
 
 
@@ -12,10 +13,10 @@ class PrefilterRule(ChildResource):
     SUPPORTED_PARAMS = ['category', 'section', 'insert_before', 'insert_after']
     IGNORE_FOR_CREATE = []
     IGNORE_FOR_UPDATE = []
-    MINIMUM_VERSION_REQUIRED_CREATE = '6.5.0'
-    MINIMUM_VERSION_REQUIRED_GET = '6.5.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.5.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.5.0'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_650
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_650
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_650
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_650
 
     @utils.support_params
     def create(

@@ -11,8 +11,8 @@ from fireREST.fmc.audit import Audit
 from fireREST.fmc.deployment import Deployment
 from fireREST.fmc.device import Device
 from fireREST.fmc.devicecluster import DeviceCluster
-from fireREST.fmc.devicehapair import DeviceHAPair
 from fireREST.fmc.devicegroup import DeviceGroup
+from fireREST.fmc.devicehapair import DeviceHAPair
 from fireREST.fmc.health import Health
 from fireREST.fmc.integration import Integration
 from fireREST.fmc.intelligence import Intelligence
@@ -22,7 +22,6 @@ from fireREST.fmc.policy import Policy
 from fireREST.fmc.system import System
 from fireREST.fmc.update import Update
 from fireREST.fmc.user import User
-
 
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())

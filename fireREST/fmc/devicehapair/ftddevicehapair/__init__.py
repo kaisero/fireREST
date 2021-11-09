@@ -1,16 +1,17 @@
+from fireREST.defaults import API_RELEASE_623
 from fireREST.fmc import Connection, Resource
-from fireREST.fmc.devicehapair.ftddevicehapair.monitoredinterface import MonitoredInterface
 from fireREST.fmc.devicehapair.ftddevicehapair.failoverinterfacemacaddressconfig import (
     FailoverInterfaceMacAddressConfig,
 )
+from fireREST.fmc.devicehapair.ftddevicehapair.monitoredinterface import MonitoredInterface
 
 
 class FtdHAPair(Resource):
     PATH = '/devicehapairs/ftddevicehapairs/{uuid}'
-    MINIMUM_VERSION_REQUIRED_CREATE = '6.2.3'
-    MINIMUM_VERSION_REQUIRED_GET = '6.2.3'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.2.3'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.2.3'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_623
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_623
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_623
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_623
     SUPPORTED_PARAMS = ['name']
 
     def __init__(self, conn: Connection):

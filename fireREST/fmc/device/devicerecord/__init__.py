@@ -1,3 +1,4 @@
+from fireREST.defaults import API_RELEASE_610
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.device.devicerecord.bridgegroupinterface import BridgeGroupInterface
 from fireREST.fmc.device.devicerecord.etherchannelinterface import EtherChannelInterface
@@ -17,10 +18,10 @@ from fireREST.fmc.device.devicerecord.vlaninterface import VlanInterface
 
 class DeviceRecord(Resource):
     PATH = '/devices/devicerecords/{uuid}'
-    MINIMUM_VERSION_REQUIRED_CREATE = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_GET = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.1.0'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_610
     SUPPORTED_PARAMS = ['hostname']
 
     def __init__(self, conn: Connection):

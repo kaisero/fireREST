@@ -1,6 +1,4 @@
-from typing import Union
-
-from fireREST import utils
+from fireREST.defaults import API_RELEASE_660
 from fireREST.fmc import ChildResource
 
 
@@ -12,4 +10,4 @@ class Deployment(ChildResource):
     SUPPORTED_PARAMS = []
     IGNORE_FOR_CREATE = []
     IGNORE_FOR_UPDATE = []
-    MINIMUM_VERSION_REQUIRED_GET = '6.6.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_660

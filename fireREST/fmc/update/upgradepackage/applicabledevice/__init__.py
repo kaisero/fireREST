@@ -1,3 +1,4 @@
+from fireREST.defaults import API_RELEASE_630
 from fireREST.fmc import ChildResource
 
 
@@ -6,4 +7,4 @@ class ApplicableDevice(ChildResource):
     CONTAINER_PATH = '/updates/upgradepackages/{uuid}'
     NAMESPACE = 'platform'
     PATH = '/updates/upgradepackages/{container_uuid}/applicabledevices/{uuid}'
-    MINIMUM_VERSION_REQUIRED_GET = '6.3.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630

@@ -1,11 +1,12 @@
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_700
 from fireREST.fmc import Resource, Connection
 from fireREST.fmc.object.ssoserver.override import Override
 
 
 class SsoServer(Resource):
     PATH = '/object/ssoservers/{uuid}'
-    MINIMUM_VERSION_REQUIRED_GET = '7.0.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700
 
     SUPPORTED_PARAMS = ['override_target_id']
 

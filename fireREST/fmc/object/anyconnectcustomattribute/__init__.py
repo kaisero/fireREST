@@ -1,11 +1,12 @@
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_700
 from fireREST.fmc import Resource, Connection
 from fireREST.fmc.object.anyconnectcustomattribute.override import Override
 
 
 class AnyconnectCustomAttribute(Resource):
     PATH = '/object/anyconnectcustomattributes/{uuid}'
-    MINIMUM_VERSION_REQUIRED_GET = '7.0.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700
 
     SUPPORTED_FILTERS = ['name_or_value', 'unused_only']
     SUPPORTED_PARAMS = ['override_target_id']

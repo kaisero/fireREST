@@ -23,7 +23,7 @@ def accesspolicy(request, fmc):
     return policy
 
 
-def test_initialization(fmc, accesspolicy):
+def test_initialization(fmc):
     actual_accessrule = fmc.policy.accesspolicy.accessrule
     assert isinstance(actual_accessrule, AccessRule)
 

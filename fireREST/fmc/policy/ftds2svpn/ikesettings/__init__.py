@@ -1,3 +1,4 @@
+from fireREST.defaults import API_RELEASE_630
 from fireREST.fmc import ChildResource
 
 
@@ -9,5 +10,5 @@ class IkeSettings(ChildResource):
     SUPPORTED_PARAMS = []
     IGNORE_FOR_CREATE = []
     IGNORE_FOR_UPDATE = []
-    MINIMUM_VERSION_REQUIRED_GET = '6.3.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.3.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_630

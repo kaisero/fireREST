@@ -1,3 +1,14 @@
+# 1.0.10 [2021-10-28]
+
+## Fixed
+
+* incorrect api endpoint for object.dynamicobject (#57)
+* removed incorrect delete calls for device.devicerecord.redundantinterface
+* removed incorrect delete calls for device.devicerecord.subinterface
+* removed incorrect delete calls for device.devicerecord.virtualswitch
+* removed incorrect delete calls for device.devicerecord.virtualtunnelinterface
+* removed incorrect delete calls for device.devicerecord.vlaninterface
+
 # 1.0.9 [2021-10-19]
 
 ## Fixed
