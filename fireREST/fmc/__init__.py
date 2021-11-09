@@ -476,7 +476,7 @@ class ChildResource(Resource):
         :rtype: requests.Response
         """
         url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
-        return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
+        return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
