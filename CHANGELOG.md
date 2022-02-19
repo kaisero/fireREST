@@ -1,8 +1,11 @@
-# 1.0.10 [2021-10-28]
+# 1.0.10 [2022-02-19]
 
 ## Fixed
 
-* incorrect api endpoint for object.dynamicobject (#57)
+* incorrect api endpoint for object.dynamicobject (#57, #64). thanks @dheule for providing a fix
+* missing refs in devicerecord for physicalinterface (#61)
+* incorrect api endpoint for object.continent (#60)
+* uuid check issues with object.applicationcategory (#59)
 * removed incorrect delete calls for device.devicerecord.redundantinterface
 * removed incorrect delete calls for device.devicerecord.subinterface
 * removed incorrect delete calls for device.devicerecord.virtualswitch
