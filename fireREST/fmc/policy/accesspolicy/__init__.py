@@ -1,4 +1,5 @@
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_610
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 from fireREST.fmc.policy.accesspolicy.category import Category
@@ -11,10 +12,10 @@ from fireREST.fmc.policy.accesspolicy.securityintelligencepolicy import Security
 class AccessPolicy(Resource):
     PATH = '/policy/accesspolicies/{uuid}'
     IGNORE_FOR_UPDATE = ['rules']
-    MINIMUM_VERSION_REQUIRED_CREATE = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_GET = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.1.0'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_610
     SUPPORTED_PARAMS = ['name']
 
     def __init__(self, conn: Connection):

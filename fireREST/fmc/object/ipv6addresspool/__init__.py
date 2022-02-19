@@ -1,11 +1,12 @@
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_700
 from fireREST.fmc import Resource, Connection
 from fireREST.fmc.object.ipv6addresspool.override import Override
 
 
 class Ipv6AddressPool(Resource):
     PATH = '/object/ipv6addresspools/{uuid}'
-    MINIMUM_VERSION_REQUIRED_GET = '7.0.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700
 
     SUPPORTED_PARAMS = ['override_target_id']
 

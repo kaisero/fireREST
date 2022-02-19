@@ -1,14 +1,15 @@
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_610
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.object.network.override import Override
 
 
 class Network(Resource):
     PATH = '/object/networks/{uuid}'
-    MINIMUM_VERSION_REQUIRED_CREATE = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_GET = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.1.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.1.0'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_610
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_610
     SUPPORTED_FILTERS = ['name_or_value', 'unused_only']
     SUPPORTED_PARAMS = ['override_target_id']
 

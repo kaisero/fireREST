@@ -1,8 +1,8 @@
-from re import sub
 import sys
 from copy import deepcopy
 from functools import wraps
 from logging import getLogger
+from re import sub
 from typing import Dict
 from uuid import UUID
 
@@ -12,7 +12,6 @@ from retry import retry
 
 from . import exceptions as exc
 from .mapping import FILTERS, PARAMS
-
 
 logger = getLogger(__name__)
 
@@ -29,6 +28,9 @@ def is_uuid(val: str):
         UUID(val)
         return True
     except ValueError:
+        if val.isdigit():
+            # workaround for specific resources that do not use uuid format like applicationcategories
+            return True
         return False
 
 

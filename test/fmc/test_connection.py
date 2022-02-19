@@ -89,7 +89,7 @@ def test_re_authentication_with_dry_run_enabled(conn):
     assert actual_counter == expected_counter
 
 
-def test_get_domain_id_with_correct_name(constants, conn):
+def test_get_domain_id_with_correct_name(conn):
     expected_result = conn.domain['id']
     actual_result = conn.get_domain_id(conn.domain['name'])
 

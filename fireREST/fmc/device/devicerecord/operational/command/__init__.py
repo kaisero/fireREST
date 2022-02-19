@@ -1,4 +1,5 @@
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_660
 from fireREST.fmc import ChildResource
 
 
@@ -8,7 +9,7 @@ class Command(ChildResource):
     PATH = '/devices/devicerecords/{container_uuid}/operational/commands'
 
     @utils.resolve_by_name
-    @utils.minimum_version_required(version='6.6.0')
+    @utils.minimum_version_required(version=API_RELEASE_660)
     def get(self, command: str, container_uuid=None, container_name=None):
         # commands with wordsize > 2 must be split into filter and parameters params due to fmc rest api impl
         split_cmd = command.split(' ')

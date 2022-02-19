@@ -1,8 +1,9 @@
+from fireREST.defaults import API_RELEASE_670
 from fireREST.fmc import Resource
 
 
 class SsoConfig(Resource):
     PATH = '/users/ssoconfigs/{uuid}'
     IGNORE_FOR_UPDATE = []
-    MINIMUM_VERSION_REQUIRED_GET = '6.7.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.7.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_670
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_670

@@ -1,7 +1,6 @@
-from typing import Dict, Union
-
 from fireREST import utils
-from fireREST.fmc import Connection, ChildResource
+from fireREST.defaults import API_RELEASE_623
+from fireREST.fmc import ChildResource
 
 
 class NatRule(ChildResource):
@@ -24,7 +23,7 @@ class NatRule(ChildResource):
     SUPPORTED_PARAMS = []
     IGNORE_FOR_CREATE = []
     IGNORE_FOR_UPDATE = []
-    MINIMUM_VERSION_REQUIRED_GET = '6.2.3'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_623
 
     @utils.support_params
     def get(

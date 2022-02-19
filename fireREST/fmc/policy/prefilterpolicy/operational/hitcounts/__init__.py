@@ -1,6 +1,5 @@
-from typing import Union
-
 from fireREST import utils
+from fireREST.defaults import API_RELEASE_640
 from fireREST.fmc import ChildResource
 
 
@@ -10,9 +9,9 @@ class Hitcount(ChildResource):
     PATH = '/policy/prefilterpolicies/{container_uuid}/operational/hitcounts/{uuid}'
     SUPPORTED_FILTERS = []
     SUPPORTED_PARAMS = []
-    MINIMUM_VERSION_REQUIRED_GET = '6.4.0'
-    MINIMUM_VERSION_REQUIRED_UPDATE = '6.4.0'
-    MINIMUM_VERSION_REQUIRED_DELETE = '6.4.0'
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_640
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_640
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_640
 
     @utils.support_params
     def update(self):

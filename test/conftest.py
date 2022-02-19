@@ -60,3 +60,13 @@ def fmc(constants):
         password=constants['password'],
         domain=constants['domain']['name'],
     )
+
+
+@pytest.fixture(scope='module')
+def devicerecord(fmc):
+    return fmc.device.devicerecord.get(name=STATE['device']['devicerecord']['name'])
+
+
+@pytest.fixture(scope='module')
+def virtualrouter(fmc, devicerecord):
+    return fmc.device.devicerecord.routing.virtualrouter.get(container_uuid=devicerecord['id'])[0]
