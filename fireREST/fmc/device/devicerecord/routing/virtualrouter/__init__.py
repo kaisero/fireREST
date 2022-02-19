@@ -1,6 +1,7 @@
 from fireREST.defaults import API_RELEASE_660
 from fireREST.fmc import ChildResource, Connection
 from fireREST.fmc.device.devicerecord.routing.virtualrouter.bgp import Bgp
+from fireREST.fmc.device.devicerecord.routing.virtualrouter.policybasedroute import PolicyBasedRoute
 
 
 class VirtualRouter(ChildResource):
@@ -16,3 +17,4 @@ class VirtualRouter(ChildResource):
         super().__init__(conn)
 
         self.bgp = Bgp(conn)
+        self.policybasedroute = PolicyBasedRoute(conn)

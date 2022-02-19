@@ -6,6 +6,7 @@ from fireREST.fmc.device.devicerecord.routing.ipv6staticroute import Ipv6StaticR
 from fireREST.fmc.device.devicerecord.routing.ospfinterface import OspfInterface
 from fireREST.fmc.device.devicerecord.routing.ospfv2route import Ospfv2Route
 from fireREST.fmc.device.devicerecord.routing.ospfv3interface import Ospfv3Interface
+from fireREST.fmc.device.devicerecord.routing.policybasedroute import PolicyBasedRoute
 from fireREST.fmc.device.devicerecord.routing.staticroute import StaticRoute
 from fireREST.fmc.device.devicerecord.routing.virtualrouter import VirtualRouter
 
@@ -19,5 +20,6 @@ class Routing:
         self.ospfinterface = OspfInterface(conn)
         self.ospfv2route = Ospfv2Route(conn)
         self.ospfv3interface = Ospfv3Interface(conn)
+        self.policybasedroute = PolicyBasedRoute(conn)
         self.staticroute = StaticRoute(conn)
         self.virtualrouter = VirtualRouter(conn)
