@@ -9,10 +9,7 @@ class AutoNatRule(ChildResource):
     CONTAINER_NAME = 'FtdNatPolicy'
     CONTAINER_PATH = '/policy/ftdnatpolicies/{uuid}'
     PATH = '/policy/ftdnatpolicies/{container_uuid}/autonatrules/{uuid}'
-    SUPPORTED_FILTERS = []
     SUPPORTED_PARAMS = ['section']
-    IGNORE_FOR_CREATE = []
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_623
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_623
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_623

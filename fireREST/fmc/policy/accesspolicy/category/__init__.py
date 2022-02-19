@@ -9,10 +9,7 @@ class Category(ChildResource):
     CONTAINER_NAME = 'AccessPolicy'
     CONTAINER_PATH = '/policy/accesspolicies/{uuid}'
     PATH = '/policy/accesspolicies/{container_uuid}/categories/{uuid}'
-    SUPPORTED_FILTERS = []
     SUPPORTED_PARAMS = ['above_category', 'section', 'insert_before', 'insert_after']
-    IGNORE_FOR_CREATE = []
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_650
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_650
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_650

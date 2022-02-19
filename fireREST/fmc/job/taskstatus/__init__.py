@@ -5,7 +5,6 @@ from fireREST.fmc import Resource
 
 class TaskStatus(Resource):
     PATH = '/job/taskstatuses/{uuid}'
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
 
     def get(self, uuid=None, name=None, params=None):

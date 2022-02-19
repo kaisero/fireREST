@@ -9,10 +9,7 @@ class PrefilterRule(ChildResource):
     CONTAINER_NAME = 'PrefilterPolicy'
     CONTAINER_PATH = '/policy/prefilterpolicies/{uuid}'
     PATH = '/policy/prefilterpolicies/{container_uuid}/prefilterrules/{uuid}'
-    SUPPORTED_FILTERS = []
     SUPPORTED_PARAMS = ['category', 'section', 'insert_before', 'insert_after']
-    IGNORE_FOR_CREATE = []
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_650
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_650
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_650

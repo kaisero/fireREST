@@ -1,5 +1,7 @@
 # 1.0.11 [2022-03-DD]
 
+## New
+
 * Added support for FMC 7.1.0 api calls
   * chassis.get(...)
   * chassis.networkmodule.update(...)
@@ -64,6 +66,11 @@
   * cluster.ftddevicecluster.create(...)
   * cluster.ftddevicecluster.update(...)
   * cluster.ftddevicecluster.delete(...)
+
+## Fixed
+
+* missing filtering support for health.alert
+* missing filtering support for health.metric
 
 # 1.0.10 [2022-02-19]
 

@@ -7,7 +7,6 @@ from fireREST.fmc.deployment.deployabledevice.pendingchanges import PendingChang
 class DeployableDevice(Resource):
     PATH = '/deployment/deployabledevices/{uuid}'
     SUPPORTED_PARAMS = ['group_dependency']
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
 
     def __init__(self, conn: Connection):

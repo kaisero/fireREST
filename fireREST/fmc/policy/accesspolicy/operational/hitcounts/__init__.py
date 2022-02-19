@@ -8,7 +8,6 @@ class Hitcount(ChildResource):
     CONTAINER_PATH = '/policy/accesspolicies/{uuid}'
     PATH = '/policy/accesspolicies/{container_uuid}/operational/hitcounts/{uuid}'
     SUPPORTED_FILTERS = ['device_id', 'ids', 'fetch_zero_hitcount']
-    SUPPORTED_PARAMS = []
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_640
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_640
     MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_640
