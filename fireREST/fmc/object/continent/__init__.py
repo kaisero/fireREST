@@ -3,5 +3,5 @@ from fireREST.fmc import Resource
 
 
 class Continent(Resource):
-    PATH = '/object/continent/{uuid}'
+    PATH = '/object/continents/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
