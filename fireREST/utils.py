@@ -28,6 +28,9 @@ def is_uuid(val: str):
         UUID(val)
         return True
     except ValueError:
+        if val.isdigit():
+            # workaround for specific resources that do not use uuid format like applicationcategories
+            return True
         return False
 
 
