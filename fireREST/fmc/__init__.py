@@ -392,19 +392,21 @@ class Resource:
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def delete(self, uuid=None, name=None):
+    def delete(self, uuid=None, name=None, params=None):
         """Delete existing api resource. Either `name` or `uuid` must
-        be provided to delete an existing resource
+        be provided to delete an existing resource. Some resource may support delete by filter using params only
 
         :param uuid: id of resource
         :type uuid: str, optional
         :param name: name of resource
         :type name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
         :return: api response
         :rtype: requests.Response
         """
         url = self.url(self.PATH.format(uuid=uuid))
-        return self.conn.delete(url)
+        return self.conn.delete(url, params)
 
 
 class ChildResource(Resource):

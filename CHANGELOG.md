@@ -1,4 +1,4 @@
-# 1.0.11 [2022-03-DD]
+# 1.1.0 [2022-03-DD]
 
 ## New
 
@@ -8,7 +8,7 @@
   * chassis.networkmodule.get(...)
   * chassis.interface.get(...)
   * chassis.interface.evaluate_operation(...)
-  * chassis.operational.sync_network_module(...)
+  * chassis.operational.sync_networkmodule(...)
   * chassis.operational.breakout_interfaces(...)
   * chassis.operational.join_interfaces(...)
   * cluster.ftddevicecluster.operational.command(...)
@@ -66,6 +66,18 @@
   * cluster.ftddevicecluster.create(...)
   * cluster.ftddevicecluster.update(...)
   * cluster.ftddevicecluster.delete(...)
+  * device.devicerecord.routing.virtualrouter.ipv4staticroute.create(...)
+  * device.devicerecord.routing.virtualrouter.ipv4staticroute.get(...)
+  * device.devicerecord.routing.virtualrouter.ipv4staticroute.update(...)
+  * device.devicerecord.routing.virtualrouter.ipv4staticroute.delete(...)
+  * device.devicerecord.routing.virtualrouter.ipv6staticroute.create(...)
+  * device.devicerecord.routing.virtualrouter.ipv6staticroute.get(...)
+  * device.devicerecord.routing.virtualrouter.ipv6staticroute.update(...)
+  * device.devicerecord.routing.virtualrouter.ipv6staticroute.delete(...)
+  * device.devicerecord.routing.virtualrouter.ospfv2route.get(...)
+  * device.devicerecord.routing.virtualrouter.ospfv2interface.get(...)
+  * device.devicerecord.routing.virtualrouter.ospfv3route.get(...)
+  * device.devicerecord.routing.virtualrouter.ospfv3interface.get(...)
 
 ## Fixed
 

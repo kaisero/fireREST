@@ -8,6 +8,7 @@ from fireREST import utils
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.assignment import Assignment
 from fireREST.fmc.audit import Audit
+from fireREST.fmc.chassis import Chassis
 from fireREST.fmc.deployment import Deployment
 from fireREST.fmc.device import Device
 from fireREST.fmc.devicecluster import DeviceCluster
@@ -17,6 +18,7 @@ from fireREST.fmc.health import Health
 from fireREST.fmc.integration import Integration
 from fireREST.fmc.intelligence import Intelligence
 from fireREST.fmc.job import Job
+from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
 from fireREST.fmc.system import System
@@ -44,6 +46,7 @@ class FMC:
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)
         self.audit = Audit(self.conn)
+        self.chassis = Chassis(self.conn)
         self.deployment = Deployment(self.conn)
         self.device = Device(self.conn)
         self.devicecluster = DeviceCluster(self.conn)
@@ -53,6 +56,7 @@ class FMC:
         self.integration = Integration(self.conn)
         self.intelligence = Intelligence(self.conn)
         self.job = Job(self.conn)
+        self.netmap = NetMap(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)
