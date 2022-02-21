@@ -16,6 +16,7 @@ from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
 from fireREST.fmc.system import System
+from fireREST.fmc.troubleshoot import Troubleshoot
 from fireREST.fmc.update import Update
 from fireREST.fmc.user import User
 
@@ -37,5 +38,6 @@ def test_initialization(fmc):
     assert isinstance(fmc.object, Object)
     assert isinstance(fmc.policy, Policy)
     assert isinstance(fmc.system, System)
+    assert isinstance(fmc.troubleshoot, Troubleshoot)
     assert isinstance(fmc.update, Update)
     assert isinstance(fmc.user, User)

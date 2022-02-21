@@ -22,6 +22,7 @@ from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
 from fireREST.fmc.system import System
+from fireREST.fmc.troubleshoot import Troubleshoot
 from fireREST.fmc.update import Update
 from fireREST.fmc.user import User
 
@@ -60,5 +61,6 @@ class FMC:
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)
+        self.troubleshoot = Troubleshoot(self.conn)
         self.update = Update(self.conn)
         self.user = User(self.conn)

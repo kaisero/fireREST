@@ -12,6 +12,9 @@ API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
 #: url used to access netmap related api calls
 API_NETMAP_URL = '/api/fmc_netmap/v1'
 
+#: url used to access troubleshooting related api calls
+API_TROUBLESHOOT_URL = '/api/fmc_troubleshoot/v1'
+
 #: url used to refresh existing authorization token
 API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
 

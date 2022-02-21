@@ -338,6 +338,8 @@ class Resource:
             'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
+            'troubleshoot': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TROUBLESHOOT_URL}/domain/'
+            f'{self.conn.domain["id"]}{path}'
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
