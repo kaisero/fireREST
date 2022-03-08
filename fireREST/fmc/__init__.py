@@ -333,7 +333,8 @@ class Resource:
             'base': f'{self.conn.protocol}://{self.conn.hostname}{path}',
             'config': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_CONFIG_URL}/domain/'
             f'{self.conn.domain["id"]}{path}',
-            'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
+            'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}domain/'
+            f'{self.conn.domain["id"]}{path}',
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
         }
