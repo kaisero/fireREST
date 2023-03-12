@@ -1,6 +1,47 @@
-# 1.1.0 [2022-03-DD]
+# 1.1.0 [2023-03-19]
 
 ## New
+
+* Added support for FMC 7.2.0 api calls (incomplete)
+  * object.anyconnectpackage.create(...)
+  * object.anyconnectpackage.update(...)
+  * object.anyconnectpackage.delete(...)
+  * object.anyconnectprofile.create(...)
+  * object.anyconnectprofile.update(...)
+  * object.anyconnectprofile.delete(...)
+  * object.certenrollment.create(...)
+  * object.certenrollment.update(...)
+  * object.certenrollment.delete(...)
+  * object.certificatemap.create(...)
+  * object.certificatemap.update(...)
+  * object.certificatemap.delete(...)
+  * object.grouppolicy.create(...)
+  * object.grouppolicy.update(...)
+  * object.grouppolicy.delete(...)
+  * object.hostscanpackage.create(...)
+  * object.hostscanpackage.update(...)
+  * object.hostscanpackage.delete(...)
+  * object.ipv4addresspool.create(...)
+  * object.ipv4addresspool.update(...)
+  * object.ipv4addresspool.delete(...)
+  * object.ipv6addresspool.create(...)
+  * object.ipv6addresspool.update(...)
+  * object.ipv6addresspool.delete(...)
+  * object.radiusservergroup.create(...)
+  * object.radiusservergroup.update(...)
+  * object.radiusservergroup.delete(...)
+  * object.ssoserver.create(...)
+  * object.ssoserver.update(...)
+  * object.ssoserver.delete(...)
+  * policy.ravpn.create(...)
+  * policy.ravpn.update(...)
+  * policy.ravpn.delete(...)
+  * policy.ravpn.addressassignmentsettings.update(...)
+  * policy.ravpn.certificatemapsettings.update(...)
+  * policy.ravpn.connectionprofile.create(...)
+  * policy.ravpn.connectionprofile.update(...)
+  * policy.ravpn.connectionprofile.delete(...)
+
 
 * Added support for FMC 7.1.0 api calls
   * chassis.get(...)
@@ -62,7 +103,7 @@
   * user.duoconfig.get(...)
   * user.duoconfig.update(...)
 
-* Added support for missing older api calls
+* Added support for pre 7.1 api calls that were still missing
   * cluster.ftddevicecluster.create(...)
   * cluster.ftddevicecluster.update(...)
   * cluster.ftddevicecluster.delete(...)
