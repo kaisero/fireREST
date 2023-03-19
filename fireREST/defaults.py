@@ -9,6 +9,12 @@ API_USER_AGENT = f'FireREST/{__version__}'
 #: url used to generate token for api authorization
 API_AUTH_URL = '/api/fmc_platform/v1/auth/generatetoken'
 
+#: url used to access netmap related api calls
+API_NETMAP_URL = '/api/fmc_netmap/v1'
+
+#: url used to access troubleshooting related api calls
+API_TROUBLESHOOT_URL = '/api/fmc_troubleshoot/v1'
+
 #: url used to refresh existing authorization token
 API_REFRESH_URL = '/api/fmc_platform/v1/auth/refreshtoken'
 
@@ -59,6 +65,9 @@ API_RELEASE_660 = '6.6.0'
 API_RELEASE_670 = '6.7.0'
 API_RELEASE_700 = '7.0.0'
 API_RELEASE_710 = '7.1.0'
+API_RELEASE_720 = '7.2.0'
+API_RELEASE_730 = '7.3.0'
+API_RELEASE_740 = '7.4.0'
 
 # Execute PUT,POST and DELETE operations by default. Change this switch to only log and not execute requests
 DRY_RUN = False

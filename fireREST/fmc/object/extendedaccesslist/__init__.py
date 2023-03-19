@@ -1,7 +1,10 @@
-from fireREST.defaults import API_RELEASE_630
+from fireREST.defaults import API_RELEASE_630, API_RELEASE_710
 from fireREST.fmc import Resource
 
 
 class ExtendedAccessList(Resource):
     PATH = '/object/extendedaccesslists/{uuid}'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_710
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_710
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_710

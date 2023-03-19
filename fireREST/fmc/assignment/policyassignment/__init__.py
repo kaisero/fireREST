@@ -4,7 +4,6 @@ from fireREST.fmc import Resource
 
 class PolicyAssignment(Resource):
     PATH = '/assignment/policyassignments/{uuid}'
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_610

@@ -333,9 +333,13 @@ class Resource:
             'base': f'{self.conn.protocol}://{self.conn.hostname}{path}',
             'config': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_CONFIG_URL}/domain/'
             f'{self.conn.domain["id"]}{path}',
+            'netmap': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_NETMAP_URL}/domain/'
+            f'{self.conn.domain["id"]}{path}',
             'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
+            'troubleshoot': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TROUBLESHOOT_URL}/domain/'
+            f'{self.conn.domain["id"]}{path}'
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
@@ -390,19 +394,21 @@ class Resource:
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def delete(self, uuid=None, name=None):
+    def delete(self, uuid=None, name=None, params=None):
         """Delete existing api resource. Either `name` or `uuid` must
-        be provided to delete an existing resource
+        be provided to delete an existing resource. Some resource may support delete by filter using params only
 
         :param uuid: id of resource
         :type uuid: str, optional
         :param name: name of resource
         :type name: str, optional
+        :param params: dict of parameters for http request
+        :type params: dict, optional
         :return: api response
         :rtype: requests.Response
         """
         url = self.url(self.PATH.format(uuid=uuid))
-        return self.conn.delete(url)
+        return self.conn.delete(url, params)
 
 
 class ChildResource(Resource):

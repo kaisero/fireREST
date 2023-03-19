@@ -6,10 +6,6 @@ class Endpoint(ChildResource):
     CONTAINER_NAME = 'Endpoint'
     CONTAINER_PATH = '/policy/ftds2svpns/{uuid}'
     PATH = '/policy/ftds2svpns/{container_uuid}/endpoints/{uuid}'
-    SUPPORTED_FILTERS = []
-    SUPPORTED_PARAMS = []
-    IGNORE_FOR_CREATE = []
-    IGNORE_FOR_UPDATE = []
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_630
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_630
