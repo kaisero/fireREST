@@ -3,7 +3,7 @@
 import json
 import logging
 from http.client import responses as http_responses
-from typing import Dict, Union
+from typing import Dict, List, Union
 from urllib.parse import urlencode
 
 import requests
@@ -339,7 +339,8 @@ class Resource:
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
             'troubleshoot': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TROUBLESHOOT_URL}/domain/'
-            f'{self.conn.domain["id"]}{path}'
+            f'{self.conn.domain["id"]}{path}',
+            'bulk': f'{self.conn.protocol}://{self.conn.hostname}{path}',
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
@@ -377,7 +378,7 @@ class Resource:
         return self.conn.get(url, params)
 
     @utils.minimum_version_required
-    def update(self, data: Dict, params=None):
+    def update(self, data: Union[Dict, List[Dict]], container_uuid=None, params=None):
         """Update existing api resource. Existing data will be overridden with
         the provided payload. The request will be routed to the correct resource
         by extracting the `id` within the payload
@@ -389,7 +390,12 @@ class Resource:
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(uuid=data['id']))
+        if isinstance(data, list):
+            url = self.url(self.PATH.format(container_uuid=container_uuid, uuid='bulk'))
+        else:
+            if 'id' not in data:
+                raise ValueError("The UUID of the resource to update must be included in the data parameter")
+            url = self.url(self.PATH.format(uuid=data['id']))
         return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
@@ -465,7 +471,7 @@ class ChildResource(Resource):
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def update(self, data: Dict, container_uuid=None, container_name=None, params=None):
+    def update(self, data: Union[Dict, List[Dict]], container_uuid=None, container_name=None, params=None):
         """Update existing api resource. Either name or uuid of container resource must be provided
         Existing data will be overridden with the provided payload. The request will be routed
         to the correct resource by extracting the `id` within the payload
@@ -481,7 +487,12 @@ class ChildResource(Resource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
+        if isinstance(data, list):
+            url = self.url(self.PATH.format(container_uuid=container_uuid, uuid='bulk'))
+        else:
+            if 'id' not in data:
+                raise ValueError("The UUID of the resource to update must be included in the data parameter")
+            url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
         return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
@@ -571,7 +582,7 @@ class NestedChildResource(ChildResource):
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def update(self, data: Dict, container_uuid=None, container_name=None,
+    def update(self, data: Union[Dict, List[Dict]], container_uuid=None, container_name=None,
                child_container_name=None, child_container_uuid=None, params=None):
         """Update existing api resource. Either name or uuid of container resource must be provided
         Existing data will be overridden with the provided payload. The request will be routed
@@ -592,7 +603,13 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
+        if isinstance(data, list):
+            url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
+                                        uuid='bulk'))
+        else:
+            if 'id' not in data:
+                raise ValueError("The UUID of the resource to update must be included in the data parameter")
+            url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
                                         uuid=data['id']))
         return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
