@@ -276,7 +276,22 @@ class Connection:
         domains = ', '.join((domain['name'] for domain in self.domains))
         msg = f'Could not find domain with name {name}. Available Domains: {domains}'
         raise exc.DomainNotFoundError(msg=msg)
+    
+    def get_domain_name(self, uuid: str):
+        """helper function to retrieve domain name from list of domains
 
+        :param uuid: uuid of the domain
+        :type uuid: str
+        :return: domain name
+        :rtype: str
+        """
+        for domain in self.domains:
+            if domain['uuid'] == uuid:
+                return domain['name']
+
+        uuids = ', '.join((domain['uuid'] for domain in self.domains))
+        msg = f'Could not find domain with uuid {uuid}. Available Domains: {uuids}'
+        raise exc.DomainNotFoundError(msg=msg)
 
 class Resource:
     """Base class for api resources. `Resource` can be used for all api resources
