@@ -99,3 +99,10 @@ def test_get_domain_id_with_correct_name(conn):
 def test_get_domain_id_with_incorrect_name(conn):
     with pytest.raises(exc.DomainNotFoundError):
         conn.get_domain_id('NON-EXISTING-DOMAIN')
+
+
+def test_get_version(conn):
+    actual_result = conn.get_version()
+
+    assert actual_result is not None
+
