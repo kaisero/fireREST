@@ -56,8 +56,8 @@ class Connection:
         :type timeout: int, optional
         :param dry_run: only log POST,PUT and DELETE api calls
         :type dry_run: bool, optional
-		:param cdo: True when connecting to cdFMC
-		:domain_id: Domain ID of the cdFMC MANDATORY when connecting via CDO
+        :param cdo: True when connecting to cdFMC
+        :domain_id: Domain ID of the cdFMC MANDATORY when connecting via CDO
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
