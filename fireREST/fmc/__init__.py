@@ -34,6 +34,8 @@ class Connection:
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
+        cdo = False,
+		domain_id = None,
     ):
         """Initialize connection object. It is highly recommended to use a
         dedicated user for api operations
@@ -54,6 +56,8 @@ class Connection:
         :type timeout: int, optional
         :param dry_run: only log POST,PUT and DELETE api calls
         :type dry_run: bool, optional
+		:param cdo: True when connecting to cdFMC
+		:domain_id: Domain ID of the cdFMC MANDATORY when connecting via CDO
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -62,7 +66,12 @@ class Connection:
             'Accept': defaults.API_CONTENT_TYPE,
             'User-Agent': defaults.API_USER_AGENT,
         }
-        self.cred = HTTPBasicAuth(username, password)
+        self.cdo = cdo
+        if self.cdo:
+            self.cred = password
+        else:
+            self.cred = HTTPBasicAuth(username, password)
+        self.cred = password
         self.hostname = hostname
         self.protocol = protocol
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
@@ -72,7 +81,10 @@ class Connection:
         self.verify_cert = verify_cert
         self.domains = None
         self.login()
-        self.domain = {'id': self.get_domain_id(domain), 'name': domain}
+        if not self.cdo:
+            self.domain = {'id': self.get_domain_id(domain), 'name': domain}
+        else:
+            self.domain = {'id': domain_id, 'name': domain}
         self.version = self.get_version()
 
     @utils.handle_errors
@@ -228,11 +240,14 @@ class Connection:
 
         """
         logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
-        url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
-        response = self._request('post', url, auth=self.cred)
-        self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
-        self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-        self.domains = json.loads(response.headers['DOMAINS'])
+        if self.cdo:
+            self.headers["Authorization"] = f"Bearer {self.cred}"
+        else:
+            url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
+            response = self._request('post', url, auth=self.cred)
+            self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+            self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            self.domains = json.loads(response.headers['DOMAINS'])
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def refresh(self):
@@ -240,17 +255,17 @@ class Connection:
         times, afterwards a re-authentication using `self.login()` will be performed
 
         """
-        if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
-            logger.info('Access token is invalid. Refreshing authentication token')
-            self.refresh_counter += 1
-            url = f'{self.protocol}://{self.hostname}{defaults.API_REFRESH_URL}'
-            response = self._request('post', url)
-            self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
-            self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-
-        else:
-            logger.info('Maximum number of authentication refresh operations reached', self.hostname)
-            self.login()
+        if not self.cdo:
+            if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
+                logger.info('Access token is invalid. Refreshing authentication token')
+                self.refresh_counter += 1
+                url = f'{self.protocol}://{self.hostname}{defaults.API_REFRESH_URL}'
+                response = self._request('post', url)
+                self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+                self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            else:
+                logger.info('Maximum number of authentication refresh operations reached', self.hostname)
+                self.login()
 
     def get_version(self):
         """Get version of fmc
@@ -272,6 +287,7 @@ class Connection:
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
+
 
         domains = ', '.join((domain['name'] for domain in self.domains))
         msg = f'Could not find domain with name {name}. Available Domains: {domains}'
