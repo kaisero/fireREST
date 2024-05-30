@@ -71,7 +71,6 @@ class Connection:
             self.cred = password
         else:
             self.cred = HTTPBasicAuth(username, password)
-        self.cred = password
         self.hostname = hostname
         self.protocol = protocol
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
