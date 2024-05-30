@@ -41,8 +41,10 @@ class FMC:
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
+        cdo = False,
+		domain_id = None,
     ):
-        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run)
+        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run,cdo,domain_id)
         self.domain = self.conn.domain
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)
