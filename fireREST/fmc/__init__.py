@@ -259,7 +259,13 @@ class Connection:
         :rtype: version.Version
         """
         url = f'{self.protocol}://{self.hostname}{defaults.API_PLATFORM_URL}/info/serverversion'
-        return version.parse(self._request('get', url).json()['items'][0]['serverVersion'].split(' ')[0])
+        payload = self._request('get', url).json()
+
+        if 'items' in payload:
+            return version.parse(payload['items'][0]['serverVersion'].split(' ')[0])
+
+        msg = 'Could not determine server version'
+        raise exc.UnprocessableEntityError(msg=msg)
 
     def get_domain_id(self, name: str):
         """helper function to retrieve domain id from list of domains
