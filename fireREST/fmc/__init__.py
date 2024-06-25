@@ -351,6 +351,8 @@ class Resource:
             'netmap': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_NETMAP_URL}/domain/'
             f'{self.conn.domain["id"]}{path}',
             'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
+            'platform_with_domain': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}/domain/'
+            f'{self.conn.domain["id"]}{path}',
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
             'troubleshoot': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TROUBLESHOOT_URL}/domain/'
