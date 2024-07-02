@@ -44,6 +44,9 @@ API_REQUEST_TIMEOUT = 120
 #: name of fmc default domain for api requests
 API_DEFAULT_DOMAIN = 'Global'
 
+#: CDO default domain ID
+API_CDO_DEFAULT_DOMAIN_ID = 'e276abec-e0f2-11e3-8169-6d9ed49b625f'
+
 #: intial authorization token refresh counter
 API_REFRESH_COUNTER_INIT = 0
 

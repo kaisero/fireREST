@@ -34,7 +34,7 @@ FireREST is a python library to interface with Cisco Firepower Management Center
 from fireREST import FMC
 ```
 
-### Authentication
+### Authentication (self-hosted)
 
 FireREST uses basic authentication. In case your authentication token times out, the api client will automatically refresh the session and retry
 a failed operation. If all 3 refresh tokens have been used up the connection object will try to re-authenticate again automatically.
@@ -44,6 +44,14 @@ fmc = FMC(hostname='fmc.example.com', username='firerest', password='Cisco123', 
 ```
 
 > **_NOTE:_**  By default domain is set to `Global`
+
+### Authentication (cdFMC/CDO)
+
+fireREST uses Bearer token to authenticate. This token can be obtained from CDO cloud portal.
+
+```python
+fmc = FMC(hostname='example.app.eu.cdo.cisco.com', password='<CDO Token>', cdo=True)
+```
 
 ### CRUD Operations
 

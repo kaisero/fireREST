@@ -34,15 +34,17 @@ class FMC:
     def __init__(
         self,
         hostname: str,
-        username: str,
-        password: str,
+        username: str=None,
+        password: str=None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
+        cdo=False,
+        cdo_domain_id=defaults.API_CDO_DEFAULT_DOMAIN_ID,
     ):
-        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run)
+        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run, cdo, cdo_domain_id)
         self.domain = self.conn.domain
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)

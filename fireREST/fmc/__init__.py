@@ -27,22 +27,24 @@ class Connection:
     def __init__(
         self,
         hostname: str,
-        username: str,
-        password: str,
+        username: str=None,
+        password: str=None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
+        cdo=False,
+		cdo_domain_id=defaults.API_CDO_DEFAULT_DOMAIN_ID,
     ):
         """Initialize connection object. It is highly recommended to use a
         dedicated user for api operations
 
         :param hostname: ip address or fqdn of firepower management center
         :type hostname: str
-        :param username: username used for api authentication
-        :type username: str
-        :param password: password used for api authentication
+        :param username: username used for api authentication. Not required for CDO
+        :type username: str, optional
+        :param password: password/cdo token used for api authentication
         :type password: str
         :param protocol: protocol used to access fmc rest api. Defaults to `https`
         :type protocol: str, optional
@@ -54,6 +56,10 @@ class Connection:
         :type timeout: int, optional
         :param dry_run: only log POST,PUT and DELETE api calls
         :type dry_run: bool, optional
+        :param cdo: True when connecting to cdFMC
+        :type cdo: bool, optional
+        :param cdo_domain_id: CDO domain ID
+        :type cdo_domain_id: str, optional
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -62,7 +68,11 @@ class Connection:
             'Accept': defaults.API_CONTENT_TYPE,
             'User-Agent': defaults.API_USER_AGENT,
         }
-        self.cred = HTTPBasicAuth(username, password)
+        self.cdo = cdo
+        if self.cdo:
+            self.cred = password
+        else:
+            self.cred = HTTPBasicAuth(username, password)
         self.hostname = hostname
         self.protocol = protocol
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
@@ -72,7 +82,11 @@ class Connection:
         self.verify_cert = verify_cert
         self.domains = None
         self.login()
-        self.domain = {'id': self.get_domain_id(domain), 'name': domain}
+        if self.cdo:
+            self.domains = [{'uuid': cdo_domain_id, 'name': 'Global'}]
+            self.domain = {'id': cdo_domain_id, 'name': 'Global'}
+        else:
+            self.domain = {'id': self.get_domain_id(domain), 'name': domain}
         self.version = self.get_version()
 
     @utils.handle_errors
@@ -228,18 +242,24 @@ class Connection:
 
         """
         logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
-        url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
-        response = self._request('post', url, auth=self.cred)
-        self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
-        self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-        self.domains = json.loads(response.headers['DOMAINS'])
+        if self.cdo:
+            self.headers["Authorization"] = f"Bearer {self.cred}"
+        else:
+            url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
+            response = self._request('post', url, auth=self.cred)
+            self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+            self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            self.domains = json.loads(response.headers['DOMAINS'])
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def refresh(self):
         """Refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using `self.login()` will be performed
+        Note: CDO does not require token refresh
 
         """
+        if self.cdo:
+            return
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
             logger.info('Access token is invalid. Refreshing authentication token')
             self.refresh_counter += 1
@@ -247,7 +267,6 @@ class Connection:
             response = self._request('post', url)
             self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
             self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-
         else:
             logger.info('Maximum number of authentication refresh operations reached', self.hostname)
             self.login()
