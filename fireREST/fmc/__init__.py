@@ -72,6 +72,8 @@ class Connection:
         if self.cdo:
             self.cred = password
         else:
+            if not username:
+                raise exc.AuthError('Username is required for non-CDO connections')
             self.cred = HTTPBasicAuth(username, password)
         self.hostname = hostname
         self.protocol = protocol
