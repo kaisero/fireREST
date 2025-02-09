@@ -21,21 +21,20 @@ logger.addHandler(logging.NullHandler())
 
 
 class Connection:
-
     """API Connection object used to interact with Firepower Management Center REST API"""
 
     def __init__(
         self,
         hostname: str,
-        username: str=None,
-        password: str=None,
+        username: str = None,
+        password: str = None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
         cdo=False,
-		cdo_domain_id=defaults.API_CDO_DEFAULT_DOMAIN_ID,
+        cdo_domain_id=defaults.API_CDO_DEFAULT_DOMAIN_ID,
     ):
         """Initialize connection object. It is highly recommended to use a
         dedicated user for api operations
@@ -245,7 +244,7 @@ class Connection:
         """
         logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
         if self.cdo:
-            self.headers["Authorization"] = f"Bearer {self.cred}"
+            self.headers['Authorization'] = f'Bearer {self.cred}'
         else:
             url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
             response = self._request('post', url, auth=self.cred)
@@ -303,7 +302,7 @@ class Connection:
         domains = ', '.join((domain['name'] for domain in self.domains))
         msg = f'Could not find domain with name {name}. Available Domains: {domains}'
         raise exc.DomainNotFoundError(msg=msg)
-    
+
     def get_domain_name(self, uuid: str):
         """helper function to retrieve domain name from list of domains
 
@@ -319,6 +318,7 @@ class Connection:
         uuids = ', '.join((domain['uuid'] for domain in self.domains))
         msg = f'Could not find domain with uuid {uuid}. Available Domains: {uuids}'
         raise exc.DomainNotFoundError(msg=msg)
+
 
 class Resource:
     """Base class for api resources. `Resource` can be used for all api resources
@@ -349,7 +349,8 @@ class Resource:
     MINIMUM_VERSION_REQUIRED_DELETE = '99.99.99'
 
     def __init__(
-        self, conn,
+        self,
+        conn,
     ):
         """Initialize Resource object
 
@@ -383,7 +384,7 @@ class Resource:
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
             'troubleshoot': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TROUBLESHOOT_URL}/domain/'
-            f'{self.conn.domain["id"]}{path}'
+            f'{self.conn.domain["id"]}{path}',
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
@@ -560,8 +561,15 @@ class NestedChildResource(ChildResource):
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def create(self, data: Union[dict, list], container_uuid=None, container_name=None,
-               child_container_name=None, child_container_uuid=None, params=None):
+    def create(
+        self,
+        data: Union[dict, list],
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        params=None,
+    ):
         """Create api resource. Either name or uuid for container and child_container must be provided
         to create the resource within the provided scope
 
@@ -580,14 +588,23 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=None))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=None)
+        )
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def get(self, container_uuid=None, container_name=None, child_container_name=None, child_container_uuid=None,
-            uuid=None, name=None, params=None):
+    def get(
+        self,
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        uuid=None,
+        name=None,
+        params=None,
+    ):
         """Get api resource in json format. Either name or uuid of container resource must
         be provided to search for resources within the container scope
         If no name or uuid is provided a list of all available resources will be returned
@@ -609,14 +626,22 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: Union[dict, list]
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=uuid))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=uuid)
+        )
         return self.conn.get(url, params)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def update(self, data: Dict, container_uuid=None, container_name=None,
-               child_container_name=None, child_container_uuid=None, params=None):
+    def update(
+        self,
+        data: Dict,
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        params=None,
+    ):
         """Update existing api resource. Either name or uuid of container resource must be provided
         Existing data will be overridden with the provided payload. The request will be routed
         to the correct resource by extracting the `id` within the payload
@@ -636,14 +661,22 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=data['id']))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=data['id'])
+        )
         return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def delete(self, container_uuid=None, container_name=None, child_container_name=None, child_container_uuid=None,
-               uuid=None, name=None):
+    def delete(
+        self,
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        uuid=None,
+        name=None,
+    ):
         """Delete existing api resource. Either name or uuid of container resource must be provided
         Either `name` or `uuid` must be provided to delete an existing resource
 
@@ -662,6 +695,7 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=uuid))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=uuid)
+        )
         return self.conn.delete(url)

@@ -54,10 +54,12 @@ def test_platform_url(fmc):
     actual_url = fmc.policy.accesspolicy.url(path='/test', namespace='platform')
     assert actual_url == expected_url
 
+
 def test_platform_with_domain_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}{API_PLATFORM_URL}/domain/{fmc.conn.domain["id"]}/test'
     actual_url = fmc.audit.auditrecord.url(path='/test', namespace='platform_with_domain')
     assert actual_url == expected_url
+
 
 def test_refresh_url(fmc):
     expected_url = f'{fmc.conn.protocol}://{fmc.conn.hostname}{API_REFRESH_URL}'

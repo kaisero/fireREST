@@ -11,6 +11,8 @@ def test_initialization(fmc):
 def test_get_bgp_empty_configuration(fmc, devicerecord, virtualrouter):
     expected_result = []
 
-    actual_result = fmc.device.devicerecord.routing.virtualrouter.bgp.get(container_uuid=devicerecord['id'],
-                                                                          child_container_uuid=virtualrouter['id'])
+    actual_result = fmc.device.devicerecord.routing.virtualrouter.bgp.get(
+        container_uuid=devicerecord['id'],
+        child_container_uuid=virtualrouter['id'],
+    )
     assert expected_result == actual_result

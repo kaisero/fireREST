@@ -16,4 +16,3 @@ class PhysicalInterface(ChildResource):
         return super().get(
             container_uuid=container_uuid, container_name=container_name, uuid=uuid, name=name, params=params
         )
-

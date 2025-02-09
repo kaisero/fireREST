@@ -22,4 +22,3 @@ class FtdDeviceCluster(Resource):
     def readiness_check(self, data: Dict, skip_control_readiness=None, params=None):
         url = self.url(path='/deviceclusters/ftdclusterreadinesscheck')
         return self.conn.post(url=url, data=data, params=params)
-
