@@ -18,7 +18,7 @@ FireREST is a python library to interface with Cisco Firepower Management Center
 
 ## Requirements
 
-* Python >= 3.7
+* Python >= 3.9
 
 ## Quickstart
 
@@ -111,6 +111,10 @@ the following CRUD operations:
 │   └── policyassignment
 ├── audit
 │   └── auditrecord
+├── chassis
+│   ├── interface
+│   ├── networkmodule
+│   └── operational
 ├── deployment
 │   ├── deployabledevice
 │   │   ├── deployment
@@ -140,14 +144,22 @@ the following CRUD operations:
 │       │   ├── ospfinterface
 │       │   ├── ospfv2route
 │       │   ├── ospfv3interface
+│       │   ├── policybasedroute
 │       │   ├── staticroute
 │       │   └── virtualrouter
+│       │       ├── bgp
+│       │       ├── ipv4staticroute
+│       │       ├── ipv6staticroute
+│       │       ├── ospfinterface
+│       │       ├── ospfv2route
+│       │       └── policybasedroute
 │       ├── subinterface
 │       ├── virtualswitch
 │       ├── virtualtunnelinterface
 │       └── vlaninterface
 ├── devicecluster
 │   └── ftddevicecluster
+│       └── operational
 ├── devicegroup
 │   └── devicegrouprecord
 ├── devicehapair
@@ -156,12 +168,16 @@ the following CRUD operations:
 │       └── monitoredinterface
 ├── health
 │   ├── alert
-│   └── metric
+│   ├── metric
+│   ├── tunnelstatus
+│   └── tunnelsummary
 ├── integration
 │   ├── cloudeventsconfig
 │   ├── cloudregion
 │   ├── externallookup
-│   └── externalstorage
+│   ├── externalstorage
+│   ├── fmchastatus
+│   └── securexconfig
 ├── intelligence
 │   ├── taxiiconfig
 │   │   ├── collection
@@ -175,7 +191,14 @@ the following CRUD operations:
 │       └── source
 ├── job
 │   └── taskstatus
+├── netmap
+│   ├── host
+│   └── vulnerability
 ├── object
+│   ├── anyconnectcustomattribute
+│   │   └── override
+│   ├── anyconnectpackage
+│   ├── anyconnectprofile
 │   ├── anyprotocolportobject
 │   ├── application
 │   ├── applicationcategory
@@ -186,10 +209,14 @@ the following CRUD operations:
 │   ├── applicationtype
 │   ├── aspathlist
 │   ├── certenrollment
+│   ├── certificatemap
 │   ├── communitylist
 │   ├── continent
 │   ├── country
 │   ├── dnsservergroup
+│   │   └── override
+│   ├── dynamicobject
+│   │   └── mapping
 │   ├── endpointdevicetype
 │   ├── expandedcommunitylist
 │   ├── extendedaccesslist
@@ -197,8 +224,10 @@ the following CRUD operations:
 │   │   └── override
 │   ├── geolocation
 │   ├── globaltimezone
+│   ├── grouppolicy
 │   ├── host
 │   │   └── override
+│   ├── hostscanpackage
 │   ├── icmpv4object
 │   │   └── override
 │   ├── icmpv6object
@@ -209,7 +238,13 @@ the following CRUD operations:
 │   ├── ikev2policy
 │   ├── interface
 │   ├── interfacegroup
+│   ├── intrusionrule
+│   ├── intrusionrulegroup
+│   ├── ipv4addresspool
+│   │   └── override
 │   ├── ipv4prefixlist
+│   ├── ipv6addresspool
+│   │   └── override
 │   ├── ipv6prefixlist
 │   ├── isesecuritygrouptag
 │   ├── keychain
@@ -219,22 +254,33 @@ the following CRUD operations:
 │   ├── networkaddress
 │   ├── networkgroup
 │   │   └── override
+│   ├── operational
+│   │   └── usage
 │   ├── policylist
 │   ├── port
 │   ├── portobjectgroup
 │   │   └── override
 │   ├── protocolportobject
 │   │   └── override
+│   ├── radiusservergroup
 │   ├── range
 │   │   └── override
+│   ├── realm
 │   ├── realmuser
 │   ├── realmusergroup
 │   ├── routemap
 │   ├── securitygrouptag
 │   ├── securityzone
+│   ├── sidnsfeed
+│   ├── sidnslist
+│   ├── sinetworkfeed
+│   ├── sinetworklist
+│   ├── sinkhole
 │   ├── siurlfeed
 │   ├── siurllist
 │   ├── slamonitor
+│   ├── ssoserver
+│   │   └── override
 │   ├── standardaccesslist
 │   ├── standardcommunitylist
 │   ├── timerange
@@ -258,8 +304,13 @@ the following CRUD operations:
 │   │   ├── defaultaction
 │   │   ├── inheritancesettings
 │   │   ├── loggingsettings
-│   │   └── operational
-│   │       └── hitcounts
+│   │   ├── operational
+│   │   │   └── hitcounts
+│   │   └── securityintelligencepolicy
+│   ├── dnspolicy
+│   │   ├── allowdnsrule
+│   │   └── blockdnsrule
+│   ├── dynamicaccesspolicy
 │   ├── filepolicy
 │   ├── ftdnatpolicy
 │   │   ├── autonatrule
@@ -270,24 +321,37 @@ the following CRUD operations:
 │   │   ├── endpoint
 │   │   ├── ikesettings
 │   │   └── ipsecsettings
+│   ├── identitypolicy
 │   ├── intrusionpolicy
-│   │   └── intrusionrule
+│   │   ├── intrusionrule
+│   │   └── intrusionrulegroup
+│   ├── networkanalysispolicy
+│   │   ├── inspectorconfig
+│   │   └── inspectoroverrideconfig
 │   ├── prefilterpolicy
 │   │   ├── defaultaction
 │   │   ├── operational
 │   │   │   └── hitcounts
 │   │   └── prefilterrule
+│   ├── ravpn
+│   │   ├── addressassignmentsettings
+│   │   ├── certificatemapsettings
+│   │   └── connectionprofile
 │   ├── snmpalert
 │   └── syslogalert
 ├── system
 │   └── info
 │       ├── domain
 │       └── serverversion
+├── troubleshoot
+│   └── packettracer
+│       └── file
 ├── update
 │   └── upgradepackage
 │       └── applicabledevice
 └── user
     ├── authrole
+    ├── duoconfig
     └── ssoconfig
 ```
 
@@ -338,6 +402,10 @@ TCAT: 02-02 15:34:33 APIException:Invalid IP Address
 ## Authors
 
 Oliver Kaiser (oliver.kaiser@outlook.com)
+
+## Maintainers
+
+Rafal Chrabaszcz (rchrabas@cisco.com)
 
 ## License
 
