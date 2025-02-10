@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    fireREST.fmc.policy.intrusionpolicy.intrusionrule
+   fireREST.fmc.policy.intrusionpolicy.intrusionrulegroup
 
 Module contents
 ---------------

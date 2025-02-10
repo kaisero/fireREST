@@ -42,6 +42,8 @@ pytest-runner = "^6"
 sphinx = "^7"
 sphinx_rtd_theme = "^3"
 sphinx-click = "^6"
+sphinx-mdinclude = "^0"
+sphinx_markdown_builder = ">=0.6.8"
 
 [build-system]
 requires = ["poetry-core"]

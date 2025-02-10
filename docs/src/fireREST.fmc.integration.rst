@@ -11,6 +11,8 @@ Subpackages
    fireREST.fmc.integration.cloudregion
    fireREST.fmc.integration.externallookup
    fireREST.fmc.integration.externalstorage
+   fireREST.fmc.integration.fmchastatus
+   fireREST.fmc.integration.securexconfig
 
 Module contents
 ---------------
