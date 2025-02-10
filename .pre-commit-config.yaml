@@ -10,12 +10,9 @@ repos:
       - id: check-toml
       - id: check-yaml
       - id: check-added-large-files
-      - id: double-quote-string-fixer
-  - repo: https://github.com/psf/black
-    rev: 25.1.0
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.9.5
     hooks:
-      - id: black
-  - repo: https://github.com/pycqa/flake8
-    rev: 7.1.1
-    hooks:
-      - id: flake8
+      - id: ruff
+        args: [ '--fix' ]
+      - id: ruff-format
