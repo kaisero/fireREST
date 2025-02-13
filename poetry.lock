@@ -524,7 +524,7 @@ version = "24.2"
 description = "Core utilities for Python packages"
 optional = false
 python-versions = ">=3.8"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "packaging-24.2-py3-none-any.whl", hash = "sha256:09abb1bccd265c01f4a3aa3f7a7db064b36514d2cba19a2f694fe6150451a759"},
     {file = "packaging-24.2.tar.gz", hash = "sha256:c228a6dc5e932d346bc5739379109d49e8853dd8223571c7c5b55260edc0b97f"},
@@ -1264,4 +1264,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.9"
-content-hash = "34905f84d58865e8e526ff25022b41dc6403fd405bdef2242bcade2908a43038"
+content-hash = "3362179470d299fb78265788bdedd2c2e7478f718a5f43df79bf29ff827bfe84"
