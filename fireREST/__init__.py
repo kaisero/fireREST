@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from typing import Optional
 
 from fireREST import defaults
 from fireREST.fmc import Connection
@@ -32,8 +33,8 @@ class FMC:
     def __init__(
         self,
         hostname: str,
-        username: str = None,
-        password: str = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,

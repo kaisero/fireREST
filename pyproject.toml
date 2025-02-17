@@ -50,6 +50,7 @@ sphinx_rtd_theme = "^3"
 sphinx-click = "^6"
 sphinx-mdinclude = "^0"
 sphinx_markdown_builder = ">=0.6.8"
+mypy = ">=1"
 
 [build-system]
 requires = ["setuptools >= 75.0"]

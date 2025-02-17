@@ -3,11 +3,12 @@
 import json
 import logging
 from http.client import responses as http_responses
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 from urllib.parse import urlencode
 
 import requests
 import simplejson
+import simplejson.errors
 import urllib3
 from packaging import version
 from requests.auth import HTTPBasicAuth
@@ -26,8 +27,8 @@ class Connection:
     def __init__(
         self,
         hostname: str,
-        username: str = None,
-        password: str = None,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
@@ -68,6 +69,9 @@ class Connection:
             'User-Agent': defaults.API_USER_AGENT,
         }
         self.cdo = cdo
+        self.cred: Union[str, HTTPBasicAuth, None] = ''
+        if not password:
+            raise exc.AuthError('Password is required for api connections')
         if self.cdo:
             self.cred = password
         else:
@@ -295,6 +299,7 @@ class Connection:
         :return: domain uuid
         :rtype: str
         """
+        assert self.domains is not None  # tell mypy that self.domains is not None
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
@@ -311,6 +316,7 @@ class Connection:
         :return: domain name
         :rtype: str
         """
+        assert self.domains is not None  # tell mypy that self.domains is not None
         for domain in self.domains:
             if domain['uuid'] == uuid:
                 return domain['name']
@@ -332,13 +338,13 @@ class Resource:
     # path to api resource within a namespace. e.g. /policy/accesspolicy
     PATH = '/'
     # supported filter arguments for GET operations
-    SUPPORTED_FILTERS = []
+    SUPPORTED_FILTERS: list[str] = []
     # supported param arguments for operations
-    SUPPORTED_PARAMS = []
+    SUPPORTED_PARAMS: list[str] = []
     # ignore fields for create operations
-    IGNORE_FOR_CREATE = []
+    IGNORE_FOR_CREATE: list[str] = []
     # ignore fields for put operations
-    IGNORE_FOR_UPDATE = []
+    IGNORE_FOR_UPDATE: list[str] = []
     # minimum version required for create()
     MINIMUM_VERSION_REQUIRED_CREATE = '99.99.99'
     # minimum version required for get()
