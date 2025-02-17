@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
+from typing import Optional
 
 from fireREST import defaults
-from fireREST import exceptions as exc
-from fireREST import utils
-from fireREST.fmc import Connection, Resource
+from fireREST.fmc import Connection
 from fireREST.fmc.assignment import Assignment
 from fireREST.fmc.audit import Audit
 from fireREST.fmc.chassis import Chassis
@@ -34,15 +33,19 @@ class FMC:
     def __init__(
         self,
         hostname: str,
-        username: str,
-        password: str,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
+        cdo=False,
+        cdo_domain_id=defaults.API_CDO_DEFAULT_DOMAIN_ID,
     ):
-        self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run)
+        self.conn = Connection(
+            hostname, username, password, protocol, verify_cert, domain, timeout, dry_run, cdo, cdo_domain_id
+        )
         self.domain = self.conn.domain
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)

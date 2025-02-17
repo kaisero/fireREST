@@ -24,5 +24,6 @@ class Policy:
         self.intrusionpolicy = IntrusionPolicy(conn)
         self.networkanalysispolicy = NetworkAnalysisPolicy(conn)
         self.prefilterpolicy = PrefilterPolicy(conn)
+        self.ravpn = RaVpn(conn)
         self.snmpalert = SnmpAlert(conn)
         self.syslogalert = SyslogAlert(conn)

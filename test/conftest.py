@@ -41,6 +41,12 @@ def constants():
         'snmpalert_id': '65ad6f9e-0966-11eb-8883-d597dc3a0aca',
     }
 
+@pytest.fixture(scope='module')
+def cdo_constants():
+    return {
+        'hostname': 'example.app.eu.cdo.cisco.com',
+        'password': '<CDO TOKEN>',
+    }
 
 @pytest.fixture(scope='module')
 def conn(constants):
@@ -59,6 +65,15 @@ def fmc(constants):
         username=constants['username'],
         password=constants['password'],
         domain=constants['domain']['name'],
+    )
+
+
+@pytest.fixture(scope='module')
+def cdo_fmc(cdo_constants):
+    return FMC(
+        hostname=cdo_constants['hostname'],
+        password=cdo_constants['password'],
+        cdo=True,
     )
 
 

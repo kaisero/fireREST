@@ -26,7 +26,7 @@ class Update(Resource):
         return self.conn.post(url=url, data=data)
 
     @utils.minimum_version_required(version=API_RELEASE_710)
-    def retry(self, data: Dict):
+    def revert(self, data: Dict):
         url = self.url(path='/updates/revertupgrades')
         return self.conn.post(url=url, data=data)
 

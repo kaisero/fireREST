@@ -18,11 +18,15 @@ class Host(Resource):
         return super().get(uuid=uuid, params=params)
 
     @utils.support_params
-    def delete(self,
-               uuid: Optional[str] = None,
-               ip_address: Optional[Union[str, List]] = None,
-               params: Optional[Dict] = None):
+    def delete(
+        self,
+        uuid: Optional[str] = None,
+        ip_address: Optional[Union[str, List]] = None,
+        params: Optional[Dict] = None,
+    ):
         if ip_address:
+            if params is None:
+                params = {}
             params['bulk'] = True
         url = self.url(self.PATH.format(uuid=uuid))
         return super().delete(url=url, uuid=uuid, params=params)

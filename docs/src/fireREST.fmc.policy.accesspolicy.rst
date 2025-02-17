@@ -13,6 +13,7 @@ Subpackages
    fireREST.fmc.policy.accesspolicy.inheritancesettings
    fireREST.fmc.policy.accesspolicy.loggingsettings
    fireREST.fmc.policy.accesspolicy.operational
+   fireREST.fmc.policy.accesspolicy.securityintelligencepolicy
 
 Module contents
 ---------------

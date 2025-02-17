@@ -189,8 +189,9 @@ def handle_errors(f):
             if not args[0].dry_run:
                 response.raise_for_status()
         except HTTPError:
-            if response.status_code == 401 and ('Access token invalid' in response.text
-                                                or 'Invalid access token' in response.text):
+            if response.status_code == 401 and (
+                'Access token invalid' in response.text or 'Invalid access token' in response.text
+            ):
                 # Invalid access token detected. Refresh authorization token
                 conn.refresh()
 
@@ -236,7 +237,10 @@ def raise_for_status(response):
             {'msg': 'Duplicate Name', 'exception': exc.ResourceAlreadyExistsError},
             {'msg': 'You do not have the required authorization', 'exception': exc.AuthorizationError},
         ],
-        401: [{'msg': 'User authentication failed', 'exception': exc.AuthError}],
+        401: [
+            {'msg': 'User authentication failed', 'exception': exc.AuthError},
+            {'msg': 'CDO token is invalid', 'exception': exc.AuthError},
+        ],
         403: [{'msg': 'The user is not authorized', 'exception': exc.AuthorizationError}],
         405: [{'msg': 'is not supported', 'exception': exc.UnsupportedOperationError}],
     }
@@ -267,7 +271,7 @@ def search_filter(items=None):
         for item in items:
             for k, v in item.items():
                 if v:
-                    v = str(v).lower() if type(v) == bool else v
+                    v = str(v).lower() if isinstance(v, bool) else v
                     filter_str += f'{k}:{v};'
         return filter_str.rstrip(';')
     return ''

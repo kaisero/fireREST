@@ -25,4 +25,3 @@ def test_get_applicationcategory_by_id(fmc):
     actual_result = fmc.object.applicationcategory.get(uuid=expected_result)['id']
 
     assert expected_result == actual_result
-

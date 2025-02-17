@@ -9,6 +9,7 @@ Subpackages
 
    fireREST.fmc.assignment
    fireREST.fmc.audit
+   fireREST.fmc.chassis
    fireREST.fmc.deployment
    fireREST.fmc.device
    fireREST.fmc.devicecluster
@@ -18,9 +19,11 @@ Subpackages
    fireREST.fmc.integration
    fireREST.fmc.intelligence
    fireREST.fmc.job
+   fireREST.fmc.netmap
    fireREST.fmc.object
    fireREST.fmc.policy
    fireREST.fmc.system
+   fireREST.fmc.troubleshoot
    fireREST.fmc.update
    fireREST.fmc.user
 

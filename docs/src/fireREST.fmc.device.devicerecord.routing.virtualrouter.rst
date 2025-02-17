@@ -12,6 +12,7 @@ Subpackages
    fireREST.fmc.device.devicerecord.routing.virtualrouter.ipv6staticroute
    fireREST.fmc.device.devicerecord.routing.virtualrouter.ospfinterface
    fireREST.fmc.device.devicerecord.routing.virtualrouter.ospfv2route
+   fireREST.fmc.device.devicerecord.routing.virtualrouter.policybasedroute
 
 Module contents
 ---------------

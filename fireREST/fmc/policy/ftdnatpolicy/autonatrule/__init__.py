@@ -17,12 +17,22 @@ class AutoNatRule(ChildResource):
 
     @utils.support_params
     def create(
-        self, data: Union[dict, list], container_uuid=None, container_name=None, section=None, params=None,
+        self,
+        data: Union[dict, list],
+        container_uuid=None,
+        container_name=None,
+        section=None,
+        params=None,
     ):
         return super().create(data=data, container_uuid=container_uuid, container_name=container_name, params=params)
 
     @utils.support_params
     def update(
-        self, data: Dict, container_uuid=None, container_name=None, section=None, params=None,
+        self,
+        data: Dict,
+        container_uuid=None,
+        container_name=None,
+        section=None,
+        params=None,
     ):
         return super().update(data=data, container_uuid=container_uuid, container_name=container_name, params=params)

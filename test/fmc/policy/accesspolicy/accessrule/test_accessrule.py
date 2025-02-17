@@ -11,7 +11,6 @@ from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 
 @pytest.fixture(scope='module')
 def accesspolicy(request, fmc):
-
     data = {'name': STATE['policy']['accesspolicy']['name'], 'defaultAction': {'action': 'BLOCK'}}
     policy = fmc.policy.accesspolicy.create(data).json()
 

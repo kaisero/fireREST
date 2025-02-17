@@ -1,17 +1,68 @@
-[tool.black]
+[project]
+name = "fireREST"
+version = "1.2.0"
+description = "Python API client for Cisco Firepower Management Center (FMC)"
+keywords = ["cisco", "firepower", "fmc", "ftd", "fpr", "api", "rest", "firewall"]
+authors = [
+    { name = "Oliver Kaiser", email = "oliver.kaiser@outlook.com" }
+]
+maintainers = [
+    { name = "Rafal Chrabaszcz", email = "rchrabas@cisco.com" }
+]
+license = { text = "GPL-3.0-only" }
+readme = {file = "README.md", content-type = "text/markdown"}
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Information Technology",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Operating System :: POSIX",
+    "Topic :: System :: Networking :: Firewalls",
+]
+
+requires-python = ">=3.9"
+dependencies = [
+    "packaging>=20.3",
+    "requests>=2.23.0",
+    "retry>=0.9.2",
+    "simplejson>=3.17.2",
+    "urllib3>=1.25.8"
+]
+
+[project.urls]
+repository = "https://github.com/kaisero/fireREST"
+
+[tool.poetry]
+requires-poetry = ">=2.0"
+packages = [
+    { include = "fireREST" }
+]
+
+[tool.poetry.group.dev.dependencies]
+pre-commit = "^4"
+pytest = "^8"
+pytest-cov = "^6"
+pytest-runner = "^6"
+sphinx = "^7"
+sphinx_rtd_theme = "^3"
+sphinx-click = "^6"
+sphinx-mdinclude = "^0"
+sphinx_markdown_builder = ">=0.6.8"
+mypy = ">=1"
+
+[build-system]
+requires = ["setuptools >= 75.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+exclude = ['.venv', '.git', 'docs']
 line-length = 120
-skip-string-normalization = true
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.pytest.ini_options]
+addopts = "--verbose"
+filterwarnings = "ignore::urllib3.exceptions.InsecureRequestWarning"

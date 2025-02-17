@@ -1,3 +1,19 @@
+# 1.2.0 [2025-02-17]
+
+## New
+
+* Add support for Cloud Delivered FMC (cdFMC) (#79, #80)
+* Add helper function `get_domain_name` (#74)
+
+## Fixed
+
+* Missing filtering support for Network Group (#81)
+* Corrected API Endpoint for `auditrecords` (#67)
+* Ensure version response contains processable information (#77)
+* Standard community fix (#78)
+* Missing RaVPN policy hook
+* Other minor fixes
+
 # 1.1.0 [2023-03-19]
 
 ## New
@@ -98,7 +114,7 @@
   * troubleshoot.packettracer.file.delete(...)
   * troubleshoot.packettracer.file.details.get(...)
   * troubleshoot.packettracer.trace(...)
-  * troubleshoot.packettracer.pcaptrace(...) 
+  * troubleshoot.packettracer.pcaptrace(...)
   * update.revert(...)
   * user.duoconfig.get(...)
   * user.duoconfig.update(...)

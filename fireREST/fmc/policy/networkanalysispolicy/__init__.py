@@ -1,4 +1,3 @@
-import fireREST.fmc.policy.networkanalysispolicy.inspectorconfig
 from fireREST.defaults import API_RELEASE_700
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.networkanalysispolicy.inspectorconfig import InspectorConfig

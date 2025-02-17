@@ -3,11 +3,12 @@
 import json
 import logging
 from http.client import responses as http_responses
-from typing import Dict, Union
+from typing import Dict, Union, Optional
 from urllib.parse import urlencode
 
 import requests
 import simplejson
+import simplejson.errors
 import urllib3
 from packaging import version
 from requests.auth import HTTPBasicAuth
@@ -21,28 +22,29 @@ logger.addHandler(logging.NullHandler())
 
 
 class Connection:
-
     """API Connection object used to interact with Firepower Management Center REST API"""
 
     def __init__(
         self,
         hostname: str,
-        username: str,
-        password: str,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
         protocol=defaults.API_PROTOCOL,
         verify_cert=False,
         domain=defaults.API_DEFAULT_DOMAIN,
         timeout=defaults.API_REQUEST_TIMEOUT,
         dry_run=defaults.DRY_RUN,
+        cdo=False,
+        cdo_domain_id=defaults.API_CDO_DEFAULT_DOMAIN_ID,
     ):
         """Initialize connection object. It is highly recommended to use a
         dedicated user for api operations
 
         :param hostname: ip address or fqdn of firepower management center
         :type hostname: str
-        :param username: username used for api authentication
-        :type username: str
-        :param password: password used for api authentication
+        :param username: username used for api authentication. Not required for CDO
+        :type username: str, optional
+        :param password: password/cdo token used for api authentication
         :type password: str
         :param protocol: protocol used to access fmc rest api. Defaults to `https`
         :type protocol: str, optional
@@ -54,6 +56,10 @@ class Connection:
         :type timeout: int, optional
         :param dry_run: only log POST,PUT and DELETE api calls
         :type dry_run: bool, optional
+        :param cdo: True when connecting to cdFMC
+        :type cdo: bool, optional
+        :param cdo_domain_id: CDO domain ID
+        :type cdo_domain_id: str, optional
         """
         if not verify_cert:
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -62,7 +68,16 @@ class Connection:
             'Accept': defaults.API_CONTENT_TYPE,
             'User-Agent': defaults.API_USER_AGENT,
         }
-        self.cred = HTTPBasicAuth(username, password)
+        self.cdo = cdo
+        self.cred: Union[str, HTTPBasicAuth, None] = ''
+        if not password:
+            raise exc.AuthError('Password is required for api connections')
+        if self.cdo:
+            self.cred = password
+        else:
+            if not username:
+                raise exc.AuthError('Username is required for non-CDO connections')
+            self.cred = HTTPBasicAuth(username, password)
         self.hostname = hostname
         self.protocol = protocol
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
@@ -72,7 +87,11 @@ class Connection:
         self.verify_cert = verify_cert
         self.domains = None
         self.login()
-        self.domain = {'id': self.get_domain_id(domain), 'name': domain}
+        if self.cdo:
+            self.domains = [{'uuid': cdo_domain_id, 'name': 'Global'}]
+            self.domain = {'id': cdo_domain_id, 'name': 'Global'}
+        else:
+            self.domain = {'id': self.get_domain_id(domain), 'name': domain}
         self.version = self.get_version()
 
     @utils.handle_errors
@@ -228,18 +247,24 @@ class Connection:
 
         """
         logger.info('Attempting authentication with Firepower Management Center (%s)', self.hostname)
-        url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
-        response = self._request('post', url, auth=self.cred)
-        self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
-        self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-        self.domains = json.loads(response.headers['DOMAINS'])
+        if self.cdo:
+            self.headers['Authorization'] = f'Bearer {self.cred}'
+        else:
+            url = f'{self.protocol}://{self.hostname}{defaults.API_AUTH_URL}'
+            response = self._request('post', url, auth=self.cred)
+            self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+            self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            self.domains = json.loads(response.headers['DOMAINS'])
         self.refresh_counter = defaults.API_REFRESH_COUNTER_INIT
 
     def refresh(self):
         """Refresh authorization token. This operation is performed for up to three
         times, afterwards a re-authentication using `self.login()` will be performed
+        Note: CDO does not require token refresh
 
         """
+        if self.cdo:
+            return
         if self.refresh_counter < defaults.API_REFRESH_COUNTER_MAX:
             logger.info('Access token is invalid. Refreshing authentication token')
             self.refresh_counter += 1
@@ -247,7 +272,6 @@ class Connection:
             response = self._request('post', url)
             self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
             self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-
         else:
             logger.info('Maximum number of authentication refresh operations reached', self.hostname)
             self.login()
@@ -259,7 +283,13 @@ class Connection:
         :rtype: version.Version
         """
         url = f'{self.protocol}://{self.hostname}{defaults.API_PLATFORM_URL}/info/serverversion'
-        return version.parse(self._request('get', url).json()['items'][0]['serverVersion'].split(' ')[0])
+        payload = self._request('get', url).json()
+
+        if 'items' in payload:
+            return version.parse(payload['items'][0]['serverVersion'].split(' ')[0])
+
+        msg = 'Could not determine server version'
+        raise exc.UnprocessableEntityError(msg=msg)
 
     def get_domain_id(self, name: str):
         """helper function to retrieve domain id from list of domains
@@ -269,12 +299,30 @@ class Connection:
         :return: domain uuid
         :rtype: str
         """
+        assert self.domains is not None  # tell mypy that self.domains is not None
         for domain in self.domains:
             if domain['name'] == name:
                 return domain['uuid']
 
         domains = ', '.join((domain['name'] for domain in self.domains))
         msg = f'Could not find domain with name {name}. Available Domains: {domains}'
+        raise exc.DomainNotFoundError(msg=msg)
+
+    def get_domain_name(self, uuid: str):
+        """helper function to retrieve domain name from list of domains
+
+        :param uuid: uuid of the domain
+        :type uuid: str
+        :return: domain name
+        :rtype: str
+        """
+        assert self.domains is not None  # tell mypy that self.domains is not None
+        for domain in self.domains:
+            if domain['uuid'] == uuid:
+                return domain['name']
+
+        uuids = ', '.join((domain['uuid'] for domain in self.domains))
+        msg = f'Could not find domain with uuid {uuid}. Available Domains: {uuids}'
         raise exc.DomainNotFoundError(msg=msg)
 
 
@@ -290,13 +338,13 @@ class Resource:
     # path to api resource within a namespace. e.g. /policy/accesspolicy
     PATH = '/'
     # supported filter arguments for GET operations
-    SUPPORTED_FILTERS = []
+    SUPPORTED_FILTERS: list[str] = []
     # supported param arguments for operations
-    SUPPORTED_PARAMS = []
+    SUPPORTED_PARAMS: list[str] = []
     # ignore fields for create operations
-    IGNORE_FOR_CREATE = []
+    IGNORE_FOR_CREATE: list[str] = []
     # ignore fields for put operations
-    IGNORE_FOR_UPDATE = []
+    IGNORE_FOR_UPDATE: list[str] = []
     # minimum version required for create()
     MINIMUM_VERSION_REQUIRED_CREATE = '99.99.99'
     # minimum version required for get()
@@ -307,7 +355,8 @@ class Resource:
     MINIMUM_VERSION_REQUIRED_DELETE = '99.99.99'
 
     def __init__(
-        self, conn,
+        self,
+        conn,
     ):
         """Initialize Resource object
 
@@ -336,10 +385,12 @@ class Resource:
             'netmap': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_NETMAP_URL}/domain/'
             f'{self.conn.domain["id"]}{path}',
             'platform': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}{path}',
+            'platform_with_domain': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_PLATFORM_URL}/domain/'
+            f'{self.conn.domain["id"]}{path}',
             'tid': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TID_URL}{path}',
             'refresh': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_REFRESH_URL}',
             'troubleshoot': f'{self.conn.protocol}://{self.conn.hostname}{defaults.API_TROUBLESHOOT_URL}/domain/'
-            f'{self.conn.domain["id"]}{path}'
+            f'{self.conn.domain["id"]}{path}',
         }
         if namespace not in options.keys():
             raise exc.InvalidNamespaceError(f'Invalid namespace "{namespace}" provided. Options: {options.keys()}')
@@ -516,8 +567,15 @@ class NestedChildResource(ChildResource):
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def create(self, data: Union[dict, list], container_uuid=None, container_name=None,
-               child_container_name=None, child_container_uuid=None, params=None):
+    def create(
+        self,
+        data: Union[dict, list],
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        params=None,
+    ):
         """Create api resource. Either name or uuid for container and child_container must be provided
         to create the resource within the provided scope
 
@@ -536,14 +594,23 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=None))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=None)
+        )
         return self.conn.post(url, data, params, self.IGNORE_FOR_CREATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def get(self, container_uuid=None, container_name=None, child_container_name=None, child_container_uuid=None,
-            uuid=None, name=None, params=None):
+    def get(
+        self,
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        uuid=None,
+        name=None,
+        params=None,
+    ):
         """Get api resource in json format. Either name or uuid of container resource must
         be provided to search for resources within the container scope
         If no name or uuid is provided a list of all available resources will be returned
@@ -565,14 +632,22 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: Union[dict, list]
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=uuid))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=uuid)
+        )
         return self.conn.get(url, params)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def update(self, data: Dict, container_uuid=None, container_name=None,
-               child_container_name=None, child_container_uuid=None, params=None):
+    def update(
+        self,
+        data: Dict,
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        params=None,
+    ):
         """Update existing api resource. Either name or uuid of container resource must be provided
         Existing data will be overridden with the provided payload. The request will be routed
         to the correct resource by extracting the `id` within the payload
@@ -592,14 +667,22 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=data['id']))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=data['id'])
+        )
         return self.conn.put(url, data, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name
     @utils.minimum_version_required
-    def delete(self, container_uuid=None, container_name=None, child_container_name=None, child_container_uuid=None,
-               uuid=None, name=None):
+    def delete(
+        self,
+        container_uuid=None,
+        container_name=None,
+        child_container_name=None,
+        child_container_uuid=None,
+        uuid=None,
+        name=None,
+    ):
         """Delete existing api resource. Either name or uuid of container resource must be provided
         Either `name` or `uuid` must be provided to delete an existing resource
 
@@ -618,6 +701,7 @@ class NestedChildResource(ChildResource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid,
-                                        uuid=uuid))
+        url = self.url(
+            self.PATH.format(container_uuid=container_uuid, child_container_uuid=child_container_uuid, uuid=uuid)
+        )
         return self.conn.delete(url)

@@ -9,6 +9,15 @@ class Metric(Resource):
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_670
 
     @utils.support_params
-    def get(self, device_uuids=None, end_time=None, metric=None, regex_filter=None,
-            query_function=None, start_time=None, step=None, params=None):
+    def get(
+        self,
+        device_uuids=None,
+        end_time=None,
+        metric=None,
+        regex_filter=None,
+        query_function=None,
+        start_time=None,
+        step=None,
+        params=None,
+    ):
         return super().get(params=params)
