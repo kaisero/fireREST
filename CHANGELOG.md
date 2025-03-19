@@ -1,3 +1,9 @@
+# 1.2.1 [Unreleased]
+
+## Fixed
+
+* Bulk updates fail for UPDATE operations (Issue #71)
+
 # 1.2.0 [2025-02-17]
 
 ## New
