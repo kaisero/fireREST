@@ -1,8 +1,9 @@
 # test files
 test.py
 
-# Byte-compiled / optimized / DLL files
+# Byte-compiled
 __pycache__/
+cache/
 
 # Distribution / packaging
 dist/
@@ -27,3 +28,7 @@ docs/_build/
 
 # Mypy
 .mypy_cache/
+
+# Cache
+.DS_Store
+build/

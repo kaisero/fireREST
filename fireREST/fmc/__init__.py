@@ -532,7 +532,10 @@ class ChildResource(Resource):
         :return: api response
         :rtype: requests.Response
         """
-        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
+        if isinstance(data, list):
+            url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=None))
+        else:
+            url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=data['id']))
         return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
     @utils.resolve_by_name

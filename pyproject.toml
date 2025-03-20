@@ -1,6 +1,6 @@
 [project]
 name = "fireREST"
-version = "1.2.0"
+version = "1.2.1"
 description = "Python API client for Cisco Firepower Management Center (FMC)"
 keywords = ["cisco", "firepower", "fmc", "ftd", "fpr", "api", "rest", "firewall"]
 authors = [
