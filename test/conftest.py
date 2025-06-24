@@ -25,9 +25,9 @@ STATE = {
 @pytest.fixture(scope='module')
 def constants():
     return {
-        'hostname': 'fmc.example.com',
-        'username': 'firerest',
-        'password': 'ChangeMeForSecurity123!',
+        'hostname': '10.62.158.192',
+        'username': 'api',
+        'password': 'Cisco123!',
         'domain': {'name': 'Global/DEV'},
         'devicehapair': 'ftd01.example.com',
         'devicehapair_id': '6dd24c5c-0971-11eb-bde5-8c24580c007a',
@@ -51,8 +51,8 @@ def constants():
 @pytest.fixture(scope='module')
 def cdo_constants():
     return {
-        'hostname': 'example.app.eu.cdo.cisco.com',
-        'password': '<CDO TOKEN>',
+        'hostname': 'cisco-rchrabas--sbs3cp.app.eu.cdo.cisco.com',
+        'password': 'eyJraWQiOiIwIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYifQ.eyJ2ZXIiOiIwIiwicm9sZXMiOlsiUk9MRV9TVVBFUl9BRE1JTiJdLCJhbXIiOiJzYW1sIiwiaXNzIjoiaXRkIiwiY2x1c3RlcklkIjoiMyIsInN1YmplY3RUeXBlIjoidXNlciIsImNsaWVudF9pZCI6ImFwaS1jbGllbnQiLCJwYXJlbnRJZCI6ImFjNzkzYjFjLWVlOGEtNDY4MS1iNmEwLTA0YTJjZGM4ZDJhMSIsInNjb3BlIjpbInRydXN0IiwicmVhZCIsImFjNzkzYjFjLWVlOGEtNDY4MS1iNmEwLTA0YTJjZGM4ZDJhMSIsIndyaXRlIl0sImlkIjoiMzYwN2U2YWEtYTA2ZS00ZTY1LTg4NGEtYzY3ZTY0MGFlNTU5IiwiZXhwIjozODk0ODAwNTc5LCJyZWdpb24iOiJwcm9kZXUiLCJpYXQiOjE3NDczMTY5OTIsImp0aSI6IjU5NDhlM2QxLTIyZWItNGRiMC05NWI2LWY2MTY4Y2NmZDA4OCJ9.w3HiccnnKGTPHXrX3yqWLy5PurOR7uxdZo5Fwjc_8avsS01KURr2WJqUGzBnGHjLff7Xmt_SVdp-vxYG279yTHGfT9GWZYVNWl1YAmKb2-xIan6gIxsIjvKa038YTvTjWkYQ-HgpoaKk8Z8w0d3vj7bf8Vu4ZivutRsIgqg_ClkeLzazX_GmqREJHFEl20twXGXbDb245N0dMjEcs743CdYiES1ep2pgQqBHZAIVPx3m4VllDM3a4k6Hz2JWYdaR9NN2Lt1fav64T2puTzffOztwdUCg9PHZGwQDa0NX1P2GScZg93_5FgNUPk8F2VzXhdDdArBSXm67S73_jHsxyg',
     }
 
 

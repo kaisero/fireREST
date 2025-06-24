@@ -1,6 +1,6 @@
 [project]
 name = "fireREST"
-version = "1.2.1"
+version = "1.2.2"
 description = "Python API client for Cisco Firepower Management Center (FMC)"
 keywords = ["cisco", "firepower", "fmc", "ftd", "fpr", "api", "rest", "firewall"]
 authors = [
@@ -25,10 +25,10 @@ classifiers = [
 requires-python = ">=3.9"
 dependencies = [
     "packaging>=20.3",
-    "requests>=2.23.0",
+    "requests>=2.32.4",
     "retry>=0.9.2",
     "simplejson>=3.17.2",
-    "urllib3>=1.25.8"
+    "urllib3>=2.5.0"
 ]
 
 [project.urls]
@@ -51,6 +51,7 @@ sphinx-click = "^6"
 sphinx-mdinclude = "^0"
 sphinx_markdown_builder = ">=0.6.8"
 mypy = ">=1"
+jinja2 = ">=3.1.6"
 
 [build-system]
 requires = ["setuptools >= 75.0"]
