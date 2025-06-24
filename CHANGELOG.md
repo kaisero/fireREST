@@ -1,3 +1,9 @@
+# 1.2.2 [2025-06-24]
+
+## Fixed
+
+* Bump dependent libriaries versions
+
 # 1.2.1 [2025-03-26]
 
 ## Fixed
