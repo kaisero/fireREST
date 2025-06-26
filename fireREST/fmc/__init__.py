@@ -269,9 +269,13 @@ class Connection:
             logger.info('Access token is invalid. Refreshing authentication token')
             self.refresh_counter += 1
             url = f'{self.protocol}://{self.hostname}{defaults.API_REFRESH_URL}'
-            response = self._request('post', url)
-            self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
-            self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            try:
+                response = self._request('post', url)
+                self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
+                self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
+            except exc.GenericApiError as e:
+                logger.error('Failed to refresh authentication token. Trying to re-authenticate.')
+                self.login()
         else:
             logger.info('Maximum number of authentication refresh operations reached', self.hostname)
             self.login()
