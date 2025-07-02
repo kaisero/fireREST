@@ -273,7 +273,7 @@ class Connection:
                 response = self._request('post', url)
                 self.headers['X-auth-access-token'] = response.headers['X-auth-access-token']
                 self.headers['X-auth-refresh-token'] = response.headers['X-auth-refresh-token']
-            except exc.GenericApiError as e:
+            except exc.GenericApiError:
                 logger.error('Failed to refresh authentication token. Trying to re-authenticate.')
                 self.login()
         else:
