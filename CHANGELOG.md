@@ -1,3 +1,9 @@
+# 1.2.3 [2025-07-02]
+
+## New
+
+* Handle authentication token refresh errors and re-authenticate if necessary
+
 # 1.2.2 [2025-06-24]
 
 ## Fixed
