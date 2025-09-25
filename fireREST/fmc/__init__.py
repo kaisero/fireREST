@@ -183,7 +183,11 @@ class Connection:
                 params['expanded'] = defaults.API_EXPANSION_MODE
 
         response = self._request('get', url, params=params)
-        payload = response.json()
+        try:
+            payload = response.json()
+        except (json.JSONDecodeError, simplejson.errors.JSONDecodeError):
+            logger.error('Failed to decode JSON response: %s', response.text)
+            return response.text
 
         if 'paging' in payload:
             if _items is None:
