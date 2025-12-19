@@ -1,3 +1,10 @@
+# 1.2.4 [Unreleased]
+
+## Fixed
+
+* Security Cloud Control failed authentication changed message handling
+* Bump urllib3 version
+
 # 1.2.3 [2025-07-02]
 
 ## New

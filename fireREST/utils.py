@@ -240,6 +240,7 @@ def raise_for_status(response):
         401: [
             {'msg': 'User authentication failed', 'exception': exc.AuthError},
             {'msg': 'CDO token is invalid', 'exception': exc.AuthError},
+            {'msg': 'SCC token is invalid', 'exception': exc.AuthError},
         ],
         403: [{'msg': 'The user is not authorized', 'exception': exc.AuthorizationError}],
         405: [{'msg': 'is not supported', 'exception': exc.UnsupportedOperationError}],
