@@ -19,6 +19,8 @@
   name-to-uuid resolution to query the wrong parent resource.
 * `policy.prefilterpolicy.defaultaction` had `CONTAINER_NAME = 'AccessPolicy'` (copy-paste error).
   Corrected to `'PrefilterPolicy'` so container name resolution targets the right class.
+* `policy.ftds2svpn.endpoint` had `CONTAINER_NAME = 'Endpoint'` (self-referencing error).
+  Corrected to `'FtdS2sVpn'` so container name resolution targets the parent VPN policy.
 
 # 1.1.0 [2023-03-19]
 
