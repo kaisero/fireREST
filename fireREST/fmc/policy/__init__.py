@@ -5,6 +5,7 @@ from fireREST.fmc.policy.dynamicaccesspolicy import DynamicAccessPolicy
 from fireREST.fmc.policy.filepolicy import FilePolicy
 from fireREST.fmc.policy.ftdnatpolicy import FtdNatPolicy
 from fireREST.fmc.policy.ftds2svpn import FtdS2sVpn
+from fireREST.fmc.policy.identitypolicy import IdentityPolicy
 from fireREST.fmc.policy.intrusionpolicy import IntrusionPolicy
 from fireREST.fmc.policy.networkanalysispolicy import NetworkAnalysisPolicy
 from fireREST.fmc.policy.prefilterpolicy import PrefilterPolicy
@@ -21,6 +22,7 @@ class Policy:
         self.filepolicy = FilePolicy(conn)
         self.ftdnatpolicy = FtdNatPolicy(conn)
         self.ftds2svpn = FtdS2sVpn(conn)
+        self.identitypolicy = IdentityPolicy(conn)
         self.intrusionpolicy = IntrusionPolicy(conn)
         self.networkanalysispolicy = NetworkAnalysisPolicy(conn)
         self.prefilterpolicy = PrefilterPolicy(conn)

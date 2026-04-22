@@ -35,6 +35,8 @@
 * `policy.accesspolicy.loggingsettings` module existed with correct PATH and version constants but
   was never imported or instantiated in `AccessPolicy.__init__()`. Now wired up as
   `self.loggingsettings`.
+* `policy.identitypolicy` module existed with correct PATH and version constants but was never
+  imported or instantiated in `Policy.__init__()`. Now wired up as `self.identitypolicy`.
 
 # 1.1.0 [2023-03-19]
 
