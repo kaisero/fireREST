@@ -8,6 +8,10 @@
 * `cluster.ftddevicecluster.operational.command()` built a URL with a literal `{container_uuid}`
   placeholder because `PATH` was concatenated without formatting. The path is now formatted with
   `container_uuid` before building the final URL.
+* `chassis.operational.breakout_interfaces()`, `join_interfaces()`, and `sync_networkmodule()` built
+  malformed URLs because `PATH` contains both `{container_uuid}` and `{uuid}` but only
+  `container_uuid` was substituted, leaving a literal `{uuid}` in every request URL. Both
+  placeholders are now substituted before the action suffix is appended.
 
 # 1.1.0 [2023-03-19]
 

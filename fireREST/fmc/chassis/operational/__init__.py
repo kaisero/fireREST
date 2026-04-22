@@ -17,7 +17,8 @@ class Operational(ChildResource):
                             container_uuid: Optional[str] = None,
                             container_name: Optional[str] = None,
                             params: Optional[Dict] = None):
-        url = self.url(f'{self.PATH.format(container_uuid=container_uuid)}/breakoutinterfaces')
+        base = self.PATH.format(container_uuid=container_uuid, uuid='').rstrip('/')
+        url = self.url(f'{base}/breakoutinterfaces')
         return self.conn.post(url=url, data=data, params=params)
 
     @utils.minimum_version_required(version=API_RELEASE_710)
@@ -27,7 +28,8 @@ class Operational(ChildResource):
                         container_uuid: Optional[str] = None,
                         container_name: Optional[str] = None,
                         params: Optional[Dict] = None):
-        url = self.url(f'{self.PATH.format(container_uuid=container_uuid)}/joininterfaces')
+        base = self.PATH.format(container_uuid=container_uuid, uuid='').rstrip('/')
+        url = self.url(f'{base}/joininterfaces')
         return self.conn.post(url=url, data=data, params=params)
 
     @utils.minimum_version_required(version=API_RELEASE_710)
@@ -36,5 +38,6 @@ class Operational(ChildResource):
                            container_uuid: Optional[str] = None,
                            container_name: Optional[str] = None,
                            params: Optional[Dict] = None):
-        url = self.url(f'{self.PATH.format(container_uuid=container_uuid)}/syncnetworkmodule')
+        base = self.PATH.format(container_uuid=container_uuid, uuid='').rstrip('/')
+        url = self.url(f'{base}/syncnetworkmodule')
         return self.conn.put(url=url, data=data, params=params)
