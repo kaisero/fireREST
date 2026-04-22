@@ -21,6 +21,9 @@
   Corrected to `'PrefilterPolicy'` so container name resolution targets the right class.
 * `policy.ftds2svpn.endpoint` had `CONTAINER_NAME = 'Endpoint'` (self-referencing error).
   Corrected to `'FtdS2sVpn'` so container name resolution targets the parent VPN policy.
+* `policy.prefilterpolicy` exposed its `PrefilterRule` child as `self.accessrule` instead of
+  `self.prefilterrule`. Attribute renamed to `prefilterrule` to match the underlying class name
+  and the documented API surface.
 
 # 1.1.0 [2023-03-19]
 

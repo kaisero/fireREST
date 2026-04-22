@@ -16,6 +16,6 @@ class PrefilterPolicy(Resource):
     def __init__(self, conn: Connection):
         super().__init__(conn)
 
-        self.accessrule = PrefilterRule(conn)
+        self.prefilterrule = PrefilterRule(conn)
         self.defaultaction = DefaultAction(conn)
         self.operational = Operational(conn)
