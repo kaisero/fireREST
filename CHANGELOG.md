@@ -5,6 +5,9 @@
 * `netmap.host.delete()` and `netmap.vulnerability.delete()` raised `TypeError` at runtime because they
   passed an unsupported `url=` keyword argument to `Resource.delete()`. Both methods now call
   `self.conn.delete()` directly and also guard against a `None` params dict before setting `bulk=True`.
+* `cluster.ftddevicecluster.operational.command()` built a URL with a literal `{container_uuid}`
+  placeholder because `PATH` was concatenated without formatting. The path is now formatted with
+  `container_uuid` before building the final URL.
 
 # 1.1.0 [2023-03-19]
 
