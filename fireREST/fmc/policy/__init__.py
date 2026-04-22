@@ -3,7 +3,9 @@ from fireREST.fmc.policy.accesspolicy import AccessPolicy
 from fireREST.fmc.policy.dnspolicy import DnsPolicy
 from fireREST.fmc.policy.dynamicaccesspolicy import DynamicAccessPolicy
 from fireREST.fmc.policy.filepolicy import FilePolicy
+from fireREST.fmc.policy.flexconfigpolicy import FlexConfigPolicy
 from fireREST.fmc.policy.ftdnatpolicy import FtdNatPolicy
+from fireREST.fmc.policy.ftdplatformsettingspolicy import FtdPlatformSettingsPolicy
 from fireREST.fmc.policy.ftds2svpn import FtdS2sVpn
 from fireREST.fmc.policy.healthpolicy import HealthPolicy
 from fireREST.fmc.policy.identitypolicy import IdentityPolicy
@@ -23,7 +25,9 @@ class Policy:
         self.dnspolicy = DnsPolicy(conn)
         self.dynamicaccesspolicy = DynamicAccessPolicy(conn)
         self.filepolicy = FilePolicy(conn)
+        self.flexconfigpolicy = FlexConfigPolicy(conn)
         self.ftdnatpolicy = FtdNatPolicy(conn)
+        self.ftdplatformsettingspolicy = FtdPlatformSettingsPolicy(conn)
         self.ftds2svpn = FtdS2sVpn(conn)
         self.healthpolicy = HealthPolicy(conn)
         self.identitypolicy = IdentityPolicy(conn)

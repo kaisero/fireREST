@@ -8,6 +8,7 @@ from fireREST import utils
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.assignment import Assignment
 from fireREST.fmc.audit import Audit
+from fireREST.fmc.backup import Backup
 from fireREST.fmc.chassis import Chassis
 from fireREST.fmc.deployment import Deployment
 from fireREST.fmc.device import Device
@@ -48,6 +49,7 @@ class FMC:
         self.version = self.conn.version
         self.assignment = Assignment(self.conn)
         self.audit = Audit(self.conn)
+        self.backup = Backup(self.conn)
         self.chassis = Chassis(self.conn)
         self.deployment = Deployment(self.conn)
         self.device = Device(self.conn)

@@ -3,6 +3,10 @@ from fireREST.fmc.object.anyconnectcustomattribute import AnyconnectCustomAttrib
 from fireREST.fmc.object.anyconnectexternalbrowserpackage import AnyconnectExternalBrowserPackage
 from fireREST.fmc.object.anyconnectpackage import AnyconnectPackage
 from fireREST.fmc.object.anyconnectprofile import AnyconnectProfile
+from fireREST.fmc.object.bfdtemplate import BfdTemplate
+from fireREST.fmc.object.dhcpipv6pool import DhcpIpv6Pool
+from fireREST.fmc.object.internalca import InternalCa
+from fireREST.fmc.object.internalcertificate import InternalCertificate
 from fireREST.fmc.object.anyprotocolportobject import AnyProtocolPortObject
 from fireREST.fmc.object.application import Application
 from fireREST.fmc.object.applicationcategory import ApplicationCategory
@@ -88,6 +92,8 @@ class Object:
         self.anyconnectcustomattribute = AnyconnectCustomAttribute(conn)
         self.anyconnectexternalbrowserpackage = AnyconnectExternalBrowserPackage(conn)
         self.anyconnectpackage = AnyconnectPackage(conn)
+        self.bfdtemplate = BfdTemplate(conn)
+        self.dhcpipv6pool = DhcpIpv6Pool(conn)
         self.anyconnectprofile = AnyconnectProfile(conn)
         self.application = Application(conn)
         self.applicationcategory = ApplicationCategory(conn)
@@ -121,6 +127,8 @@ class Object:
         self.ikev2policy = Ikev2Policy(conn)
         self.interface = Interface(conn)
         self.interfacegroup = InterfaceGroup(conn)
+        self.internalca = InternalCa(conn)
+        self.internalcertificate = InternalCertificate(conn)
         self.intrusionrule = IntrusionRule(conn)
         self.intrusionrulegroup = IntrusionRuleGroup(conn)
         self.ipv4addresspool = Ipv4AddressPool(conn)

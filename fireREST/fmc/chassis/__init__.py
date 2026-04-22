@@ -3,6 +3,7 @@ from fireREST.defaults import API_RELEASE_710
 from fireREST.fmc.chassis.interface import Interface
 from fireREST.fmc.chassis.networkmodule import NetworkModule
 from fireREST.fmc.chassis.operational import Operational
+from fireREST.fmc.chassis.physicalinterface import PhysicalInterface
 
 
 class Chassis(Resource):
@@ -14,3 +15,4 @@ class Chassis(Resource):
         self.interface = Interface(conn)
         self.networkmodule = NetworkModule(conn)
         self.operational = Operational(conn)
+        self.physicalinterface = PhysicalInterface(conn)

@@ -1,4 +1,5 @@
 from fireREST.fmc import Connection
+from fireREST.fmc.device.devicerecord.routing.bfdpolicy import BfdPolicy
 from fireREST.fmc.device.devicerecord.routing.bgp import Bgp
 from fireREST.fmc.device.devicerecord.routing.bgpgeneralsettings import BgpGeneralSettings
 from fireREST.fmc.device.devicerecord.routing.eigrproute import EigrpRoute
@@ -14,6 +15,7 @@ from fireREST.fmc.device.devicerecord.routing.virtualrouter import VirtualRouter
 
 class Routing:
     def __init__(self, conn: Connection):
+        self.bfdpolicy = BfdPolicy(conn)
         self.bgp = Bgp(conn)
         self.bgpgeneralsettings = BgpGeneralSettings(conn)
         self.eigrproute = EigrpRoute(conn)

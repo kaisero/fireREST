@@ -3,6 +3,7 @@ from typing import Dict
 from fireREST import utils
 from fireREST.defaults import API_RELEASE_640, API_RELEASE_710
 from fireREST.fmc import Connection, Resource
+from fireREST.fmc.devicecluster.ftddevicecluster.clusterhealthmonitorsettings import ClusterHealthMonitorSettings
 from fireREST.fmc.devicecluster.ftddevicecluster.operational import Operational
 
 
@@ -16,6 +17,7 @@ class FtdDeviceCluster(Resource):
 
     def __init__(self, conn: Connection):
         super().__init__(conn)
+        self.clusterhealthmonitorsettings = ClusterHealthMonitorSettings(conn)
         self.operational = Operational(conn)
 
     @utils.minimum_version_required(version=API_RELEASE_710)

@@ -1,6 +1,7 @@
 from fireREST.defaults import API_RELEASE_610
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.device.devicerecord.bridgegroupinterface import BridgeGroupInterface
+from fireREST.fmc.device.devicerecord.loopbackinterface import LoopbackInterface
 from fireREST.fmc.device.devicerecord.etherchannelinterface import EtherChannelInterface
 from fireREST.fmc.device.devicerecord.fpinterfacestatistics import FpInterfaceStatistics
 from fireREST.fmc.device.devicerecord.fplogicalinterface import FpLogicalInterface
@@ -35,6 +36,7 @@ class DeviceRecord(Resource):
         self.fpphysicalinterface = FpPhysicalInterface(conn)
         self.inlineset = InlineSet(conn)
         self.interfaceevent = InterfaceEvent(conn)
+        self.loopbackinterface = LoopbackInterface(conn)
         self.operational = Operational(conn)
         self.physicalinterface = PhysicalInterface(conn)
         self.redundantinterface = RedundantInterface(conn)
