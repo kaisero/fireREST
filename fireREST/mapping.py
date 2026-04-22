@@ -205,6 +205,7 @@ STATE = {
 }
 
 FILTERS = {
+    'command': 'command',
     'current_security_level': 'currentSecurityLevel',
     'destination_interface': 'destinationInterface',
     'deployed_status': 'deployedStatus',

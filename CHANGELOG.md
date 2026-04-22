@@ -29,6 +29,9 @@
 * `mapping.PARAMS` was missing entries for `group_dependency` and `hostname`. Any call to
   `deployment.deployabledevice.get(group_dependency=...)` or
   `device.devicerecord.get(hostname=...)` would raise `KeyError` in the `support_params` decorator.
+* `device.devicerecord.operational.command.get()` passed a plain dict to `utils.search_filter()`
+  which expects a list of dicts, causing `AttributeError` at runtime. The call is now wrapped in a
+  list. Added `'command'` to `mapping.FILTERS` for consistency with the rest of the library.
 
 # 1.1.0 [2023-03-19]
 
