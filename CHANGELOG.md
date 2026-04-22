@@ -37,6 +37,9 @@
   `self.loggingsettings`.
 * `policy.identitypolicy` module existed with correct PATH and version constants but was never
   imported or instantiated in `Policy.__init__()`. Now wired up as `self.identitypolicy`.
+* `object.standardaccesslist` only had `MINIMUM_VERSION_REQUIRED_GET` set despite CHANGELOG 1.1.0
+  advertising create/update/delete support. Added `MINIMUM_VERSION_REQUIRED_CREATE`,
+  `MINIMUM_VERSION_REQUIRED_UPDATE`, and `MINIMUM_VERSION_REQUIRED_DELETE` at 7.1.0.
 
 # 1.1.0 [2023-03-19]
 
