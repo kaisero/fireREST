@@ -17,6 +17,8 @@
 * `policy.networkanalysispolicy.inspectorconfig` had `CONTAINER_PATH` pointing to
   `/policy/intrusionpolicies/{uuid}` instead of `/policy/networkanalysispolicies/{uuid}`, causing
   name-to-uuid resolution to query the wrong parent resource.
+* `policy.prefilterpolicy.defaultaction` had `CONTAINER_NAME = 'AccessPolicy'` (copy-paste error).
+  Corrected to `'PrefilterPolicy'` so container name resolution targets the right class.
 
 # 1.1.0 [2023-03-19]
 

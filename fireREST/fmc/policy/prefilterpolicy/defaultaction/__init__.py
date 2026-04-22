@@ -3,7 +3,7 @@ from fireREST.fmc import ChildResource
 
 
 class DefaultAction(ChildResource):
-    CONTAINER_NAME = 'AccessPolicy'
+    CONTAINER_NAME = 'PrefilterPolicy'
     CONTAINER_PATH = '/policy/prefilterpolicies/{uuid}'
     PATH = '/policy/prefilterpolicies/{container_uuid}/defaultactions/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_650
