@@ -26,6 +26,9 @@
   and the documented API surface.
 * `deployment.deployabledevices` attribute was plural, inconsistent with every other child
   attribute in the library and with the README/docs. Renamed to `deployment.deployabledevice`.
+* `mapping.PARAMS` was missing entries for `group_dependency` and `hostname`. Any call to
+  `deployment.deployabledevice.get(group_dependency=...)` or
+  `device.devicerecord.get(hostname=...)` would raise `KeyError` in the `support_params` decorator.
 
 # 1.1.0 [2023-03-19]
 

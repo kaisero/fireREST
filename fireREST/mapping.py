@@ -252,6 +252,8 @@ FILTERS = {
 PARAMS = {
     'above_category': 'aboveCategory',
     'category': 'category',
+    'group_dependency': 'groupDependency',
+    'hostname': 'hostname',
     'insert_after': 'insertAfter',
     'insert_before': 'insertBefore',
     'name': 'name',
