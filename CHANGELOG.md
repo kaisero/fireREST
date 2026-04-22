@@ -24,6 +24,8 @@
 * `policy.prefilterpolicy` exposed its `PrefilterRule` child as `self.accessrule` instead of
   `self.prefilterrule`. Attribute renamed to `prefilterrule` to match the underlying class name
   and the documented API surface.
+* `deployment.deployabledevices` attribute was plural, inconsistent with every other child
+  attribute in the library and with the README/docs. Renamed to `deployment.deployabledevice`.
 
 # 1.1.0 [2023-03-19]
 
