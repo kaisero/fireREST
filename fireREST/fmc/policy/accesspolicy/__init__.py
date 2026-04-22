@@ -5,6 +5,7 @@ from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 from fireREST.fmc.policy.accesspolicy.category import Category
 from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
 from fireREST.fmc.policy.accesspolicy.inheritancesettings import InheritanceSettings
+from fireREST.fmc.policy.accesspolicy.loggingsettings import LoggingSettings
 from fireREST.fmc.policy.accesspolicy.operational import Operational
 from fireREST.fmc.policy.accesspolicy.securityintelligencepolicy import SecurityIntelligencePolicy
 
@@ -25,6 +26,7 @@ class AccessPolicy(Resource):
         self.category = Category(conn)
         self.defaultaction = DefaultAction(conn)
         self.inheritancesettings = InheritanceSettings(conn)
+        self.loggingsettings = LoggingSettings(conn)
         self.operational = Operational(conn)
         self.securityintelligencepolicy = SecurityIntelligencePolicy(conn)
 

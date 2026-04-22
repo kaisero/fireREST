@@ -32,6 +32,9 @@
 * `device.devicerecord.operational.command.get()` passed a plain dict to `utils.search_filter()`
   which expects a list of dicts, causing `AttributeError` at runtime. The call is now wrapped in a
   list. Added `'command'` to `mapping.FILTERS` for consistency with the rest of the library.
+* `policy.accesspolicy.loggingsettings` module existed with correct PATH and version constants but
+  was never imported or instantiated in `AccessPolicy.__init__()`. Now wired up as
+  `self.loggingsettings`.
 
 # 1.1.0 [2023-03-19]
 
