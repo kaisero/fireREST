@@ -122,8 +122,8 @@
   * object.expandedcommunitylist.update(...)
   * object.expandedcommunitylist.delete(...)
   * object.standardcommunitylist.create(...)
-  * object.standardcommunitylist.create(...)
-  * object.standardcommunitylist.create(...)
+  * object.standardcommunitylist.update(...)
+  * object.standardcommunitylist.delete(...)
   * object.standardaccesslist.create(...)
   * object.standardaccesslist.update(...)
   * object.standardaccesslist.delete(...)
@@ -233,7 +233,7 @@
   * GET object.sinetworklist
   * GET object.sinkhole
   * GET object.ssoserver
-  * GET bject.usage
+  * GET object.usage
   * GET policy.accesspolicy.securityintelligencepolicy
   * GET policy.dnspolicy
   * GET policy.dnspolicy.allowdnsrule
@@ -247,7 +247,7 @@
   * GET, UPDATE, DELETE policy.networkanalysispolicy.inspectorconfig
   * GET, UPDATE, DELETE policy.networkanalysispolicy.inspectoroverrideconfig
   * GET policy.ravpn
-  * GET policy.ravpn.addressassignmensettings
+  * GET policy.ravpn.addressassignmentsettings
   * GET policy.ravpn.certificatemapsettings
   * GET policy.ravpn.connectionprofile
 
