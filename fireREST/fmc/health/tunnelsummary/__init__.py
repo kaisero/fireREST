@@ -4,7 +4,7 @@ from fireREST.fmc import Resource
 
 
 class TunnelSummary(Resource):
-    PATH = '/health/metrics/{uuid}'
+    PATH = '/health/tunnelsummaries/{uuid}'
     SUPPORTED_FILTERS = ['device_id', 'group_by', 'vpn_topology_id']
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_710
 

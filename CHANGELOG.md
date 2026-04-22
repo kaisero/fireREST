@@ -12,6 +12,8 @@
   malformed URLs because `PATH` contains both `{container_uuid}` and `{uuid}` but only
   `container_uuid` was substituted, leaving a literal `{uuid}` in every request URL. Both
   placeholders are now substituted before the action suffix is appended.
+* `health.tunnelsummary` had `PATH = '/health/metrics/{uuid}'` — an exact copy of the `Metric`
+  class path. Corrected to `/health/tunnelsummaries/{uuid}`.
 
 # 1.1.0 [2023-03-19]
 
