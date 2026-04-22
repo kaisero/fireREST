@@ -18,6 +18,7 @@ from fireREST.fmc.health import Health
 from fireREST.fmc.integration import Integration
 from fireREST.fmc.intelligence import Intelligence
 from fireREST.fmc.job import Job
+from fireREST.fmc.license import License
 from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
@@ -57,6 +58,7 @@ class FMC:
         self.integration = Integration(self.conn)
         self.intelligence = Intelligence(self.conn)
         self.job = Job(self.conn)
+        self.license = License(self.conn)
         self.netmap = NetMap(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)

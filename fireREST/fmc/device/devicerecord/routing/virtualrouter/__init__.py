@@ -1,6 +1,7 @@
 from fireREST.defaults import API_RELEASE_660
 from fireREST.fmc import ChildResource, Connection
 from fireREST.fmc.device.devicerecord.routing.virtualrouter.bgp import Bgp
+from fireREST.fmc.device.devicerecord.routing.virtualrouter.eigrproute import EigrpRoute
 from fireREST.fmc.device.devicerecord.routing.virtualrouter.ipv4staticroute import Ipv4StaticRoute
 from fireREST.fmc.device.devicerecord.routing.virtualrouter.ipv6staticroute import Ipv6StaticRoute
 from fireREST.fmc.device.devicerecord.routing.virtualrouter.ospfinterface import OspfInterface
@@ -23,6 +24,7 @@ class VirtualRouter(ChildResource):
         super().__init__(conn)
 
         self.bgp = Bgp(conn)
+        self.eigrproute = EigrpRoute(conn)
         self.ipv4staticroute = Ipv4StaticRoute(conn)
         self.ipv6staticroute = Ipv6StaticRoute(conn)
         self.ospfinterface = OspfInterface(conn)

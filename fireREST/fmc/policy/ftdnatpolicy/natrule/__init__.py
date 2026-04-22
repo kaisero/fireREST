@@ -1,5 +1,5 @@
 from fireREST import utils
-from fireREST.defaults import API_RELEASE_623
+from fireREST.defaults import API_RELEASE_623, API_RELEASE_720
 from fireREST.fmc import ChildResource
 
 
@@ -7,6 +7,7 @@ class NatRule(ChildResource):
     CONTAINER_NAME = 'FtdNatPolicy'
     CONTAINER_PATH = '/policy/ftdnatpolicies/{uuid}'
     PATH = '/policy/ftdnatpolicies/{container_uuid}/natrules/{uuid}'
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_720
     SUPPORTED_FILTERS = [
         'section',
         'source_interface',

@@ -3,6 +3,8 @@ from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.ravpn.addressassignmentsettings import AddressAssignmentSettings
 from fireREST.fmc.policy.ravpn.certificatemapsettings import CertificateMapSettings
 from fireREST.fmc.policy.ravpn.connectionprofile import ConnectionProfile
+from fireREST.fmc.policy.ravpn.ipsecadvancedsettings import IpsecAdvancedSettings
+from fireREST.fmc.policy.ravpn.ldapattributemap import LdapAttributeMap
 
 
 class RaVpn(Resource):
@@ -18,3 +20,5 @@ class RaVpn(Resource):
         self.addressassignmentsettings = AddressAssignmentSettings(conn)
         self.certificatemapsettings = CertificateMapSettings(conn)
         self.connectionprofile = ConnectionProfile(conn)
+        self.ipsecadvancedsettings = IpsecAdvancedSettings(conn)
+        self.ldapattributemap = LdapAttributeMap(conn)

@@ -1,7 +1,7 @@
 from typing import Dict
 
 from fireREST import utils
-from fireREST.defaults import API_RELEASE_630, API_RELEASE_670, API_RELEASE_710
+from fireREST.defaults import API_RELEASE_630, API_RELEASE_670, API_RELEASE_710, API_RELEASE_720
 from fireREST.fmc import Resource
 from fireREST.fmc.update.upgradepackage import UpgradePackage
 
@@ -26,8 +26,13 @@ class Update(Resource):
         return self.conn.post(url=url, data=data)
 
     @utils.minimum_version_required(version=API_RELEASE_710)
-    def retry(self, data: Dict):
+    def revert(self, data: Dict):
         url = self.url(path='/updates/revertupgrades')
+        return self.conn.post(url=url, data=data)
+
+    @utils.minimum_version_required(version=API_RELEASE_720)
+    def snapshot(self, data: Dict):
+        url = self.url(path='/updates/upgradesnapshot')
         return self.conn.post(url=url, data=data)
 
     @utils.minimum_version_required(version=API_RELEASE_630)

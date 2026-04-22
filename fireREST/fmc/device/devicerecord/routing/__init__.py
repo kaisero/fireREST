@@ -1,6 +1,7 @@
 from fireREST.fmc import Connection
 from fireREST.fmc.device.devicerecord.routing.bgp import Bgp
 from fireREST.fmc.device.devicerecord.routing.bgpgeneralsettings import BgpGeneralSettings
+from fireREST.fmc.device.devicerecord.routing.eigrproute import EigrpRoute
 from fireREST.fmc.device.devicerecord.routing.ipv4staticroute import Ipv4StaticRoute
 from fireREST.fmc.device.devicerecord.routing.ipv6staticroute import Ipv6StaticRoute
 from fireREST.fmc.device.devicerecord.routing.ospfinterface import OspfInterface
@@ -15,6 +16,7 @@ class Routing:
     def __init__(self, conn: Connection):
         self.bgp = Bgp(conn)
         self.bgpgeneralsettings = BgpGeneralSettings(conn)
+        self.eigrproute = EigrpRoute(conn)
         self.ipv4staticroute = Ipv4StaticRoute(conn)
         self.ipv6staticroute = Ipv6StaticRoute(conn)
         self.ospfinterface = OspfInterface(conn)

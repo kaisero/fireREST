@@ -1,5 +1,56 @@
 # Unreleased
 
+## New
+
+* Completed FMC 7.2.0 api support (previously marked incomplete in 1.1.0)
+  * chassis.operational.evaluate_operation(...)
+  * deployment.jobhistory.downloadreport.get(...)
+  * deployment.jobhistory.emailreport.get(...)
+  * device.changemanager(...)
+  * device.devicesettings.get(...)
+  * device.devicesettings.update(...)
+  * device.devicerecord.routing.eigrproute.create(...)
+  * device.devicerecord.routing.eigrproute.get(...)
+  * device.devicerecord.routing.eigrproute.update(...)
+  * device.devicerecord.routing.eigrproute.delete(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.create(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.get(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.update(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.delete(...)
+  * integration.ebssnapshot.create(...)
+  * integration.ebssnapshot.get(...)
+  * integration.testumbrellaconnection.create(...)
+  * integration.umbrellaconnection.create(...)
+  * integration.umbrellaconnection.get(...)
+  * integration.umbrellaconnection.update(...)
+  * license.devicelicense.get(...)
+  * license.devicelicense.update(...)
+  * license.smartlicense.create(...)
+  * license.smartlicense.get(...)
+  * object.anyconnectexternalbrowserpackage.create(...)
+  * object.anyconnectexternalbrowserpackage.get(...)
+  * object.anyconnectexternalbrowserpackage.update(...)
+  * object.anyconnectexternalbrowserpackage.delete(...)
+  * policy.ftdnatpolicy.natrule.delete(...)
+  * policy.ftds2svpn.ipseccryptomap.get(...)
+  * policy.ftds2svpn.ipseccryptomap.update(...)
+  * policy.ftds2svpn.s2svpnsummary.get(...)
+  * policy.healthpolicy.get(...)
+  * policy.policylock.create(...)
+  * policy.policylock.get(...)
+  * policy.ravpn.ipsecadvancedsettings.get(...)
+  * policy.ravpn.ipsecadvancedsettings.update(...)
+  * policy.ravpn.ldapattributemap.get(...)
+  * policy.ravpn.ldapattributemap.update(...)
+  * policy.umbrelladnspolicy.create(...)
+  * policy.umbrelladnspolicy.get(...)
+  * policy.umbrelladnspolicy.update(...)
+  * policy.umbrelladnspolicy.delete(...)
+  * policy.umbrelladnspolicy.umbrelladnsrule.get(...)
+  * policy.umbrelladnspolicy.umbrelladnsrule.update(...)
+  * troubleshoot.task.create(...)
+  * update.snapshot(...)
+
 ## Fixed
 
 * `netmap.host.delete()` and `netmap.vulnerability.delete()` raised `TypeError` at runtime because they
@@ -46,6 +97,11 @@
 * `object.communitylist` only had `MINIMUM_VERSION_REQUIRED_GET` set. The FMC API supports full
   CRUD for community lists. Added `MINIMUM_VERSION_REQUIRED_CREATE`, `MINIMUM_VERSION_REQUIRED_UPDATE`,
   and `MINIMUM_VERSION_REQUIRED_DELETE` at 6.5.0 to match the GET floor.
+* `policy.ravpn` was imported in `Policy.__init__()` but never instantiated, making the entire
+  RA VPN policy surface unreachable at runtime. Now wired up as `self.ravpn`.
+* `update.revert()` was defined with the duplicate name `retry`, silently shadowing the legitimate
+  `retry()` method added in 6.7.0. The 7.1.0 method that posts to `/updates/revertupgrades` is now
+  correctly named `revert()`, matching the entry already listed in the 1.1.0 changelog.
 
 # 1.1.0 [2023-03-19]
 

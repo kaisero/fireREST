@@ -1,5 +1,6 @@
 from fireREST.fmc import Connection
 from fireREST.fmc.object.anyconnectcustomattribute import AnyconnectCustomAttribute
+from fireREST.fmc.object.anyconnectexternalbrowserpackage import AnyconnectExternalBrowserPackage
 from fireREST.fmc.object.anyconnectpackage import AnyconnectPackage
 from fireREST.fmc.object.anyconnectprofile import AnyconnectProfile
 from fireREST.fmc.object.anyprotocolportobject import AnyProtocolPortObject
@@ -85,6 +86,7 @@ class Object:
     def __init__(self, conn: Connection):
         self.anyprotocolportobject = AnyProtocolPortObject(conn)
         self.anyconnectcustomattribute = AnyconnectCustomAttribute(conn)
+        self.anyconnectexternalbrowserpackage = AnyconnectExternalBrowserPackage(conn)
         self.anyconnectpackage = AnyconnectPackage(conn)
         self.anyconnectprofile = AnyconnectProfile(conn)
         self.application = Application(conn)

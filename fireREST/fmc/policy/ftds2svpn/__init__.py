@@ -3,7 +3,9 @@ from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.ftds2svpn.advancedsettings import AdvancedSettings
 from fireREST.fmc.policy.ftds2svpn.endpoint import Endpoint
 from fireREST.fmc.policy.ftds2svpn.ikesettings import IkeSettings
+from fireREST.fmc.policy.ftds2svpn.ipseccryptomap import IpsecCryptoMap
 from fireREST.fmc.policy.ftds2svpn.ipsecsettings import IpsecSettings
+from fireREST.fmc.policy.ftds2svpn.s2svpnsummary import S2sVpnSummary
 
 
 class FtdS2sVpn(Resource):
@@ -19,4 +21,6 @@ class FtdS2sVpn(Resource):
         self.advancedsettings = AdvancedSettings(conn)
         self.endpoint = Endpoint(conn)
         self.ikesettings = IkeSettings(conn)
+        self.ipseccryptomap = IpsecCryptoMap(conn)
         self.ipsecsettings = IpsecSettings(conn)
+        self.s2svpnsummary = S2sVpnSummary(conn)
