@@ -43,6 +43,9 @@
 * `device.devicerecord.routing.virtualrouter.ospfv3route` and `ospfv3interface` were listed in
   CHANGELOG 1.1.0 and the README but neither module existed. Created both `NestedChildResource`
   modules and wired them into `VirtualRouter.__init__()`.
+* `object.communitylist` only had `MINIMUM_VERSION_REQUIRED_GET` set. The FMC API supports full
+  CRUD for community lists. Added `MINIMUM_VERSION_REQUIRED_CREATE`, `MINIMUM_VERSION_REQUIRED_UPDATE`,
+  and `MINIMUM_VERSION_REQUIRED_DELETE` at 6.5.0 to match the GET floor.
 
 # 1.1.0 [2023-03-19]
 
