@@ -1,3 +1,11 @@
+# Unreleased
+
+## Fixed
+
+* `netmap.host.delete()` and `netmap.vulnerability.delete()` raised `TypeError` at runtime because they
+  passed an unsupported `url=` keyword argument to `Resource.delete()`. Both methods now call
+  `self.conn.delete()` directly and also guard against a `None` params dict before setting `bulk=True`.
+
 # 1.1.0 [2023-03-19]
 
 ## New
