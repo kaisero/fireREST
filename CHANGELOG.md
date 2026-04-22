@@ -14,6 +14,9 @@
   placeholders are now substituted before the action suffix is appended.
 * `health.tunnelsummary` had `PATH = '/health/metrics/{uuid}'` — an exact copy of the `Metric`
   class path. Corrected to `/health/tunnelsummaries/{uuid}`.
+* `policy.networkanalysispolicy.inspectorconfig` had `CONTAINER_PATH` pointing to
+  `/policy/intrusionpolicies/{uuid}` instead of `/policy/networkanalysispolicies/{uuid}`, causing
+  name-to-uuid resolution to query the wrong parent resource.
 
 # 1.1.0 [2023-03-19]
 
