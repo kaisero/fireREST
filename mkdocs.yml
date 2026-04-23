@@ -1,0 +1,89 @@
+site_name: FireREST
+site_description: Python API client for Cisco Firepower Management Center (FMC)
+repo_url: https://github.com/cromanme/fireREST
+repo_name: cromanme/fireREST
+edit_uri: edit/feature/full_support_7.4/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_bases: true
+            inherited_members: true
+            heading_level: 2
+            members_order: source
+            docstring_style: google
+            show_submodules: true
+            filters:
+              - "!^_"
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - API Reference:
+    - FMC Client: reference/fmc.md
+    - Analysis: reference/analysis.md
+    - Assignment: reference/assignment.md
+    - Audit: reference/audit.md
+    - Backup: reference/backup.md
+    - Change Management: reference/changemanagement.md
+    - Chassis: reference/chassis.md
+    - Deployment: reference/deployment.md
+    - Device: reference/device.md
+    - Device Cluster: reference/devicecluster.md
+    - Device Group: reference/devicegroup.md
+    - Device HA Pair: reference/devicehapair.md
+    - Health: reference/health.md
+    - Integration: reference/integration.md
+    - Intelligence: reference/intelligence.md
+    - Job: reference/job.md
+    - License: reference/license.md
+    - NetMap: reference/netmap.md
+    - Object: reference/object.md
+    - Policy: reference/policy.md
+    - System: reference/system.md
+    - System Configuration: reference/systemconfiguration.md
+    - Troubleshoot: reference/troubleshoot.md
+    - Update: reference/update.md
+    - User: reference/user.md
