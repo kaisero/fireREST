@@ -14,6 +14,7 @@ Subpackages
    fireREST.fmc.device.devicerecord.routing.ospfinterface
    fireREST.fmc.device.devicerecord.routing.ospfv2route
    fireREST.fmc.device.devicerecord.routing.ospfv3interface
+   fireREST.fmc.device.devicerecord.routing.policybasedroute
    fireREST.fmc.device.devicerecord.routing.staticroute
    fireREST.fmc.device.devicerecord.routing.virtualrouter
 

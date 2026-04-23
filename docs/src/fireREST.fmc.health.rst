@@ -9,6 +9,8 @@ Subpackages
 
    fireREST.fmc.health.alert
    fireREST.fmc.health.metric
+   fireREST.fmc.health.tunnelstatus
+   fireREST.fmc.health.tunnelsummary
 
 Module contents
 ---------------

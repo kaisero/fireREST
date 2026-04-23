@@ -1,6 +1,14 @@
 fireREST.fmc.devicecluster.ftddevicecluster package
 ===================================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   fireREST.fmc.devicecluster.ftddevicecluster.operational
+
 Module contents
 ---------------
 

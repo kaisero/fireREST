@@ -9,10 +9,16 @@ from fireREST.fmc import Connection
 STATE = {
     'object': {'network': {'name': 'FireREST-NetworkObj'}},
     'policy': {
-        'accesspolicy': {'name': 'FireREST-AccessPolicy', 'accessrule': {'name': 'FireREST-AccessRule'}},
-        'ftdnatpolicy': {'name': 'FireREST-NatPolicy', 'manualnatrule': {'name': 'FireREST-ManualNatRule'}},
+        'accesspolicy': {
+            'name': 'FireREST-AccessPolicy',
+            'accessrule': {'name': 'FireREST-AccessRule'},
+        },
+        'ftdnatpolicy': {
+            'name': 'FireREST-NatPolicy',
+            'manualnatrule': {'name': 'FireREST-ManualNatRule'},
+        },
     },
-    'device': {'devicerecord': {'name': 'ftd01.example.com'}},
+    'device': {'devicerecord': {'name': 'ftd-01'}},
 }
 
 
@@ -43,6 +49,14 @@ def constants():
 
 
 @pytest.fixture(scope='module')
+def cdo_constants():
+    return {
+        'hostname': 'example.app.eu.cdo.cisco.com',
+        'password': '<CDO TOKEN>',
+    }
+
+
+@pytest.fixture(scope='module')
 def conn(constants):
     return Connection(
         hostname=constants['hostname'],
@@ -59,6 +73,15 @@ def fmc(constants):
         username=constants['username'],
         password=constants['password'],
         domain=constants['domain']['name'],
+    )
+
+
+@pytest.fixture(scope='module')
+def cdo_fmc(cdo_constants):
+    return FMC(
+        hostname=cdo_constants['hostname'],
+        password=cdo_constants['password'],
+        cdo=True,
     )
 
 

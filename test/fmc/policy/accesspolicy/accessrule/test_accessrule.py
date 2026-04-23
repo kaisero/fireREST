@@ -11,7 +11,6 @@ from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 
 @pytest.fixture(scope='module')
 def accesspolicy(request, fmc):
-
     data = {'name': STATE['policy']['accesspolicy']['name'], 'defaultAction': {'action': 'BLOCK'}}
     policy = fmc.policy.accesspolicy.create(data).json()
 
@@ -153,6 +152,22 @@ def test_update_accessrule(fmc, accesspolicy):
     data = STATE['policy']['accesspolicy']['accessrule']
     expected_result = 200
     actual_result = fmc.policy.accesspolicy.accessrule.update(container_uuid=accesspolicy['id'], data=data).status_code
+
+    assert expected_result == actual_result
+
+
+def test_update_accessrule_using_bulk_operation(fmc, accesspolicy):
+    expected_result = 200
+
+    data = [{'name': 'BulkRule01_toupdate', 'action': 'ALLOW'}, {'name': 'BulkRule02_toupdate', 'action': 'ALLOW'}]
+    response = fmc.policy.accesspolicy.accessrule.create(container_uuid=accesspolicy['id'], data=data)
+
+    result = response.json()
+    result['items'][0]['name'] = 'BulkRule01_updated'
+    result['items'][1]['name'] = 'BulkRule02_updated'
+
+    response = fmc.policy.accesspolicy.accessrule.update(container_uuid=accesspolicy['id'], data=result['items'])
+    actual_result = response.status_code
 
     assert expected_result == actual_result
 

@@ -1,6 +1,14 @@
 fireREST.fmc.object.dnsservergroup package
 ==========================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   fireREST.fmc.object.dnsservergroup.override
+
 Module contents
 ---------------
 

@@ -8,6 +8,7 @@ Subpackages
    :maxdepth: 4
 
    fireREST.fmc.user.authrole
+   fireREST.fmc.user.duoconfig
    fireREST.fmc.user.ssoconfig
 
 Module contents

@@ -312,6 +312,47 @@
   `retry()` method added in 6.7.0. The 7.1.0 method that posts to `/updates/revertupgrades` is now
   correctly named `revert()`, matching the entry already listed in the 1.1.0 changelog.
 
+# 1.2.4 [2026-01-14]
+
+## Fixed
+
+* Security Cloud Control failed authentication changed message handling
+* Bump dependecies version
+
+# 1.2.3 [2025-07-02]
+
+## New
+
+* Handle authentication token refresh errors and re-authenticate if necessary
+
+# 1.2.2 [2025-06-24]
+
+## Fixed
+
+* Bump dependent libriaries versions
+
+# 1.2.1 [2025-03-26]
+
+## Fixed
+
+* Bulk updates fail for UPDATE operations (Issue #71)
+
+# 1.2.0 [2025-02-17]
+
+## New
+
+* Add support for Cloud Delivered FMC (cdFMC) (#79, #80)
+* Add helper function `get_domain_name` (#74)
+
+## Fixed
+
+* Missing filtering support for Network Group (#81)
+* Corrected API Endpoint for `auditrecords` (#67)
+* Ensure version response contains processable information (#77)
+* Standard community fix (#78)
+* Missing RaVPN policy hook
+* Other minor fixes
+
 # 1.1.0 [2023-03-19]
 
 ## New
@@ -412,7 +453,7 @@
   * troubleshoot.packettracer.file.delete(...)
   * troubleshoot.packettracer.file.details.get(...)
   * troubleshoot.packettracer.trace(...)
-  * troubleshoot.packettracer.pcaptrace(...) 
+  * troubleshoot.packettracer.pcaptrace(...)
   * update.revert(...)
   * user.duoconfig.get(...)
   * user.duoconfig.update(...)

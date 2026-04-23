@@ -158,3 +158,9 @@ def test_search_filter_with_invalid_input():
     expected_filter = ''
     actual_filter = utils.search_filter(items=[{'EmptyValue': None}])
     assert actual_filter == expected_filter
+
+
+def test_search_filter_with_bool():
+    expected_filter = 'myvalue:true;deviceId:457d932a-3dfb-11ea-9b36-8a42de410c5c'
+    actual_filter = utils.search_filter(items=[{'myvalue': True}, {'deviceId': '457d932a-3dfb-11ea-9b36-8a42de410c5c'}])
+    assert actual_filter == expected_filter

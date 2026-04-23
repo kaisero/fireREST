@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import copy
-import uuid
-
-import packaging
-import pytest
-
-import fireREST.exceptions as exc
 from fireREST.fmc.policy.ftdnatpolicy.autonatrule import AutoNatRule
 from fireREST.fmc.policy.ftdnatpolicy.manualnatrule import ManualNatRule
 from fireREST.fmc.policy.ftdnatpolicy.natrule import NatRule

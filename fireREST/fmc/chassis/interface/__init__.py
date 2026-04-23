@@ -14,11 +14,14 @@ class Interface(ChildResource):
 
     @utils.minimum_version_required(version=API_RELEASE_710)
     @utils.resolve_by_name
-    def evaluate_operation(self, operation: Optional[str] = None,
-                           container_uuid: Optional[str] = None,
-                           container_name: Optional[str] = None,
-                           uuid: Optional[str] = None,
-                           name: Optional[str] = None,
-                           params: Optional[Dict] = None):
+    def evaluate_operation(
+        self,
+        operation: Optional[str] = None,
+        container_uuid: Optional[str] = None,
+        container_name: Optional[str] = None,
+        uuid: Optional[str] = None,
+        name: Optional[str] = None,
+        params: Optional[Dict] = None,
+    ):
         url = self.url(f'{self.PATH.format(container_uuid=container_uuid, uuid=uuid)}/evaluateoperation')
         return self.conn.get(url=url, params=params)

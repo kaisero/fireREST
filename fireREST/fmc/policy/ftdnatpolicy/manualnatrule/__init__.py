@@ -29,6 +29,12 @@ class ManualNatRule(ChildResource):
 
     @utils.support_params
     def update(
-        self, data: Dict, container_uuid=None, container_name=None, section=None, target_index=None, params=None,
+        self,
+        data: Dict,
+        container_uuid=None,
+        container_name=None,
+        section=None,
+        target_index=None,
+        params=None,
     ):
         return super().update(data=data, container_uuid=container_uuid, container_name=container_name, params=params)
