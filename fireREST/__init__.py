@@ -6,9 +6,11 @@ from fireREST import defaults
 from fireREST import exceptions as exc
 from fireREST import utils
 from fireREST.fmc import Connection, Resource
+from fireREST.fmc.analysis import Analysis
 from fireREST.fmc.assignment import Assignment
 from fireREST.fmc.audit import Audit
 from fireREST.fmc.backup import Backup
+from fireREST.fmc.changemanagement import ChangeManagement
 from fireREST.fmc.chassis import Chassis
 from fireREST.fmc.deployment import Deployment
 from fireREST.fmc.device import Device
@@ -24,6 +26,7 @@ from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
 from fireREST.fmc.system import System
+from fireREST.fmc.systemconfiguration import SystemConfiguration
 from fireREST.fmc.troubleshoot import Troubleshoot
 from fireREST.fmc.update import Update
 from fireREST.fmc.user import User
@@ -47,9 +50,11 @@ class FMC:
         self.conn = Connection(hostname, username, password, protocol, verify_cert, domain, timeout, dry_run)
         self.domain = self.conn.domain
         self.version = self.conn.version
+        self.analysis = Analysis(self.conn)
         self.assignment = Assignment(self.conn)
         self.audit = Audit(self.conn)
         self.backup = Backup(self.conn)
+        self.changemanagement = ChangeManagement(self.conn)
         self.chassis = Chassis(self.conn)
         self.deployment = Deployment(self.conn)
         self.device = Device(self.conn)
@@ -65,6 +70,7 @@ class FMC:
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)
+        self.systemconfiguration = SystemConfiguration(self.conn)
         self.troubleshoot = Troubleshoot(self.conn)
         self.update = Update(self.conn)
         self.user = User(self.conn)

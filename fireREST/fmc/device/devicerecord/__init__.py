@@ -1,13 +1,15 @@
 from fireREST.defaults import API_RELEASE_610
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.device.devicerecord.bridgegroupinterface import BridgeGroupInterface
-from fireREST.fmc.device.devicerecord.loopbackinterface import LoopbackInterface
+from fireREST.fmc.device.devicerecord.dhcp import Dhcp
 from fireREST.fmc.device.devicerecord.etherchannelinterface import EtherChannelInterface
 from fireREST.fmc.device.devicerecord.fpinterfacestatistics import FpInterfaceStatistics
 from fireREST.fmc.device.devicerecord.fplogicalinterface import FpLogicalInterface
 from fireREST.fmc.device.devicerecord.fpphysicalinterface import FpPhysicalInterface
 from fireREST.fmc.device.devicerecord.inlineset import InlineSet
 from fireREST.fmc.device.devicerecord.interfaceevent import InterfaceEvent
+from fireREST.fmc.device.devicerecord.loopbackinterface import LoopbackInterface
+from fireREST.fmc.device.devicerecord.managementconvergencemode import ManagementConvergenceMode
 from fireREST.fmc.device.devicerecord.operational import Operational
 from fireREST.fmc.device.devicerecord.physicalinterface import PhysicalInterface
 from fireREST.fmc.device.devicerecord.redundantinterface import RedundantInterface
@@ -30,6 +32,7 @@ class DeviceRecord(Resource):
         super().__init__(conn)
 
         self.bridgegroupinterface = BridgeGroupInterface(conn)
+        self.dhcp = Dhcp(conn)
         self.etherchannelinterface = EtherChannelInterface(conn)
         self.fpinterfacestatistics = FpInterfaceStatistics(conn)
         self.fplogicalinterface = FpLogicalInterface(conn)
@@ -37,6 +40,7 @@ class DeviceRecord(Resource):
         self.inlineset = InlineSet(conn)
         self.interfaceevent = InterfaceEvent(conn)
         self.loopbackinterface = LoopbackInterface(conn)
+        self.managementconvergencemode = ManagementConvergenceMode(conn)
         self.operational = Operational(conn)
         self.physicalinterface = PhysicalInterface(conn)
         self.redundantinterface = RedundantInterface(conn)
