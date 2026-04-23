@@ -103,7 +103,7 @@ response = fmc.object.network.delete(name='NetObjViaAPI')
 
 ## Supported operations
 
-Since FireREST does not try to provide a python object model nearly all api calls up to version 6.7.0 are available which includes but is not limited to
+Since FireREST does not try to provide a python object model nearly all api calls up to version 7.4.0 are available which includes but is not limited to
 the following CRUD operations:
 
 ```
