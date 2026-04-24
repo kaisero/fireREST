@@ -107,58 +107,99 @@ Since FireREST does not try to provide a python object model nearly all api call
 the following CRUD operations:
 
 ```
+├── analysis
+│   ├── activesessions
+│   └── useractivity
 ├── assignment
 │   └── policyassignment
 ├── audit
-│   └── auditrecord
+│   ├── auditrecord
+│   └── configchanges
+├── backup
+│   ├── downloadbackup
+│   └── file
+├── changemanagement
+│   └── ticket
+│       ├── previewchanges
+│       └── validationresults
 ├── chassis
+│   ├── appinfo
+│   ├── chassisetherchannelinterface
+│   ├── chassisinterface
+│   ├── chassisinterfaceevent
+│   ├── chassissnmpsettings
+│   ├── chassissubinterface
+│   ├── faultsummary
+│   ├── instancesummary
 │   ├── interface
+│   ├── interfacesummary
+│   ├── inventorysummary
+│   ├── logicaldevice
 │   ├── networkmodule
-│   └── operational
+│   ├── operational
+│   └── physicalinterface
 ├── deployment
 │   ├── deployabledevice
 │   │   ├── deployment
 │   │   └── pendingchanges
 │   ├── deploymentrequest
 │   ├── jobhistory
+│   │   ├── downloadreport
+│   │   └── emailreport
+│   ├── pendingchangesrequest
 │   └── rollbackrequest
 ├── device
-│   └── devicerecord
-│       ├── bridgegroupinterface
-│       ├── etherchannelinterface
-│       ├── fpinterfacestatistics
-│       ├── fplogicalinterface
-│       ├── fpphysicalinterface
-│       ├── inlineset
-│       ├── interfaceevent
-│       ├── operational
-│       │   ├── command
-│       │   └── metric
-│       ├── physicalinterface
-│       ├── redundantinterface
-│       ├── routing
-│       │   ├── bgp
-│       │   ├── bgpgeneralsettings
-│       │   ├── ipv4staticroute
-│       │   ├── ipv6staticroute
-│       │   ├── ospfinterface
-│       │   ├── ospfv2route
-│       │   ├── ospfv3interface
-│       │   ├── policybasedroute
-│       │   ├── staticroute
-│       │   └── virtualrouter
-│       │       ├── bgp
-│       │       ├── ipv4staticroute
-│       │       ├── ipv6staticroute
-│       │       ├── ospfinterface
-│       │       ├── ospfv2route
-│       │       └── policybasedroute
-│       ├── subinterface
-│       ├── virtualswitch
-│       ├── virtualtunnelinterface
-│       └── vlaninterface
+│   ├── devicerecord
+│   │   ├── bridgegroupinterface
+│   │   ├── dhcp
+│   │   │   ├── ddnssettings
+│   │   │   ├── dhcprelaysettings
+│   │   │   └── dhcpserver
+│   │   ├── etherchannelinterface
+│   │   ├── fpinterfacestatistics
+│   │   ├── fplogicalinterface
+│   │   ├── fpphysicalinterface
+│   │   ├── inlineset
+│   │   ├── interfaceevent
+│   │   ├── loopbackinterface
+│   │   ├── managementconvergencemode
+│   │   ├── operational
+│   │   │   ├── command
+│   │   │   ├── metric
+│   │   │   └── virtualaccessinterface
+│   │   ├── physicalinterface
+│   │   ├── redundantinterface
+│   │   ├── routing
+│   │   │   ├── bfdpolicy
+│   │   │   ├── bgp
+│   │   │   ├── bgpgeneralsettings
+│   │   │   ├── eigrproute
+│   │   │   ├── ipv4staticroute
+│   │   │   ├── ipv6staticroute
+│   │   │   ├── ospfinterface
+│   │   │   ├── ospfv2route
+│   │   │   ├── ospfv3interface
+│   │   │   ├── policybasedroute
+│   │   │   ├── staticroute
+│   │   │   └── virtualrouter
+│   │   │       ├── bfdpolicy
+│   │   │       ├── bgp
+│   │   │       ├── eigrproute
+│   │   │       ├── ipv4staticroute
+│   │   │       ├── ipv6staticroute
+│   │   │       ├── ospfinterface
+│   │   │       ├── ospfv2route
+│   │   │       ├── ospfv3interface
+│   │   │       ├── ospfv3route
+│   │   │       └── policybasedroute
+│   │   ├── subinterface
+│   │   ├── virtualswitch
+│   │   ├── virtualtunnelinterface
+│   │   └── vlaninterface
+│   └── devicesettings
 ├── devicecluster
 │   └── ftddevicecluster
+│       ├── clusterhealthmonitorsettings
 │       └── operational
 ├── devicegroup
 │   └── devicegrouprecord
@@ -168,16 +209,29 @@ the following CRUD operations:
 │       └── monitoredinterface
 ├── health
 │   ├── alert
+│   ├── csdac
 │   ├── metric
+│   ├── pathmonitoredinterface
+│   ├── ravpngateway
+│   ├── ravpnsession
 │   ├── tunnelstatus
+│   │   └── tunneldetails
 │   └── tunnelsummary
 ├── integration
+│   ├── cdfmcsnapshot
 │   ├── cloudeventsconfig
 │   ├── cloudregion
+│   ├── ebssnapshot
 │   ├── externallookup
 │   ├── externalstorage
 │   ├── fmchastatus
-│   └── securexconfig
+│   ├── securexconfig
+│   ├── testumbrellaconnection
+│   ├── umbrella
+│   │   ├── datacenter
+│   │   └── tunneldeployment
+│   │       └── transcript
+│   └── umbrellaconnection
 ├── intelligence
 │   ├── taxiiconfig
 │   │   ├── collection
@@ -191,12 +245,16 @@ the following CRUD operations:
 │       └── source
 ├── job
 │   └── taskstatus
+├── license
+│   ├── devicelicense
+│   └── smartlicense
 ├── netmap
 │   ├── host
 │   └── vulnerability
 ├── object
 │   ├── anyconnectcustomattribute
 │   │   └── override
+│   ├── anyconnectexternalbrowserpackage
 │   ├── anyconnectpackage
 │   ├── anyconnectprofile
 │   ├── anyprotocolportobject
@@ -208,11 +266,22 @@ the following CRUD operations:
 │   ├── applicationtag
 │   ├── applicationtype
 │   ├── aspathlist
+│   ├── azureadreaml
+│   ├── azureadstatus
+│   ├── bfdtemplate
 │   ├── certenrollment
 │   ├── certificatemap
+│   ├── ciphersuitelist
 │   ├── communitylist
 │   ├── continent
 │   ├── country
+│   ├── customsiiplist
+│   ├── customsiiplistdownload
+│   ├── customsiurllist
+│   ├── customsiurllistdownload
+│   ├── dhcpipv6pool
+│   ├── distinguishedname
+│   ├── distinguishednamegroup
 │   ├── dnsservergroup
 │   │   └── override
 │   ├── dynamicobject
@@ -220,6 +289,12 @@ the following CRUD operations:
 │   ├── endpointdevicetype
 │   ├── expandedcommunitylist
 │   ├── extendedaccesslist
+│   ├── externalcacertificate
+│   ├── externalcacertificategroup
+│   ├── externalcertificate
+│   ├── externalcertificategroup
+│   ├── filecategory
+│   ├── filetype
 │   ├── fqdn
 │   │   └── override
 │   ├── geolocation
@@ -238,6 +313,9 @@ the following CRUD operations:
 │   ├── ikev2policy
 │   ├── interface
 │   ├── interfacegroup
+│   ├── internalca
+│   ├── internalcertgroup
+│   ├── internalcertificate
 │   ├── intrusionrule
 │   ├── intrusionrulegroup
 │   ├── ipv4addresspool
@@ -252,9 +330,12 @@ the following CRUD operations:
 │   ├── network
 │   │   └── override
 │   ├── networkaddress
+│   ├── networkaddressoverride
 │   ├── networkgroup
 │   │   └── override
+│   ├── ntpserver
 │   ├── operational
+│   │   ├── findoverlaps
 │   │   └── usage
 │   ├── policylist
 │   ├── port
@@ -268,7 +349,9 @@ the following CRUD operations:
 │   ├── realm
 │   ├── realmuser
 │   ├── realmusergroup
+│   ├── resourceprofile
 │   ├── routemap
+│   ├── secureclientcustomization
 │   ├── securitygrouptag
 │   ├── securityzone
 │   ├── sidnsfeed
@@ -283,6 +366,7 @@ the following CRUD operations:
 │   │   └── override
 │   ├── standardaccesslist
 │   ├── standardcommunitylist
+│   ├── testazureadream
 │   ├── timerange
 │   ├── timezone
 │   │   └── override
@@ -307,27 +391,48 @@ the following CRUD operations:
 │   │   ├── operational
 │   │   │   └── hitcounts
 │   │   └── securityintelligencepolicy
+│   ├── chassisplatformsettingspolicy
+│   │   ├── accesslistsettings
+│   │   ├── dnssettings
+│   │   ├── sshclientsettings
+│   │   ├── sshserversettings
+│   │   ├── syslogsettings
+│   │   ├── timesynchronizationsettings
+│   │   └── timezonesettings
+│   ├── decryptionpolicy
+│   │   └── decryptionpolicyrule
 │   ├── dnspolicy
 │   │   ├── allowdnsrule
 │   │   └── blockdnsrule
 │   ├── dynamicaccesspolicy
 │   ├── filepolicy
+│   │   └── filerule
+│   ├── flexconfigpolicy
 │   ├── ftdnatpolicy
 │   │   ├── autonatrule
 │   │   ├── manualnatrule
 │   │   └── natrule
+│   ├── ftdplatformsettingspolicy
+│   │   ├── httpaccesssettings
+│   │   ├── netflowpolicies
+│   │   └── snmpsettings
 │   ├── ftds2svpn
 │   │   ├── advancedsettings
 │   │   ├── endpoint
 │   │   ├── ikesettings
-│   │   └── ipsecsettings
+│   │   ├── ipseccryptomap
+│   │   ├── ipsecsettings
+│   │   └── s2svpnsummary
+│   ├── healthpolicy
 │   ├── identitypolicy
 │   ├── intrusionpolicy
 │   │   ├── intrusionrule
 │   │   └── intrusionrulegroup
+│   ├── natexemptrule
 │   ├── networkanalysispolicy
 │   │   ├── inspectorconfig
 │   │   └── inspectoroverrideconfig
+│   ├── policylock
 │   ├── prefilterpolicy
 │   │   ├── defaultaction
 │   │   ├── operational
@@ -336,23 +441,39 @@ the following CRUD operations:
 │   ├── ravpn
 │   │   ├── addressassignmentsettings
 │   │   ├── certificatemapsettings
-│   │   └── connectionprofile
+│   │   ├── connectionprofile
+│   │   ├── ipsecadvancedsettings
+│   │   ├── ldapattributemap
+│   │   ├── loadbalancesettings
+│   │   └── secureclientcustomizationsettings
 │   ├── snmpalert
-│   └── syslogalert
+│   ├── syslogalert
+│   ├── umbrelladnspolicy
+│   │   └── umbrelladnsrule
+│   ├── vpntunnelstatus
+│   └── zerotrustpolicy
+│       ├── application
+│       └── applicationgroup
 ├── system
 │   └── info
 │       ├── domain
 │       └── serverversion
+├── systemconfiguration
+│   ├── changemanagementconfig
+│   └── remotemanagementaccess
 ├── troubleshoot
-│   └── packettracer
-│       └── file
+│   ├── device
+│   ├── packettracer
+│   │   └── file
+│   └── task
 ├── update
 │   └── upgradepackage
 │       └── applicabledevice
 └── user
     ├── authrole
     ├── duoconfig
-    └── ssoconfig
+    ├── ssoconfig
+    └── users
 ```
 
 ## Troubleshooting
