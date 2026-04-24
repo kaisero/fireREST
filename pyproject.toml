@@ -1,25 +1,33 @@
 [project]
 name = "fireREST"
-version = "1.2.4"
+version = "1.3.0"
 description = "Python API client for Cisco Firepower Management Center (FMC)"
 keywords = ["cisco", "firepower", "fmc", "ftd", "fpr", "api", "rest", "firewall"]
 authors = [
     { name = "Oliver Kaiser", email = "oliver.kaiser@outlook.com" }
 ]
 maintainers = [
-    { name = "Rafal Chrabaszcz", email = "rchrabas@cisco.com" }
+    { name = "Rafal Chrabaszcz", email = "rchrabas@cisco.com" },
+    { name = "Christian Mendez", email = "cristianr.mendezm@gmail.com" }
 ]
 license = { text = "GPL-3.0-only" }
 readme = {file = "README.md", content-type = "text/markdown"}
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
+    "Intended Audience :: System Administrators",
     "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
-    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent",
     "Topic :: System :: Networking :: Firewalls",
+    "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
 requires-python = ">=3.9"
@@ -32,7 +40,12 @@ dependencies = [
 ]
 
 [project.urls]
-repository = "https://github.com/kaisero/fireREST"
+Repository = "https://github.com/kaisero/fireREST"
+"Bug Tracker" = "https://github.com/kaisero/fireREST/issues"
+Changelog = "https://github.com/kaisero/fireREST/blob/master/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+include = ["fireREST*"]
 
 [tool.poetry]
 requires-poetry = ">=2.0"
@@ -50,6 +63,8 @@ mkdocs-material = "^9"
 mkdocstrings = {version = "^0.27", extras = ["python"]}
 mypy = ">=1"
 jinja2 = ">=3.1.6"
+build = ">=1.2"
+twine = ">=6.0"
 
 [build-system]
 requires = ["setuptools >= 75.0"]
