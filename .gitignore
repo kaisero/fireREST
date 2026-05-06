@@ -1,6 +1,9 @@
 # LLM
 .llm/
 
+# Claude Code (local settings only — commands are tracked)
+.claude/settings.local.json
+
 # test files
 test.py
 
