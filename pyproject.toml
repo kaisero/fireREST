@@ -59,6 +59,8 @@ pytest-cov = "^6"
 pytest-runner = "^6"
 mkdocs = "^1.6"
 mkdocs-material = "^9"
+mkdocs-gen-files = "^0.5"
+mkdocs-literate-nav = "^0.6"
 mkdocstrings = {version = "^0.27", extras = ["python"]}
 mypy = ">=1"
 jinja2 = ">=3.1.6"
