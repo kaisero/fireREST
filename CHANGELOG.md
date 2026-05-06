@@ -260,6 +260,17 @@
   * troubleshoot.task.create(...)
   * update.snapshot(...)
 
+## Documentation
+
+* Migrated documentation from Sphinx to MkDocs with Material theme and mkdocstrings.
+* Added Google-style docstrings to all 312 resource classes, sourced from the FMC OAS3 specs
+  (7.2.5, 7.3.1, 7.4.2). Each docstring includes description, tags, supported operations,
+  operation IDs, and query parameters.
+* API reference pages are now auto-generated at build time from the codebase via
+  `mkdocs-gen-files` and `mkdocs-literate-nav`. Adding a new resource class automatically
+  includes it in the docs without any manual file edits.
+* Added FMC API release constants for 7.6.0, 7.7.0, and 10.0.0 in `defaults.py`.
+
 ## Breaking Changes
 
 * `policy.prefilterpolicy.accessrule` renamed to `prefilterrule`.
