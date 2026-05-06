@@ -1,8 +1,10 @@
 # fireREST Project Context
 
 You are working on **fireREST** — a Python SDK for the Cisco Firepower Management Center (FMC) REST API.
-Current version: **1.3.0**. Active branch: `feature/full_support_7.4`.
+Current version: **1.3.0** (CHANGELOG header is `# Unreleased` until release is cut).
+Active branch: `feature/full_support_7.4`. PR #98 open against `kaisero/fireREST`.
 Maintainer on this fork: Christian Mendez (`cromanme/fireREST` on GitHub, upstream is `kaisero/fireREST`).
+PyPI publish access granted by kaisero.
 
 ---
 
@@ -137,45 +139,89 @@ self.mynewsection = MySection(self.conn)
 2. Add the snake_case → camelCase mapping to `fireREST/mapping.py` in `FILTERS` or `PARAMS`.
 3. Write a custom `get()` decorated with `@utils.support_params`.
 
+### Docstring format (all 312 resource classes already have these)
+Generated from OAS3 specs via `gen_docstrings.py`. Format:
+```python
+"""<description from OAS3 GET operation>.
+
+**Tags:** Object
+
+**Supported operations:** GET, CREATE, UPDATE, DELETE
+
+**Operation IDs:**
+
+- `getAllNetworkObject` (GET (list))
+- `getNetworkObject` (GET)
+- `createMultipleNetworkObject` (CREATE)
+- `updateNetworkObject` (UPDATE)
+- `deleteNetworkObject` (DELETE)
+
+**Query parameters:**
+
+- `filter` (string, optional): Filter by name or value.
+- `expanded` (boolean, optional): Include extended sub-object details in response.
+- `offset` (integer, optional): Index of first item to return.
+- `limit` (integer, optional): Number of items to return.
+"""
+```
+To regenerate docstrings after adding new classes: `python gen_docstrings.py`
+
 ---
 
-## Known Bugs (tracked in `.llm/fireREST_phase2_reference.md` §2)
+## PR Review — rchrabas Preferences (upstream collaborator)
 
-| ID | File | Issue |
-|---|---|---|
-| BUG-01 | `netmap/host`, `netmap/vulnerability` | `delete()` passes `url=` kwarg — TypeError at runtime |
-| BUG-02 | `devicecluster/ftddevicecluster/operational` | `command()` uses un-formatted `{container_uuid}` literal |
-| BUG-03 | `chassis/operational` | 3 methods leave `{uuid}` un-substituted |
-| BUG-04 | `health/tunnelsummary` | `PATH` uses metric's path, should be `/health/tunnelsummaries/{uuid}` |
-| BUG-05 | `policy/networkanalysispolicy/inspectorconfig` | `CONTAINER_PATH` points to `intrusionpolicies` instead of `networkanalysispolicies` |
-| BUG-06 | `policy/prefilterpolicy/defaultaction` | `CONTAINER_NAME = 'AccessPolicy'` should be `'PrefilterPolicy'` |
-| BUG-07 | `policy/ftds2svpn/endpoint` | `CONTAINER_NAME = 'Endpoint'` should be `'FtdS2sVpn'` |
-| BUG-08 | `policy/prefilterpolicy` | Attribute `accessrule` should be `prefilterrule` |
-| BUG-09 | `deployment` | Attribute `deployabledevices` (plural) should be `deployabledevice` |
-| BUG-10 | `mapping.py` | `PARAMS` missing `group_dependency` and `hostname` → KeyError |
-| BUG-11 | `mapping.py` | `command` filter built ad-hoc in device operational, inconsistent |
+rchrabas reviews all PRs against `kaisero/fireREST`. Known preferences:
+- **Breaking changes** must be in a separate `## Breaking Changes` section in CHANGELOG — not buried in `## Fixed`.
+- **Renames of public attributes** (e.g. `deployabledevices` → `deployabledevice`) are breaking changes. If rchrabas pushes back on a rename, revert it and leave the old name.
+- **CHANGELOG header** should be `# Unreleased` while the PR is open; versioned only after merge.
+- **tox.ini** should NOT include `[testenv:publish]` or `[testenv:publish-test]` — publish is done manually.
+- **pyproject.toml** classifiers: Python 3.9 is EoL, omit it. Start from 3.10.
+- **Docs reference pages** must be auto-generated from code, not static committed files.
+- **CHANGELOG bug descriptions**: keep to one concise line each — no multi-line "because..." explanations.
+- **gh CLI** is installed at `C:\Program Files\GitHub CLI\gh.exe` (not on PATH in Bash tool — use PowerShell or full path).
 
-Check `.llm/fireREST_phase2_reference.md` for exact fix snippets.
+---
 
-## Missing Implementations (`.llm/fireREST_phase2_reference.md` §3)
+## Known Bugs — ALL FIXED on `feature/full_support_7.4`
 
-| ID | Issue |
-|---|---|
-| MISSING-01 | `policy.accesspolicy.loggingsettings` module exists but never instantiated in `AccessPolicy.__init__()` |
-| MISSING-02 | `policy.identitypolicy` module exists but never wired into `Policy.__init__()` |
-| MISSING-03 | `object.standardaccesslist` only has GET; CHANGELOG claimed create/update/delete |
-| MISSING-04 | `VirtualRouter` missing `ospfv3route` and `ospfv3interface` subresources (no files exist) |
-| MISSING-05 | `object.communitylist` only has GET; FMC API supports CREATE/UPDATE/DELETE |
+BUG-01 through BUG-11 from `.llm/fireREST_phase2_reference.md` §2 are resolved.
+Note: BUG-09 (`deployabledevices` rename) was **reverted** at rchrabas's request — attribute stays plural.
+
+## Missing Implementations — ALL FIXED on `feature/full_support_7.4`
+
+MISSING-01 through MISSING-05 from `.llm/fireREST_phase2_reference.md` §3 are resolved.
 
 ---
 
 ## Documentation (MkDocs)
 
-- Config: `mkdocs.yml` with Material theme, dark/light toggle, mkdocstrings
-- Source: `docs/` — `index.md` (home) + `reference/*.md` (25 API reference pages)
-- Each reference page uses explicit `:::` directives per class with `inherited_members: true`
+- Config: `mkdocs.yml` — Material theme, dark/light toggle, mkdocstrings, gen-files, literate-nav
+- Home page: `docs/index.md` (static)
+- Reference pages: **auto-generated at build time** by `docs/gen_ref_pages.py`
+  - Scans `fireREST/fmc/` via AST, emits one page per namespace with `:::` directives
+  - Navigation auto-populated via `SUMMARY.md` written by literate-nav
+  - Adding a new resource class → appears in docs automatically on next build
 - Build: `poetry run mkdocs build --strict`
-- Sphinx was fully removed (no RST files remain)
+- Local preview: `poetry run mkdocs serve` → `http://127.0.0.1:8000`
+- Sphinx fully removed (no RST files remain)
+- Dev deps: `mkdocs-gen-files ^0.5`, `mkdocs-literate-nav ^0.6` added to `pyproject.toml`
+
+### CHANGELOG format
+```markdown
+# Unreleased         ← always "Unreleased" while PR is open
+
+## New
+* ...
+
+## Documentation
+* ...
+
+## Breaking Changes
+* ...
+
+## Fixed
+* Fixed <short one-line description>.
+```
 
 ---
 
@@ -194,17 +240,26 @@ poetry run mypy fireREST
 # Tests
 poetry run pytest --cov=fireREST --cov-report=term
 
-# Build docs
+# Build docs (local preview)
+poetry run mkdocs serve
+
+# Build docs (static output to site/)
 poetry run mkdocs build --strict
 
 # Build package
 python -m build
 
-# Publish to PyPI (kaisero granted access)
+# Publish to PyPI (kaisero granted access — do manually, not via tox)
 twine check dist/* && twine upload dist/*
 
-# Tox (all environments)
+# Tox (lint, type check, test, docs)
 tox
+
+# Read PR comments
+& "C:\Program Files\GitHub CLI\gh.exe" api repos/kaisero/fireREST/pulls/<N>/comments
+
+# List PRs
+& "C:\Program Files\GitHub CLI\gh.exe" pr list --repo kaisero/fireREST --state all
 ```
 
 ---
