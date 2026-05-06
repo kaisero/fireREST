@@ -1,4 +1,4 @@
-# 1.3.0 [2026-04-23]
+# Unreleased
 
 ## New
 
@@ -260,57 +260,29 @@
   * troubleshoot.task.create(...)
   * update.snapshot(...)
 
+## Breaking Changes
+
+* `policy.prefilterpolicy.accessrule` renamed to `prefilterrule`.
+* `device.devicerecord.operational.command.get()` filter is now correctly passed as a list to `utils.search_filter()`.
+
 ## Fixed
 
-* `netmap.host.delete()` and `netmap.vulnerability.delete()` raised `TypeError` at runtime because they
-  passed an unsupported `url=` keyword argument to `Resource.delete()`. Both methods now call
-  `self.conn.delete()` directly and also guard against a `None` params dict before setting `bulk=True`.
-* `cluster.ftddevicecluster.operational.command()` built a URL with a literal `{container_uuid}`
-  placeholder because `PATH` was concatenated without formatting. The path is now formatted with
-  `container_uuid` before building the final URL.
-* `chassis.operational.breakout_interfaces()`, `join_interfaces()`, and `sync_networkmodule()` built
-  malformed URLs because `PATH` contains both `{container_uuid}` and `{uuid}` but only
-  `container_uuid` was substituted, leaving a literal `{uuid}` in every request URL. Both
-  placeholders are now substituted before the action suffix is appended.
-* `health.tunnelsummary` had `PATH = '/health/metrics/{uuid}'` — an exact copy of the `Metric`
-  class path. Corrected to `/health/tunnelsummaries/{uuid}`.
-* `policy.networkanalysispolicy.inspectorconfig` had `CONTAINER_PATH` pointing to
-  `/policy/intrusionpolicies/{uuid}` instead of `/policy/networkanalysispolicies/{uuid}`, causing
-  name-to-uuid resolution to query the wrong parent resource.
-* `policy.prefilterpolicy.defaultaction` had `CONTAINER_NAME = 'AccessPolicy'` (copy-paste error).
-  Corrected to `'PrefilterPolicy'` so container name resolution targets the right class.
-* `policy.ftds2svpn.endpoint` had `CONTAINER_NAME = 'Endpoint'` (self-referencing error).
-  Corrected to `'FtdS2sVpn'` so container name resolution targets the parent VPN policy.
-* `policy.prefilterpolicy` exposed its `PrefilterRule` child as `self.accessrule` instead of
-  `self.prefilterrule`. Attribute renamed to `prefilterrule` to match the underlying class name
-  and the documented API surface.
-* `deployment.deployabledevices` attribute was plural, inconsistent with every other child
-  attribute in the library and with the README/docs. Renamed to `deployment.deployabledevice`.
-* `mapping.PARAMS` was missing entries for `group_dependency` and `hostname`. Any call to
-  `deployment.deployabledevice.get(group_dependency=...)` or
-  `device.devicerecord.get(hostname=...)` would raise `KeyError` in the `support_params` decorator.
-* `device.devicerecord.operational.command.get()` passed a plain dict to `utils.search_filter()`
-  which expects a list of dicts, causing `AttributeError` at runtime. The call is now wrapped in a
-  list. Added `'command'` to `mapping.FILTERS` for consistency with the rest of the library.
-* `policy.accesspolicy.loggingsettings` module existed with correct PATH and version constants but
-  was never imported or instantiated in `AccessPolicy.__init__()`. Now wired up as
-  `self.loggingsettings`.
-* `policy.identitypolicy` module existed with correct PATH and version constants but was never
-  imported or instantiated in `Policy.__init__()`. Now wired up as `self.identitypolicy`.
-* `object.standardaccesslist` only had `MINIMUM_VERSION_REQUIRED_GET` set despite CHANGELOG 1.1.0
-  advertising create/update/delete support. Added `MINIMUM_VERSION_REQUIRED_CREATE`,
-  `MINIMUM_VERSION_REQUIRED_UPDATE`, and `MINIMUM_VERSION_REQUIRED_DELETE` at 7.1.0.
-* `device.devicerecord.routing.virtualrouter.ospfv3route` and `ospfv3interface` were listed in
-  CHANGELOG 1.1.0 and the README but neither module existed. Created both `NestedChildResource`
-  modules and wired them into `VirtualRouter.__init__()`.
-* `object.communitylist` only had `MINIMUM_VERSION_REQUIRED_GET` set. The FMC API supports full
-  CRUD for community lists. Added `MINIMUM_VERSION_REQUIRED_CREATE`, `MINIMUM_VERSION_REQUIRED_UPDATE`,
-  and `MINIMUM_VERSION_REQUIRED_DELETE` at 6.5.0 to match the GET floor.
-* `policy.ravpn` was imported in `Policy.__init__()` but never instantiated, making the entire
-  RA VPN policy surface unreachable at runtime. Now wired up as `self.ravpn`.
-* `update.revert()` was defined with the duplicate name `retry`, silently shadowing the legitimate
-  `retry()` method added in 6.7.0. The 7.1.0 method that posts to `/updates/revertupgrades` is now
-  correctly named `revert()`, matching the entry already listed in the 1.1.0 changelog.
+* Fixed `TypeError` in `netmap.host.delete()` and `netmap.vulnerability.delete()` caused by unsupported `url=` keyword argument to `Resource.delete()`.
+* Fixed `cluster.ftddevicecluster.operational.command()` building malformed URLs.
+* Fixed `chassis.operational` methods building malformed URLs.
+* Fixed `health.tunnelsummary` `PATH` pointing to `/health/metrics/{uuid}` instead of `/health/tunnelsummaries/{uuid}`.
+* Fixed `policy.networkanalysispolicy.inspectorconfig` `CONTAINER_PATH` pointing to `intrusionpolicies` instead of `networkanalysispolicies`.
+* Fixed `policy.prefilterpolicy.defaultaction` `CONTAINER_NAME` set to `'AccessPolicy'` instead of `'PrefilterPolicy'`.
+* Fixed `policy.ftds2svpn.endpoint` `CONTAINER_NAME` set to `'Endpoint'` instead of `'FtdS2sVpn'`.
+* Fixed `mapping.PARAMS` missing `group_dependency` and `hostname` entries causing `KeyError` in `support_params` decorator.
+* Fixed `device.devicerecord.operational.command.get()` passing a plain dict to `utils.search_filter()` where a list is expected.
+* Fixed `policy.accesspolicy.loggingsettings` not instantiated in `AccessPolicy.__init__()`.
+* Fixed `policy.identitypolicy` not instantiated in `Policy.__init__()`.
+* Fixed `object.standardaccesslist` missing `MINIMUM_VERSION_REQUIRED_CREATE/UPDATE/DELETE` constants.
+* Fixed missing `ospfv3route` and `ospfv3interface` modules under `virtualrouter`.
+* Fixed `object.communitylist` missing `MINIMUM_VERSION_REQUIRED_CREATE/UPDATE/DELETE` constants.
+* Fixed `policy.ravpn` not instantiated in `Policy.__init__()`.
+* Fixed `update.revert()` incorrectly named `retry`, shadowing the existing `retry()` method.
 
 # 1.2.4 [2026-01-14]
 

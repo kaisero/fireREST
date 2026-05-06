@@ -8,7 +8,7 @@ from fireREST.fmc.deployment.rollbackrequest import RollbackRequest
 
 class Deployment:
     def __init__(self, conn: Connection):
-        self.deployabledevice = DeployableDevice(conn)
+        self.deployabledevices = DeployableDevice(conn)
         self.deploymentrequest = DeploymentRequest(conn)
         self.jobhistory = JobHistory(conn)
         self.pendingchangesrequest = PendingChangesRequest(conn)
