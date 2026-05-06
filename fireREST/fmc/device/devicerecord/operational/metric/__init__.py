@@ -4,6 +4,23 @@ from fireREST.fmc import ChildResource
 
 
 class Metric(ChildResource):
+    """Retrieves HealthMonitor metrics for the device.
+
+    **Tags:** Devices
+
+    **Supported operations:** GET
+
+    **Operation IDs:**
+
+    - `getHealthMonitorModel` (GET (list))
+
+    **Query parameters:**
+
+    - `filter` (string): The metric filter query parameter should have healthmonitor name.Currently supports only `metric:memory & metric:cpu`
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/operational/metrics'

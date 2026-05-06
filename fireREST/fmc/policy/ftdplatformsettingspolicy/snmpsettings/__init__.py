@@ -3,6 +3,24 @@ from fireREST.fmc import ChildResource
 
 
 class SnmpSettings(ChildResource):
+    """Retrieves the Threat Defense SNMP Platform settings policy.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, UPDATE
+
+    **Operation IDs:**
+
+    - `getAllSNMPSettingsPolicy` (GET (list))
+    - `getSNMPSettingsPolicy` (GET)
+    - `updateSNMPSettingsPolicy` (UPDATE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     CONTAINER_NAME = 'FtdPlatformSettingsPolicy'
     CONTAINER_PATH = '/policy/ftdplatformsettingspolicies/{uuid}'
     PATH = '/policy/ftdplatformsettingspolicies/{container_uuid}/snmpsettings/{uuid}'

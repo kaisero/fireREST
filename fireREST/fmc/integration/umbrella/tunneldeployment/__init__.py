@@ -4,6 +4,17 @@ from fireREST.fmc.integration.umbrella.tunneldeployment.transcript import Transc
 
 
 class TunnelDeployment(Resource):
+    """Retrieves Tunnel deployment data on Umbrella.
+
+    **Tags:** Integration
+
+    **Supported operations:** GET, CREATE
+
+    **Operation IDs:**
+
+    - `getUmbrellaDeploymentData` (GET)
+    - `createUmbrellaDeploymentData` (CREATE)
+    """
     PATH = '/integration/umbrella/tunneldeployments/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_730
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_730

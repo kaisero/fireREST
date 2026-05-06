@@ -3,6 +3,26 @@ from fireREST.fmc import Resource
 
 
 class StandardCommunityList(Resource):
+    """Retrieves, deletes, creates, or modifies the StandardCommunityList object associated with the specified ID. If no ID is specified for a GET, retrieves list of all StandardCommunityList objects.
+
+    **Tags:** Object
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllStandardCommunityList` (GET (list))
+    - `getStandardCommunityList` (GET)
+    - `createStandardCommunityList` (CREATE)
+    - `updateStandardCommunityList` (UPDATE)
+    - `deleteStandardCommunityList` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     PATH = '/object/standardcommunitylists/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_710
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_660

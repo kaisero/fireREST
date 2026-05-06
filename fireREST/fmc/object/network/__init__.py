@@ -5,6 +5,30 @@ from fireREST.fmc.object.network.override import Override
 
 
 class Network(Resource):
+    """Retrieves, deletes, creates, or modifies the network objects associated with the specified ID. If no ID is specified for a GET, retrieves list of all network objects.
+
+    **Tags:** Object
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllNetworkObject` (GET (list))
+    - `getNetworkObject` (GET)
+    - `createMultipleNetworkObject` (CREATE)
+    - `updateNetworkObject` (UPDATE)
+    - `deleteMultipleNetworkObject` (DELETE (bulk))
+    - `deleteNetworkObject` (DELETE)
+
+    **Query parameters:**
+
+    - `overrideTargetId` (string, optional): Retrieves the override(s) associated with the network object on given target ID.
+    - `filter` (string, optional): To be used in conjunction with `"unusedOnly:true"` to search for unused objects and `"nameOrValue:{nameOrValue}"` to search for both name and value. `"ids:id1,id2,..."`.`ids` is a comma-separated list of rule IDs to be deleted.
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    - `bulk` (boolean, optional): Enables bulk create for network objects.
+    """
     PATH = '/object/networks/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610

@@ -4,6 +4,27 @@ from fireREST.fmc import ChildResource
 
 
 class VirtualTunnelInterface(ChildResource):
+    """Retrieves, deletes, creates, or modifies the vti interface associated with the specified NGFW device ID and/or interface ID.
+
+    **Tags:** Devices
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllFTDVTIInterface` (GET (list))
+    - `getFTDVTIInterface` (GET)
+    - `createMultipleFTDVTIInterface` (CREATE)
+    - `updateFTDVTIInterface` (UPDATE)
+    - `deleteFTDVTIInterface` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    - `bulk` (boolean, optional): Enables bulk create for NGFW vti interfaces.
+    """
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/virtualtunnelinterfaces/{uuid}'

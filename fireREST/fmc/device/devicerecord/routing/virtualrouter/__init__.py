@@ -13,6 +13,26 @@ from fireREST.fmc.device.devicerecord.routing.virtualrouter.policybasedroute imp
 
 
 class VirtualRouter(ChildResource):
+    """Retrieves list of all virtual routers created in the specified device.
+
+    **Tags:** Devices
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllVirtualRouterModel` (GET (list))
+    - `getVirtualRouterModel` (GET)
+    - `createVirtualRouterModel` (CREATE)
+    - `updateVirtualRouterModel` (UPDATE)
+    - `deleteVirtualRouterModel` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/routing/virtualrouters/{uuid}'

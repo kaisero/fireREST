@@ -3,6 +3,16 @@ from fireREST.fmc import Resource
 
 
 class TestAzureAdRealm(Resource):
+    """Tests Azure AD Realm connectivity.
+
+    **Tags:** Object
+
+    **Supported operations:** CREATE
+
+    **Operation IDs:**
+
+    - `createTestAzureADRealm` (CREATE)
+    """
     PATH = '/object/testazureadrealms'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740
 

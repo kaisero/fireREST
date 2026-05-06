@@ -3,6 +3,17 @@ from fireREST.fmc import ChildResource
 
 
 class CertificateMapSettings(ChildResource):
+    """Retrieves Certificate Map Setting inside a VPN RA Topology.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, UPDATE
+
+    **Operation IDs:**
+
+    - `getFTDRAVpnCertificateMapSettings` (GET)
+    - `updateFTDRAVpnCertificateMapSettings` (UPDATE)
+    """
     CONTAINER_NAME = 'RaVpn'
     CONTAINER_PATH = '/policy/ravpns/{uuid}'
     PATH = '/policy/ravpns/{container_uuid}/certificatemapsettings/{uuid}'

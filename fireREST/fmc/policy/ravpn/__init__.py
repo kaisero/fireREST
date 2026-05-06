@@ -10,6 +10,26 @@ from fireREST.fmc.policy.ravpn.secureclientcustomizationsettings import SecureCl
 
 
 class RaVpn(Resource):
+    """Retrieves the Firewall Threat Defense RA VPN topology associated with the specified ID.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllFTDRAVpnModel` (GET (list))
+    - `getFTDRAVpnModel` (GET)
+    - `createFTDRAVpnModel` (CREATE)
+    - `updateFTDRAVpnModel` (UPDATE)
+    - `deleteFTDRAVpnModel` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     PATH = '/policy/ravpns/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_720
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700

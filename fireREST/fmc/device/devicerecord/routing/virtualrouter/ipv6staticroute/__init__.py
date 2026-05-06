@@ -3,6 +3,26 @@ from fireREST.fmc import NestedChildResource
 
 
 class Ipv6StaticRoute(NestedChildResource):
+    """Retrieves, deletes, creates, or modifies the IPv6 Static Route associated with the specified virtual router. Also, retrieves list of all IPv6 Static routes.
+
+    **Tags:** Devices
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllVrfIPv6StaticRouteModel` (GET (list))
+    - `getVrfIPv6StaticRouteModel` (GET)
+    - `createVrfIPv6StaticRouteModel` (CREATE)
+    - `updateVrfIPv6StaticRouteModel` (UPDATE)
+    - `deleteVrfIPv6StaticRouteModel` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     CHILD_CONTAINER_NAME = 'VirtualRouter'

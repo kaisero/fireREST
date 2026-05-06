@@ -3,6 +3,27 @@ from fireREST.fmc import Resource
 
 
 class SlaMonitor(Resource):
+    """Retrieves, deletes, creates, or modifies the sla monitor object associated with the specified ID. If no ID is specified for a GET, retrieves list of all sla monitor objects.
+
+    **Tags:** Object
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllSLAMonitorObjectModel` (GET (list))
+    - `getSLAMonitorObjectModel` (GET)
+    - `createMultipleSLAMonitorObjectModel` (CREATE)
+    - `updateSLAMonitorObjectModel` (UPDATE)
+    - `deleteSLAMonitorObjectModel` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    - `bulk` (boolean, optional): Enables bulk create for SLA monitor objects.
+    """
     PATH = '/object/slamonitors/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_623
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_623

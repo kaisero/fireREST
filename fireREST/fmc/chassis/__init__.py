@@ -18,6 +18,25 @@ from fireREST.fmc.chassis.physicalinterface import PhysicalInterface
 
 
 class Chassis(Resource):
+    """Retrieves list of all chassis managed devices from Firewall Management Center.
+
+    **Tags:** Chassis
+
+    **Supported operations:** GET, CREATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllFMCManagedChassis` (GET (list))
+    - `getFMCManagedChassis` (GET)
+    - `createFMCManagedChassis` (CREATE)
+    - `deleteFMCManagedChassis` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     PATH = '/chassis/fmcmanagedchassis/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_710
 

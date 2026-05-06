@@ -3,6 +3,16 @@ from fireREST.fmc import Resource
 
 
 class Device(Resource):
+    """Triggers troubleshooting for a TPK Chassis.
+
+    **Tags:** Troubleshoot
+
+    **Supported operations:** CREATE
+
+    **Operation IDs:**
+
+    - `createDeviceTroubleshoot` (CREATE)
+    """
     NAMESPACE = 'troubleshoot'
     PATH = '/troubleshoot/device'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740

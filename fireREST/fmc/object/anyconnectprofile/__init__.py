@@ -4,6 +4,27 @@ from fireREST.fmc import Resource, Connection
 
 
 class AnyconnectProfile(Resource):
+    """Retrieves, update, deletes or creates the AnyConnect Profile associated with the specified ID. If no ID is specified for a GET, retrieves list of all AnyConnect Profile objects.
+
+    **Tags:** Object
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllAnyConnectProfileModel` (GET (list))
+    - `getAnyConnectProfileModel` (GET)
+    - `createAnyConnectProfileModel` (CREATE)
+    - `updateAnyConnectProfileModel` (UPDATE)
+    - `deleteAnyConnectProfileModel` (DELETE)
+
+    **Query parameters:**
+
+    - `filter` (string, optional): To be used in conjunction with `"unusedOnly:true"` to search for unused objects and `"nameOrValue:{nameOrValue}"` to search for both name and value.
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     PATH = '/object/anyconnectprofiles/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_720
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700

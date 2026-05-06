@@ -3,6 +3,26 @@ from fireREST.fmc import NestedChildResource
 
 
 class EigrpRoute(NestedChildResource):
+    """Retrieves, deletes, creates, or modifies the EIGRP associated for a specified virtual router with the specified ID. Also, retrieves list of all EIGRP.
+
+    **Tags:** Devices
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllVrfEigrpPolicyModel` (GET (list))
+    - `getVrfEigrpPolicyModel` (GET)
+    - `createVrfEigrpPolicyModel` (CREATE)
+    - `updateVrfEigrpPolicyModel` (UPDATE)
+    - `deleteVrfEigrpPolicyModel` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     CHILD_CONTAINER_NAME = 'VirtualRouter'

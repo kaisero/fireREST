@@ -4,6 +4,26 @@ from fireREST.fmc.policy.filepolicy.filerule import FileRule
 
 
 class FilePolicy(Resource):
+    """Retrieves the File Policy associated with the specified ID.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllFilePolicy` (GET (list))
+    - `getFilePolicy` (GET)
+    - `createFilePolicy` (CREATE)
+    - `updateFilePolicy` (UPDATE)
+    - `deleteFilePolicy` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     PATH = '/policy/filepolicies/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610
 

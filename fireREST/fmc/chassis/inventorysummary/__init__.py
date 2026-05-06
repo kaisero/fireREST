@@ -3,6 +3,22 @@ from fireREST.fmc import ChildResource
 
 
 class InventorySummary(ChildResource):
+    """Retrieves Inventory summary data from the chassis
+
+    **Tags:** Chassis
+
+    **Supported operations:** GET
+
+    **Operation IDs:**
+
+    - `getChassisInventorySummary` (GET (list))
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     CONTAINER_NAME = 'Chassis'
     CONTAINER_PATH = '/chassis/fmcmanagedchassis/{uuid}'
     PATH = '/chassis/fmcmanagedchassis/{container_uuid}/inventorysummary/{uuid}'

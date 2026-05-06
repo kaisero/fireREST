@@ -10,6 +10,26 @@ from fireREST.fmc.policy.chassisplatformsettingspolicy.timezonesettings import T
 
 
 class ChassisPlatformSettingsPolicy(Resource):
+    """Retrieves the chassis platform settings policies associated with the specified ID.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllChassisPlatformSettingsPolicy` (GET (list))
+    - `getChassisPlatformSettingsPolicy` (GET)
+    - `createChassisPlatformSettingsPolicy` (CREATE)
+    - `updateChassisPlatformSettingsPolicy` (UPDATE)
+    - `deleteChassisPlatformSettingsPolicy` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
     PATH = '/policy/chassisplatformsettingspolicies/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740
