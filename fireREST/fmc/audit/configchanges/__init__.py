@@ -21,6 +21,7 @@ class ConfigChanges(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     NAMESPACE = 'platform_with_domain'
     PATH = '/audit/configchanges/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740

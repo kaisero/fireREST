@@ -33,6 +33,7 @@ class PrefilterRule(ChildResource):
     - `insertBefore` (number, optional): This parameter specifies that the rules will be inserted before the specified rule index. insertBefore takes precedence over insertAfter - if both are specified, the insertBefore parameter will apply.
     - `filter` (string): To be used in conjunction with `bulk=true` for bulk deletion. Value is of format (including quotes): `"ids:id1,id2,..."`. `ids` is a comma-separated list of rule IDs to be deleted.
     """
+
     CONTAINER_NAME = 'PrefilterPolicy'
     CONTAINER_PATH = '/policy/prefilterpolicies/{uuid}'
     PATH = '/policy/prefilterpolicies/{container_uuid}/prefilterrules/{uuid}'

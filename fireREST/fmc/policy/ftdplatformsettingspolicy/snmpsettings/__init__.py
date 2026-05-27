@@ -21,6 +21,7 @@ class SnmpSettings(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'FtdPlatformSettingsPolicy'
     CONTAINER_PATH = '/policy/ftdplatformsettingspolicies/{uuid}'
     PATH = '/policy/ftdplatformsettingspolicies/{container_uuid}/snmpsettings/{uuid}'

@@ -24,6 +24,7 @@ class SecureClientCustomization(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/object/secureclientcustomizations/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740

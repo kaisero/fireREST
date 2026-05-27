@@ -28,6 +28,7 @@ class Icmpv6Object(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for ICMPv6 objects.
     """
+
     PATH = '/object/icmpv6objects/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610

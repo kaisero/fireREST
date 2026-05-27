@@ -21,6 +21,7 @@ class LdapAttributeMap(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'RaVpn'
     CONTAINER_PATH = '/policy/ravpns/{uuid}'
     PATH = '/policy/ravpns/{container_uuid}/ldapattributemaps/{uuid}'

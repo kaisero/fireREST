@@ -44,6 +44,7 @@ class DeviceRecord(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk registration or unregistration for devices.
     """
+
     PATH = '/devices/devicerecords/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610

@@ -20,6 +20,7 @@ class SmartLicense(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     NAMESPACE = 'platform'
     PATH = '/license/smartlicenses/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_720

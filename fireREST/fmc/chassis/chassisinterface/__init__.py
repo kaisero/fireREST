@@ -21,6 +21,7 @@ class ChassisInterface(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'Chassis'
     CONTAINER_PATH = '/chassis/fmcmanagedchassis/{uuid}'
     PATH = '/chassis/fmcmanagedchassis/{container_uuid}/interfaces/{uuid}'

@@ -27,6 +27,7 @@ class Backup(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/backup/files/{uuid}'
 
     def __init__(self, conn: Connection):

@@ -20,8 +20,9 @@ class CommunityList(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/object/communitylists/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_650
-    MINIMUM_VERSION_REQUIRED_GET    = API_RELEASE_650
+    MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_650
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_650
     MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_650

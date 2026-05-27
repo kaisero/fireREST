@@ -20,5 +20,6 @@ class ApplicationRisk(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/object/applicationrisks/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610

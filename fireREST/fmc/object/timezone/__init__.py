@@ -27,6 +27,7 @@ class Timezone(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for Time Zone objects.
     """
+
     PATH = '/object/timezoneobjects/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_660
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_660

@@ -25,6 +25,7 @@ class IntrusionRule(ChildResource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean): This parameter specifies that bulk operation is being used in the query. This parameter is required for bulk Snort 3 intrusion rule operations.
     """
+
     CONTAINER_NAME = 'IntrusionPolicy'
     CONTAINER_PATH = '/policy/intrusionpolicies/{uuid}'
     PATH = '/policy/intrusionpolicies/{container_uuid}/intrusionrules/{uuid}'

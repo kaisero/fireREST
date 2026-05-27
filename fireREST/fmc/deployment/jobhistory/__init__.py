@@ -24,6 +24,7 @@ class JobHistory(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/deployment/jobhistories/{uuid}'
     SUPPORTED_FILTERS = ['device_uuid']
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_670

@@ -29,6 +29,7 @@ class DynamicObject(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create (POST) or delete (DELETE) of Dynamic Objects.
     """
+
     PATH = '/object/dynamicobjects/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_700
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700

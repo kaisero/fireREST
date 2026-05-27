@@ -29,6 +29,7 @@ class FtdS2sVpn(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/policy/ftds2svpns/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_630
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630

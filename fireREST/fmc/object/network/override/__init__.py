@@ -19,6 +19,7 @@ class Override(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'Network'
     CONTAINER_PATH = '/object/networks/{uuid}'
     PATH = '/object/networks/{container_uuid}/overrides/{uuid}'

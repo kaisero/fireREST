@@ -51,6 +51,7 @@ class UserActivity(Resource):
     - `azureEvents` (string, optional): Delete Azure user activities (events), format: `id1,id2,...`
     - `ldapEvents` (string, optional): Delete LDAP user activities (events), format: `id1,id2,...`
     """
+
     PATH = '/analysis/useractivity/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740
     MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_740

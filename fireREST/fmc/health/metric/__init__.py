@@ -21,6 +21,7 @@ class Metric(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/health/metrics/{uuid}'
     SUPPORTED_FILTERS = ['device_uuids', 'end_time', 'metric', 'regex_filter', 'query_function', 'start_time', 'step']
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_670

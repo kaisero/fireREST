@@ -25,6 +25,7 @@ class VirtualTunnelInterface(ChildResource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for NGFW vti interfaces.
     """
+
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/virtualtunnelinterfaces/{uuid}'

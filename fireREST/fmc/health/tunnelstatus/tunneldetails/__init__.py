@@ -19,6 +19,7 @@ class TunnelDetails(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'TunnelStatus'
     CONTAINER_PATH = '/health/tunnelstatuses/{uuid}'
     PATH = '/health/tunnelstatuses/{container_uuid}/tunneldetails/{uuid}'

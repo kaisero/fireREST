@@ -22,6 +22,7 @@ class InspectorOverrideConfig(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'NetworkAnalysisPolicy'
     CONTAINER_PATH = '/policy/networkanalysispolicies/{uuid}'
     PATH = '/policy/networkanalysispolicies/{container_uuid}/inspectoroverrideconfigs/{uuid}'

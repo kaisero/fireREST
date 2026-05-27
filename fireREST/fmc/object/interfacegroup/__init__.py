@@ -26,6 +26,7 @@ class InterfaceGroup(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for interface group objects.
     """
+
     PATH = '/object/interfacegroups/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_630
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630

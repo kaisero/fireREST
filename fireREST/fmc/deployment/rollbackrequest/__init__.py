@@ -13,5 +13,6 @@ class RollbackRequest(Resource):
 
     - `createRollbackRequest` (CREATE)
     """
+
     PATH = '/deployment/rollbackrequests/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_670

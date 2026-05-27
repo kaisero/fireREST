@@ -25,6 +25,7 @@ class ApplicationGroup(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'ZeroTrustPolicy'
     CONTAINER_PATH = '/policy/zerotrustpolicies/{uuid}'
     PATH = '/policy/zerotrustpolicies/{container_uuid}/applicationgroups/{uuid}'

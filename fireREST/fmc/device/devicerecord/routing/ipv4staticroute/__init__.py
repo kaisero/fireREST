@@ -24,6 +24,7 @@ class Ipv4StaticRoute(ChildResource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for IPv4 static routes.
     """
+
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/routing/ipv4staticroutes/{uuid}'

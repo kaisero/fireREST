@@ -19,6 +19,7 @@ class ValidationResults(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'Ticket'
     CONTAINER_PATH = '/changemanagement/tickets/{uuid}'
     PATH = '/changemanagement/tickets/{container_uuid}/validationresults/{uuid}'

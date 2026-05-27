@@ -28,6 +28,7 @@ class Host(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create or delete. This field must be true in order to delete with a filter rather than an identifier.
     """
+
     NAMESPACE = 'netmap'
     PATH = '/hosts/{uuid}'
     SUPPORTED_FILTERS = ['ip_address']

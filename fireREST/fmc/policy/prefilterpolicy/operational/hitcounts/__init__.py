@@ -25,6 +25,7 @@ class Hitcount(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'PrefilterPolicy'
     CONTAINER_PATH = '/policy/prefilterpolicies/{uuid}'
     PATH = '/policy/prefilterpolicies/{container_uuid}/operational/hitcounts/{uuid}'

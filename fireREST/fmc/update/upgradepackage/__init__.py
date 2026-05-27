@@ -22,6 +22,7 @@ class UpgradePackage(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     NAMESPACE = 'platform'
     PATH = '/updates/upgradepackages/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630

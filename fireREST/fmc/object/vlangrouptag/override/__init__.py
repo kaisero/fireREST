@@ -20,6 +20,7 @@ class Override(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'VlanGroupTag'
     CONTAINER_PATH = '/object/vlangrouptags/{uuid}'
     PATH = '/object/vlangrouptags/{container_uuid}/overrides/{uuid}'

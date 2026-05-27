@@ -23,6 +23,7 @@ class TunnelStatus(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/health/tunnelstatuses/{uuid}'
     SUPPORTED_FILTERS = ['device_id', 'deployed_status', 'sort_by', 'status', 'vpn_topology_id']
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_710

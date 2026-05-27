@@ -29,6 +29,7 @@ class IntrusionRule(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean): This parameter specifies that bulk operation is being used in the query. This parameter is required for bulk Snort 3 intrusion rule operations.
     """
+
     PATH = '/object/intrusionrules/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_700
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700

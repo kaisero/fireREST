@@ -26,6 +26,7 @@ class AnyconnectCustomAttribute(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/object/anyconnectcustomattributes/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700
 

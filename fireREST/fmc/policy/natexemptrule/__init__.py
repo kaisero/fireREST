@@ -13,5 +13,6 @@ class NatExemptRule(Resource):
 
     - `getVPNNatExemptModel` (GET)
     """
+
     PATH = '/policy/natexemptrules/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740

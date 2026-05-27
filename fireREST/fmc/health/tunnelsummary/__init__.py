@@ -21,6 +21,7 @@ class TunnelSummary(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/health/tunnelsummaries/{uuid}'
     SUPPORTED_FILTERS = ['device_id', 'group_by', 'vpn_topology_id']
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_710

@@ -28,6 +28,7 @@ class SsoServer(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for SSO Server Policy Objects.
     """
+
     PATH = '/object/ssoservers/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_720
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700

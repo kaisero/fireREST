@@ -35,6 +35,7 @@ class AccessRule(ChildResource):
     - `section` (string, optional): This parameter specifies the section into which the rules will be added. If this parameter is not used the section will be the default section. Only mandatory and default are allowed values. If a section is specified, a category cannot be specified.
     - `category` (string, optional): This parameter specifies the category into which the rules will be added. If a category is specified it must exist or the request will fail. If a section is specified, a category cannot be specified.
     """
+
     CONTAINER_NAME = 'AccessPolicy'
     CONTAINER_PATH = '/policy/accesspolicies/{uuid}'
     PATH = '/policy/accesspolicies/{container_uuid}/accessrules/{uuid}'

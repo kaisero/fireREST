@@ -13,6 +13,7 @@ class TestAzureAdRealm(Resource):
 
     - `createTestAzureADRealm` (CREATE)
     """
+
     PATH = '/object/testazureadrealms'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740
 

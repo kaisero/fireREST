@@ -13,6 +13,7 @@ class FindOverlaps(Resource):
 
     - `createOverlapWarning` (CREATE)
     """
+
     PATH = '/object/operational/findoverlaps'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740
 

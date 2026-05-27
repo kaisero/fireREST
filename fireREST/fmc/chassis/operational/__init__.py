@@ -24,10 +24,9 @@ class Operational(ChildResource):
 
     @utils.minimum_version_required(version=API_RELEASE_720)
     @utils.resolve_by_name
-    def evaluate_operation(self,
-                           container_uuid: Optional[str] = None,
-                           container_name: Optional[str] = None,
-                           params: Optional[Dict] = None):
+    def evaluate_operation(
+        self, container_uuid: Optional[str] = None, container_name: Optional[str] = None, params: Optional[Dict] = None
+    ):
         base = self.PATH.format(container_uuid=container_uuid, uuid='').rstrip('/')
         url = self.url(f'{base}/evaluateoperation')
         return self.conn.get(url=url, params=params)

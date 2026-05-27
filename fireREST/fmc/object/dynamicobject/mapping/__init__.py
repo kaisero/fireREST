@@ -23,6 +23,7 @@ class Mapping(ChildResource):
     - `action` (string, optional): Specify action for dynamic object mappings. It can be one of ["add", "remove", "remove_all"]. Default value is "add".
     - `propagate` (string, optional): Control propagating dynamic object mappings. It can be ["true", "false"]. Default value is "true".
     """
+
     CONTAINER_NAME = 'DynamicObject'
     CONTAINER_PATH = '/object/dynamicobjects/{uuid}'
     PATH = '/object/dynamicobjects/{container_uuid}/mappings'

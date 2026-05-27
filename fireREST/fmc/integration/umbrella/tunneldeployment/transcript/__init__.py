@@ -13,6 +13,7 @@ class Transcript(ChildResource):
 
     - `getUmbrellaDeploymentTranscript` (GET)
     """
+
     CONTAINER_NAME = 'TunnelDeployment'
     CONTAINER_PATH = '/integration/umbrella/tunneldeployments/{uuid}'
     PATH = '/integration/umbrella/tunneldeployments/{container_uuid}/transcripts/{uuid}'

@@ -23,6 +23,7 @@ class BfdPolicy(NestedChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     CHILD_CONTAINER_NAME = 'VirtualRouter'

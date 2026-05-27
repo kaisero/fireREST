@@ -26,6 +26,7 @@ class IntrusionRuleGroup(ChildResource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean): [DEV ERROR: Missing description]
     """
+
     CONTAINER_NAME = 'IntrusionPolicy'
     CONTAINER_PATH = '/policy/intrusionpolicies/{uuid}'
     PATH = '/policy/intrusionpolicies/{container_uuid}/intrusionrulegroups/{uuid}'

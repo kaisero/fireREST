@@ -13,5 +13,6 @@ class DeploymentRequest(Resource):
 
     - `createDeploymentRequest` (CREATE)
     """
+
     PATH = '/deployment/deploymentrequests/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610

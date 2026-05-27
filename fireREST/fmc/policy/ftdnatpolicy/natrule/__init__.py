@@ -26,6 +26,7 @@ class NatRule(ChildResource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean): Enables bulk actions for NAT rules.
     """
+
     CONTAINER_NAME = 'FtdNatPolicy'
     CONTAINER_PATH = '/policy/ftdnatpolicies/{uuid}'
     PATH = '/policy/ftdnatpolicies/{container_uuid}/natrules/{uuid}'

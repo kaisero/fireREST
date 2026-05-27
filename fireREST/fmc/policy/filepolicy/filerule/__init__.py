@@ -23,6 +23,7 @@ class FileRule(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'FilePolicy'
     CONTAINER_PATH = '/policy/filepolicies/{uuid}'
     PATH = '/policy/filepolicies/{container_uuid}/filerules/{uuid}'

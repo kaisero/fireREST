@@ -13,6 +13,7 @@ class EmailReport(ChildResource):
 
     - `createEmailReport` (CREATE)
     """
+
     CONTAINER_NAME = 'JobHistory'
     CONTAINER_PATH = '/deployment/jobhistories/{uuid}'
     PATH = '/deployment/jobhistories/{container_uuid}/operational/emailreports/{uuid}'

@@ -21,6 +21,7 @@ class SecurexConfig(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/integration/securexconfigs/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_700
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_700

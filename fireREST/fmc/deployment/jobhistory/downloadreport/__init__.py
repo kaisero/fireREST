@@ -19,6 +19,7 @@ class DownloadReport(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'JobHistory'
     CONTAINER_PATH = '/deployment/jobhistories/{uuid}'
     PATH = '/deployment/jobhistories/{container_uuid}/operational/downloadreports/{uuid}'

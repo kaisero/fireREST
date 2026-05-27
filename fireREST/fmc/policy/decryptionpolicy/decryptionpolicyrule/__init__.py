@@ -28,6 +28,7 @@ class DecryptionPolicyRule(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'DecryptionPolicy'
     CONTAINER_PATH = '/policy/decryptionpolicies/{uuid}'
     PATH = '/policy/decryptionpolicies/{container_uuid}/decryptionpolicyrules/{uuid}'

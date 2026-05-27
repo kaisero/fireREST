@@ -24,6 +24,7 @@ class DeviceLicense(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean): [DEV ERROR: Missing description]
     """
+
     NAMESPACE = 'platform'
     PATH = '/license/devicelicenses/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_720

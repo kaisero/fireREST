@@ -39,6 +39,7 @@ class ActiveSessions(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): should always be set to true
     """
+
     PATH = '/analysis/activesessions/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740
     MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_740

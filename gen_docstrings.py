@@ -19,15 +19,32 @@ NAMESPACE_PREFIXES = {
 
 # Parameters managed internally by the library — omit from generated docstrings
 SKIP_PARAMS = {
-    'domainUUID', 'objectId', 'containerUUID', 'childContainerUUID',
-    'targetId', 'domainID', 'ticket-id',
+    'domainUUID',
+    'objectId',
+    'containerUUID',
+    'childContainerUUID',
+    'targetId',
+    'domainID',
+    'ticket-id',
 }
 
 # Resolved values for $ref parameters
 REF_PARAMS = {
-    'offset':   {'name': 'offset',   'type': 'integer', 'desc': 'Index of first item to return.'},
-    'limit':    {'name': 'limit',    'type': 'integer', 'desc': 'Number of items to return.'},
-    'expanded': {'name': 'expanded', 'type': 'boolean', 'desc': 'Include extended sub-object details in response.'},
+    'offset': {
+        'name': 'offset',
+        'type': 'integer',
+        'desc': 'Index of first item to return.',
+    },
+    'limit': {
+        'name': 'limit',
+        'type': 'integer',
+        'desc': 'Number of items to return.',
+    },
+    'expanded': {
+        'name': 'expanded',
+        'type': 'boolean',
+        'desc': 'Include extended sub-object details in response.',
+    },
 }
 
 
@@ -115,8 +132,14 @@ def collect_query_params(ops: dict) -> list:
                 if ref_name in REF_PARAMS and ref_name not in seen:
                     seen.add(ref_name)
                     r = REF_PARAMS[ref_name]
-                    result.append({'name': r['name'], 'type': r['type'],
-                                   'desc': r['desc'], 'required': False})
+                    result.append(
+                        {
+                            'name': r['name'],
+                            'type': r['type'],
+                            'desc': r['desc'],
+                            'required': False,
+                        },
+                    )
                 continue
 
             name = param.get('name', '')
@@ -158,8 +181,15 @@ def make_docstring(ops: dict) -> list[str] | None:
                 tags.append(t)
 
     # Supported CRUD (deduplicate GET)
-    crud_order = [('GET', 'GET'), ('GET_LIST', 'GET'), ('POST', 'CREATE'),
-                  ('PUT', 'UPDATE'), ('PUT_BULK', 'UPDATE'), ('DELETE', 'DELETE'), ('DELETE_LIST', 'DELETE')]
+    crud_order = [
+        ('GET', 'GET'),
+        ('GET_LIST', 'GET'),
+        ('POST', 'CREATE'),
+        ('PUT', 'UPDATE'),
+        ('PUT_BULK', 'UPDATE'),
+        ('DELETE', 'DELETE'),
+        ('DELETE_LIST', 'DELETE'),
+    ]
     supported: list = []
     for key, label in crud_order:
         if key in ops and label not in supported:
@@ -167,9 +197,13 @@ def make_docstring(ops: dict) -> list[str] | None:
 
     # Operation IDs
     op_id_order = [
-        ('GET_LIST', 'GET (list)'), ('GET', 'GET'),
-        ('POST', 'CREATE'), ('PUT_BULK', 'UPDATE (bulk)'), ('PUT', 'UPDATE'),
-        ('DELETE_LIST', 'DELETE (bulk)'), ('DELETE', 'DELETE'),
+        ('GET_LIST', 'GET (list)'),
+        ('GET', 'GET'),
+        ('POST', 'CREATE'),
+        ('PUT_BULK', 'UPDATE (bulk)'),
+        ('PUT', 'UPDATE'),
+        ('DELETE_LIST', 'DELETE (bulk)'),
+        ('DELETE', 'DELETE'),
     ]
     op_ids: list = []
     for key, label in op_id_order:
@@ -225,8 +259,8 @@ def extract_class_info(content: str):
         # Must subclass Resource / ChildResource / NestedChildResource
         resource_bases = {'Resource', 'ChildResource', 'NestedChildResource'}
         is_resource = any(
-            (isinstance(b, ast.Name) and b.id in resource_bases) or
-            (isinstance(b, ast.Attribute) and b.attr in resource_bases)
+            (isinstance(b, ast.Name) and b.id in resource_bases)
+            or (isinstance(b, ast.Attribute) and b.attr in resource_bases)
             for b in node.bases
         )
         if not is_resource:
@@ -246,10 +280,10 @@ def extract_class_info(content: str):
             continue
 
         has_docstring = (
-            node.body and
-            isinstance(node.body[0], ast.Expr) and
-            isinstance(node.body[0].value, ast.Constant) and
-            isinstance(node.body[0].value.value, str)
+            node.body
+            and isinstance(node.body[0], ast.Expr)
+            and isinstance(node.body[0].value, ast.Constant)
+            and isinstance(node.body[0].value.value, str)
         )
 
         return node, attrs, has_docstring
@@ -318,8 +352,10 @@ def main():
             errors += 1
             print(f'  ERR {init_file}: {exc}')
 
-    print(f'\nDone — {ok} written, {skipped_existing} already had docstrings, '
-          f'{skipped_match} no OAS3 match, {errors} errors')
+    print(
+        f'\nDone — {ok} written, {skipped_existing} already had docstrings, '
+        f'{skipped_match} no OAS3 match, {errors} errors'
+    )
 
 
 if __name__ == '__main__':

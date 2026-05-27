@@ -22,6 +22,7 @@ class ManagementConvergenceMode(ChildResource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `ignoreWarning` (boolean, optional): Performs merge of management interface even if there are warnings
     """
+
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/managementconvergencemode/{uuid}'

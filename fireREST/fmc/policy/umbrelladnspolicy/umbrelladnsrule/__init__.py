@@ -21,6 +21,7 @@ class UmbrellaDnsRule(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'UmbrellaDnsPolicy'
     CONTAINER_PATH = '/policy/umbrelladnspolicies/{uuid}'
     PATH = '/policy/umbrelladnspolicies/{container_uuid}/umbrelladnsrules/{uuid}'

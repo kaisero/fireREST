@@ -13,5 +13,6 @@ class PendingChangesRequest(Resource):
 
     - `createPendingChangesRequest` (CREATE)
     """
+
     PATH = '/deployment/pendingchangesrequests/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740

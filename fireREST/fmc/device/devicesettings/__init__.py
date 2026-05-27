@@ -23,6 +23,7 @@ class DeviceSettings(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean): Enables bulk update on device settings.
     """
+
     PATH = '/devices/devicesettings/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_720
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_720

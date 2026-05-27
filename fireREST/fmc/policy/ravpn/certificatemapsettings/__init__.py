@@ -14,6 +14,7 @@ class CertificateMapSettings(ChildResource):
     - `getFTDRAVpnCertificateMapSettings` (GET)
     - `updateFTDRAVpnCertificateMapSettings` (UPDATE)
     """
+
     CONTAINER_NAME = 'RaVpn'
     CONTAINER_PATH = '/policy/ravpns/{uuid}'
     PATH = '/policy/ravpns/{container_uuid}/certificatemapsettings/{uuid}'

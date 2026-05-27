@@ -19,5 +19,6 @@ class Datacenter(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/integration/umbrella/datacenters/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_730

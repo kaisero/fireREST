@@ -20,6 +20,7 @@ class PendingChanges(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'DeployableDevice'
     CONTAINER_PATH = '/deployment/deployabledevices/{uuid}'
     PATH = '/deployment/deployabledevices/{container_uuid}/pendingchanges'

@@ -24,6 +24,7 @@ class TunnelTag(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): This parameter specifies that bulk operation is being used in the query. This parameter is required for bulk object operations. Only bulk POST is currently supported for tunnel tags. Allowed values are true and false.
     """
+
     PATH = '/object/tunneltags/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_640
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_630

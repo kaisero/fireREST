@@ -28,6 +28,7 @@ class UrlGroup(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `bulk` (boolean, optional): Enables bulk create for url group objects.
     """
+
     PATH = '/object/urlgroups/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_610

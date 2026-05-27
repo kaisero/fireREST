@@ -23,6 +23,7 @@ class RouteMap(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/object/routemaps/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_710
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_660

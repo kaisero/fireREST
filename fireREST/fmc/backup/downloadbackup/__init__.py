@@ -17,5 +17,6 @@ class DownloadBackup(Resource):
 
     - `backupVersion` (string, optional): To be used in locating backup for device/container UUID `backupVersion`. **Filter parameter is optional and if not provided the latest backup will be fetched.
     """
+
     PATH = '/backup/downloadbackup/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_730

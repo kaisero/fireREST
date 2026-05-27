@@ -13,6 +13,7 @@ class Device(Resource):
 
     - `createDeviceTroubleshoot` (CREATE)
     """
+
     NAMESPACE = 'troubleshoot'
     PATH = '/troubleshoot/device'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_740

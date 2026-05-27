@@ -28,6 +28,7 @@ class Application(ChildResource):
     - `bulk` (boolean): Required parameter, should be always set to `true`
     - `partialUpdate` (boolean, optional): This field specifies whether to change the entire object or only certain attributes of it. When its value is false the whole object will change, and if the value is true then only the attributes that are specified will change. The default value of this field is false.
     """
+
     CONTAINER_NAME = 'ZeroTrustPolicy'
     CONTAINER_PATH = '/policy/zerotrustpolicies/{uuid}'
     PATH = '/policy/zerotrustpolicies/{container_uuid}/applications/{uuid}'

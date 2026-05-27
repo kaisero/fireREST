@@ -21,6 +21,7 @@ class Alert(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/health/alerts/{uuid}'
     SUPPORTED_FILTERS = ['start_time', 'end_time', 'device_uuids', 'status', 'module_ids']
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_670

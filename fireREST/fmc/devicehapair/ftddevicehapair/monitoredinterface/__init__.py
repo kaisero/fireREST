@@ -21,6 +21,7 @@ class MonitoredInterface(ChildResource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     CONTAINER_NAME = 'FtdDeviceHAPair'
     CONTAINER_PATH = '/devicehapairs/ftddevicehapairs/{uuid}'
     PATH = '/devicehapairs/ftddevicehapairs/{container_uuid}/monitoredinterfaces/{uuid}'

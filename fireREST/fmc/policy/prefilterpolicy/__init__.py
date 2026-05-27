@@ -26,6 +26,7 @@ class PrefilterPolicy(Resource):
     - `limit` (integer, optional): Number of items to return.
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     """
+
     PATH = '/policy/prefilterpolicies/{uuid}'
     IGNORE_FOR_UPDATE = ['rules']
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_650

@@ -28,6 +28,7 @@ class InternalCa(Resource):
     - `expanded` (boolean, optional): Include extended sub-object details in response.
     - `isCSR` (boolean, optional): Boolean parameter to specify if the request is to create a Certificate Signing Request(CSR) or not. `false` by default. When `false`, if a certificate/key pair is provided, the certificate/key pair is imported. Else, a self-signed certificate is generated. When `true`, a CSR is generated.
     """
+
     PATH = '/object/internalcas/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_730
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_730
