@@ -2,8 +2,6 @@
 
 You are working on **fireREST** — a Python SDK for the Cisco Firepower Management Center (FMC) REST API.
 Current version: **1.3.0** (CHANGELOG header is `# Unreleased` until release is cut).
-Active branch: `feature/full_support_7.4`. PR #98 open against `kaisero/fireREST`.
-Maintainer on this fork: Christian Mendez (`cromanme/fireREST` on GitHub, upstream is `kaisero/fireREST`).
 PyPI publish access granted by kaisero.
 
 ---
@@ -174,7 +172,7 @@ rchrabas reviews all PRs against `kaisero/fireREST`. Known preferences:
 - **Breaking changes** must be in a separate `## Breaking Changes` section in CHANGELOG — not buried in `## Fixed`.
 - **Renames of public attributes** (e.g. `deployabledevices` → `deployabledevice`) are breaking changes. If rchrabas pushes back on a rename, revert it and leave the old name.
 - **CHANGELOG header** should be `# Unreleased` while the PR is open; versioned only after merge.
-- **tox.ini** should NOT include `[testenv:publish]` or `[testenv:publish-test]` — publish is done manually.
+- **Publishing** is done manually via `uv build && uv publish` — do not automate in CI without approval.
 - **pyproject.toml** classifiers: Python 3.9 is EoL, omit it. Start from 3.10.
 - **Docs reference pages** must be auto-generated from code, not static committed files.
 - **CHANGELOG bug descriptions**: keep to one concise line each — no multi-line "because..." explanations.
@@ -201,10 +199,10 @@ MISSING-01 through MISSING-05 from `.llm/fireREST_phase2_reference.md` §3 are r
   - Scans `fireREST/fmc/` via AST, emits one page per namespace with `:::` directives
   - Navigation auto-populated via `SUMMARY.md` written by literate-nav
   - Adding a new resource class → appears in docs automatically on next build
-- Build: `poetry run mkdocs build --strict`
-- Local preview: `poetry run mkdocs serve` → `http://127.0.0.1:8000`
+- Build: `make docs` or `uv run --group docs mkdocs build --strict`
+- Local preview: `uv run --group docs mkdocs serve` → `http://127.0.0.1:8000`
 - Sphinx fully removed (no RST files remain)
-- Dev deps: `mkdocs-gen-files ^0.5`, `mkdocs-literate-nav ^0.6` added to `pyproject.toml`
+- Dev deps in `[dependency-groups] docs` in `pyproject.toml`
 
 ### CHANGELOG format
 ```markdown
@@ -228,38 +226,38 @@ MISSING-01 through MISSING-05 from `.llm/fireREST_phase2_reference.md` §3 are r
 ## Development Workflow
 
 ```bash
-# Install dev deps
-poetry install
+# Install all dev + docs deps
+uv sync --group dev --group docs
 
 # Lint / format
-poetry run pre-commit run --all-files
+make pre-commit
 
 # Type check
-poetry run mypy fireREST
+make mypy
 
 # Tests
-poetry run pytest --cov=fireREST --cov-report=term
+make test
 
 # Build docs (local preview)
-poetry run mkdocs serve
+uv run --group docs mkdocs serve
 
 # Build docs (static output to site/)
-poetry run mkdocs build --strict
+make docs
 
 # Build package
-python -m build
+make build   # or: uv build
 
-# Publish to PyPI (kaisero granted access — do manually, not via tox)
-twine check dist/* && twine upload dist/*
+# Run all checks (pre-commit, mypy, test, docs, build)
+make check
 
-# Tox (lint, type check, test, docs)
-tox
+# Publish to PyPI (kaisero granted access — do manually)
+uv publish
 
 # Read PR comments
-& "C:\Program Files\GitHub CLI\gh.exe" api repos/kaisero/fireREST/pulls/<N>/comments
+gh api repos/kaisero/fireREST/pulls/<N>/comments
 
 # List PRs
-& "C:\Program Files\GitHub CLI\gh.exe" pr list --repo kaisero/fireREST --state all
+gh pr list --repo kaisero/fireREST --state all
 ```
 
 ---

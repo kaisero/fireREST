@@ -1,4 +1,4 @@
-[![python3](https://img.shields.io/badge/python-3.9+-blue.svg)](https://github.com/kaisero/fireREST/)
+[![python3](https://img.shields.io/badge/python-3.10+-blue.svg)](https://github.com/kaisero/fireREST/)
 [![pypi](https://img.shields.io/pypi/v/fireREST)](https://pypi.org/project/fireREST/)
 [![license](https://img.shields.io/badge/license-GPL%20v3.0-brightgreen.svg)](https://github.com/kaisero/fireREST/blob/master/LICENSE)
 
