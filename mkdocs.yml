@@ -1,8 +1,8 @@
 site_name: FireREST
 site_description: Python API client for Cisco Firepower Management Center (FMC)
-repo_url: https://github.com/cromanme/fireREST
-repo_name: cromanme/fireREST
-edit_uri: edit/feature/full_support_7.4/docs/
+repo_url: https://github.com/kaisero/fireREST
+repo_name: kaisero/fireREST
+edit_uri: edit/master/docs/
 
 theme:
   name: material

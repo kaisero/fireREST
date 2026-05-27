@@ -10,14 +10,13 @@ maintainers = [
     { name = "Rafal Chrabaszcz", email = "rchrabas@cisco.com" },
     { name = "Christian Mendez", email = "cristianr.mendezm@gmail.com" }
 ]
-license = { text = "GPL-3.0-only" }
+license = "GPL-3.0-or-later"
 readme = {file = "README.md", content-type = "text/markdown"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
     "Natural Language :: English",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -29,7 +28,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 dependencies = [
     "packaging>=25.1",
     "requests>=2.32.4",
@@ -43,34 +42,27 @@ Repository = "https://github.com/kaisero/fireREST"
 "Bug Tracker" = "https://github.com/kaisero/fireREST/issues"
 Changelog = "https://github.com/kaisero/fireREST/blob/master/CHANGELOG.md"
 
-[tool.setuptools.packages.find]
-include = ["fireREST*"]
-
-[tool.poetry]
-requires-poetry = ">=2.0"
-packages = [
-    { include = "fireREST" }
+[dependency-groups]
+dev = [
+    "pre-commit>=4",
+    "pytest>=8",
+    "pytest-cov>=6",
+    "mypy>=1",
+    "types-retry",
+    "types-simplejson",
+    "jinja2>=3.1.6",
+]
+docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9",
+    "mkdocs-gen-files>=0.5",
+    "mkdocs-literate-nav>=0.6",
+    "mkdocstrings[python]>=0.29",
 ]
 
-[tool.poetry.group.dev.dependencies]
-pre-commit = "^4"
-pytest = "^8"
-pytest-cov = "^6"
-pytest-runner = "^6"
-mkdocs = "^1.6"
-mkdocs-material = "^9"
-mkdocs-gen-files = "^0.5"
-mkdocs-literate-nav = "^0.6"
-mkdocstrings = {version = "^0.29", extras = ["python"]}
-mypy = ">=1"
-jinja2 = ">=3.1.6"
-build = ">=1.2"
-twine = ">=6.0"
-tox = "^4"
-
 [build-system]
-requires = ["setuptools >= 75.0"]
-build-backend = "setuptools.build_meta"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.ruff]
 exclude = ['.venv', '.git', 'docs']
