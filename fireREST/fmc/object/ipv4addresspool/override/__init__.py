@@ -3,6 +3,23 @@ from fireREST.fmc import ChildResource
 
 
 class Override(ChildResource):
+    """Retrieves all(Domain and Device) overrides on a IPv4 Address Pool object. Response will always be in expanded form. If passed, the "expanded" query parameter will be ignored.
+
+    **Tags:** Object
+
+    **Supported operations:** GET
+
+    **Operation IDs:**
+
+    - `getIPv4AddressPoolOverride` (GET (list))
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     CONTAINER_NAME = 'Ipv4AddressPool'
     CONTAINER_PATH = '/object/ipv4addresspools/{uuid}'
     PATH = '/object/ipv4addresspools/{container_uuid}/overrides/{uuid}'

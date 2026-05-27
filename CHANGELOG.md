@@ -1,3 +1,300 @@
+# Unreleased
+
+## New
+
+* Added support for FMC 7.4.0 api calls
+  * analysis.activesessions.get(...)
+  * analysis.activesessions.delete(...)
+  * analysis.useractivity.get(...)
+  * analysis.useractivity.delete(...)
+  * audit.configchanges.get(...)
+  * changemanagement.ticket.create(...)
+  * changemanagement.ticket.get(...)
+  * changemanagement.ticket.update(...)
+  * changemanagement.ticket.previewchanges.get(...)
+  * changemanagement.ticket.validationresults.get(...)
+  * chassis.appinfo.get(...)
+  * chassis.chassisetherchannelinterface.create(...)
+  * chassis.chassisetherchannelinterface.get(...)
+  * chassis.chassisetherchannelinterface.update(...)
+  * chassis.chassisetherchannelinterface.delete(...)
+  * chassis.chassisinterface.get(...)
+  * chassis.chassisinterfaceevent.create(...)
+  * chassis.chassisinterfaceevent.get(...)
+  * chassis.chassissnmpsettings.get(...)
+  * chassis.chassissnmpsettings.update(...)
+  * chassis.chassissubinterface.create(...)
+  * chassis.chassissubinterface.get(...)
+  * chassis.chassissubinterface.update(...)
+  * chassis.chassissubinterface.delete(...)
+  * chassis.faultsummary.get(...)
+  * chassis.instancesummary.get(...)
+  * chassis.interfacesummary.get(...)
+  * chassis.inventorysummary.get(...)
+  * chassis.logicaldevice.create(...)
+  * chassis.logicaldevice.get(...)
+  * chassis.logicaldevice.update(...)
+  * chassis.logicaldevice.delete(...)
+  * deployment.pendingchangesrequest.create(...)
+  * device.devicerecord.dhcp.ddnssettings.get(...)
+  * device.devicerecord.dhcp.ddnssettings.update(...)
+  * device.devicerecord.dhcp.dhcprelaysettings.get(...)
+  * device.devicerecord.dhcp.dhcprelaysettings.update(...)
+  * device.devicerecord.dhcp.dhcpserver.get(...)
+  * device.devicerecord.dhcp.dhcpserver.update(...)
+  * device.devicerecord.managementconvergencemode.create(...)
+  * device.devicerecord.managementconvergencemode.get(...)
+  * device.devicerecord.operational.virtualaccessinterface.get(...)
+  * health.tunnelstatus.tunneldetails.get(...)
+  * integration.cdfmcsnapshot.create(...)
+  * integration.cdfmcsnapshot.get(...)
+  * integration.refresh_securex_configs(...)
+  * job.taskstatus.download_reports(...)
+  * object.azureadream.create(...)
+  * object.azureadream.get(...)
+  * object.azureadream.update(...)
+  * object.azureadream.delete(...)
+  * object.azureadream.download(...)
+  * object.azureadream.usersandgroups(...)
+  * object.azureadstatus.get(...)
+  * object.ciphersuitelist.create(...)
+  * object.ciphersuitelist.get(...)
+  * object.customsiiplist.create(...)
+  * object.customsiiplist.get(...)
+  * object.customsiiplist.update(...)
+  * object.customsiiplist.delete(...)
+  * object.customsiiplistdownload.get(...)
+  * object.customsiurllist.create(...)
+  * object.customsiurllist.get(...)
+  * object.customsiurllist.update(...)
+  * object.customsiurllist.delete(...)
+  * object.customsiurllistdownload.get(...)
+  * object.distinguishedname.create(...)
+  * object.distinguishedname.get(...)
+  * object.distinguishednamegroup.get(...)
+  * object.externalcacertificate.create(...)
+  * object.externalcacertificate.get(...)
+  * object.externalcacertificategroup.get(...)
+  * object.externalcertificate.create(...)
+  * object.externalcertificate.get(...)
+  * object.externalcertificategroup.get(...)
+  * object.filecategory.get(...)
+  * object.filetype.get(...)
+  * object.internalcertgroup.get(...)
+  * object.networkaddressoverride.get(...)
+  * object.ntpserver.create(...)
+  * object.ntpserver.get(...)
+  * object.ntpserver.update(...)
+  * object.ntpserver.delete(...)
+  * object.operational.findoverlaps.create(...)
+  * object.resourceprofile.create(...)
+  * object.resourceprofile.get(...)
+  * object.resourceprofile.update(...)
+  * object.resourceprofile.delete(...)
+  * object.secureclientcustomization.create(...)
+  * object.secureclientcustomization.get(...)
+  * object.secureclientcustomization.update(...)
+  * object.secureclientcustomization.delete(...)
+  * object.testazureadream.create(...)
+  * policy.chassisplatformsettingspolicy.create(...)
+  * policy.chassisplatformsettingspolicy.get(...)
+  * policy.chassisplatformsettingspolicy.update(...)
+  * policy.chassisplatformsettingspolicy.delete(...)
+  * policy.chassisplatformsettingspolicy.accesslistsettings.get(...)
+  * policy.chassisplatformsettingspolicy.accesslistsettings.update(...)
+  * policy.chassisplatformsettingspolicy.dnssettings.get(...)
+  * policy.chassisplatformsettingspolicy.dnssettings.update(...)
+  * policy.chassisplatformsettingspolicy.sshclientsettings.get(...)
+  * policy.chassisplatformsettingspolicy.sshclientsettings.update(...)
+  * policy.chassisplatformsettingspolicy.sshserversettings.get(...)
+  * policy.chassisplatformsettingspolicy.sshserversettings.update(...)
+  * policy.chassisplatformsettingspolicy.syslogsettings.get(...)
+  * policy.chassisplatformsettingspolicy.syslogsettings.update(...)
+  * policy.chassisplatformsettingspolicy.timesynchronizationsettings.get(...)
+  * policy.chassisplatformsettingspolicy.timesynchronizationsettings.update(...)
+  * policy.chassisplatformsettingspolicy.timezonesettings.get(...)
+  * policy.chassisplatformsettingspolicy.timezonesettings.update(...)
+  * policy.decryptionpolicy.create(...)
+  * policy.decryptionpolicy.get(...)
+  * policy.decryptionpolicy.update(...)
+  * policy.decryptionpolicy.delete(...)
+  * policy.decryptionpolicy.decryptionpolicyrule.create(...)
+  * policy.decryptionpolicy.decryptionpolicyrule.get(...)
+  * policy.decryptionpolicy.decryptionpolicyrule.update(...)
+  * policy.decryptionpolicy.decryptionpolicyrule.delete(...)
+  * policy.filepolicy.filerule.create(...)
+  * policy.filepolicy.filerule.get(...)
+  * policy.filepolicy.filerule.update(...)
+  * policy.filepolicy.filerule.delete(...)
+  * policy.ftdplatformsettingspolicy.httpaccesssettings.get(...)
+  * policy.ftdplatformsettingspolicy.httpaccesssettings.update(...)
+  * policy.ftdplatformsettingspolicy.netflowpolicies.get(...)
+  * policy.ftdplatformsettingspolicy.netflowpolicies.update(...)
+  * policy.ftdplatformsettingspolicy.snmpsettings.get(...)
+  * policy.ftdplatformsettingspolicy.snmpsettings.update(...)
+  * policy.natexemptrule.get(...)
+  * policy.ravpn.secureclientcustomizationsettings.get(...)
+  * policy.ravpn.secureclientcustomizationsettings.update(...)
+  * policy.vpntunnelstatus.get(...)
+  * policy.zerotrustpolicy.create(...)
+  * policy.zerotrustpolicy.get(...)
+  * policy.zerotrustpolicy.update(...)
+  * policy.zerotrustpolicy.delete(...)
+  * policy.zerotrustpolicy.application.create(...)
+  * policy.zerotrustpolicy.application.get(...)
+  * policy.zerotrustpolicy.application.update(...)
+  * policy.zerotrustpolicy.application.delete(...)
+  * policy.zerotrustpolicy.applicationgroup.create(...)
+  * policy.zerotrustpolicy.applicationgroup.get(...)
+  * policy.zerotrustpolicy.applicationgroup.update(...)
+  * policy.zerotrustpolicy.applicationgroup.delete(...)
+  * systemconfiguration.changemanagementconfig.get(...)
+  * systemconfiguration.changemanagementconfig.update(...)
+  * systemconfiguration.remotemanagementaccess.get(...)
+  * systemconfiguration.remotemanagementaccess.update(...)
+  * troubleshoot.device.create(...)
+  * user.users.get(...)
+
+* Added support for FMC 7.3.0 api calls
+  * backup.create_device_backup(...)
+  * backup.downloadbackup.get(...)
+  * backup.file.get(...)
+  * backup.file.delete(...)
+  * chassis.physicalinterface.get(...)
+  * chassis.physicalinterface.update(...)
+  * cluster.ftddevicecluster.clusterhealthmonitorsettings.get(...)
+  * cluster.ftddevicecluster.clusterhealthmonitorsettings.update(...)
+  * device.devicerecord.loopbackinterface.create(...)
+  * device.devicerecord.loopbackinterface.get(...)
+  * device.devicerecord.loopbackinterface.update(...)
+  * device.devicerecord.loopbackinterface.delete(...)
+  * device.devicerecord.routing.bfdpolicy.create(...)
+  * device.devicerecord.routing.bfdpolicy.get(...)
+  * device.devicerecord.routing.bfdpolicy.update(...)
+  * device.devicerecord.routing.bfdpolicy.delete(...)
+  * device.devicerecord.routing.virtualrouter.bfdpolicy.create(...)
+  * device.devicerecord.routing.virtualrouter.bfdpolicy.get(...)
+  * device.devicerecord.routing.virtualrouter.bfdpolicy.update(...)
+  * device.devicerecord.routing.virtualrouter.bfdpolicy.delete(...)
+  * health.csdac.create(...)
+  * health.csdac.get(...)
+  * health.pathmonitoredinterface.get(...)
+  * health.ravpngateway.get(...)
+  * health.ravpnsession.get(...)
+  * health.ravpnsession.terminate(...)
+  * integration.umbrella.datacenter.get(...)
+  * integration.umbrella.tunneldeployment.create(...)
+  * integration.umbrella.tunneldeployment.get(...)
+  * integration.umbrella.tunneldeployment.transcript.get(...)
+  * object.bfdtemplate.create(...)
+  * object.bfdtemplate.get(...)
+  * object.bfdtemplate.update(...)
+  * object.bfdtemplate.delete(...)
+  * object.dhcpipv6pool.create(...)
+  * object.dhcpipv6pool.get(...)
+  * object.dhcpipv6pool.update(...)
+  * object.dhcpipv6pool.delete(...)
+  * object.internalca.create(...)
+  * object.internalca.get(...)
+  * object.internalca.update(...)
+  * object.internalca.delete(...)
+  * object.internalca.download(...)
+  * object.internalcertificate.create(...)
+  * object.internalcertificate.get(...)
+  * object.internalcertificate.update(...)
+  * object.internalcertificate.delete(...)
+  * object.internalcertificate.validate(...)
+  * policy.flexconfigpolicy.create(...)
+  * policy.flexconfigpolicy.get(...)
+  * policy.flexconfigpolicy.migrate(...)
+  * policy.ftdplatformsettingspolicy.get(...)
+  * policy.ravpn.loadbalancesettings.get(...)
+  * policy.ravpn.loadbalancesettings.update(...)
+
+* Completed FMC 7.2.0 api support (previously marked incomplete in 1.1.0)
+  * chassis.operational.evaluate_operation(...)
+  * deployment.jobhistory.downloadreport.get(...)
+  * deployment.jobhistory.emailreport.get(...)
+  * device.changemanager(...)
+  * device.devicesettings.get(...)
+  * device.devicesettings.update(...)
+  * device.devicerecord.routing.eigrproute.create(...)
+  * device.devicerecord.routing.eigrproute.get(...)
+  * device.devicerecord.routing.eigrproute.update(...)
+  * device.devicerecord.routing.eigrproute.delete(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.create(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.get(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.update(...)
+  * device.devicerecord.routing.virtualrouter.eigrproute.delete(...)
+  * integration.ebssnapshot.create(...)
+  * integration.ebssnapshot.get(...)
+  * integration.testumbrellaconnection.create(...)
+  * integration.umbrellaconnection.create(...)
+  * integration.umbrellaconnection.get(...)
+  * integration.umbrellaconnection.update(...)
+  * license.devicelicense.get(...)
+  * license.devicelicense.update(...)
+  * license.smartlicense.create(...)
+  * license.smartlicense.get(...)
+  * object.anyconnectexternalbrowserpackage.create(...)
+  * object.anyconnectexternalbrowserpackage.get(...)
+  * object.anyconnectexternalbrowserpackage.update(...)
+  * object.anyconnectexternalbrowserpackage.delete(...)
+  * policy.ftdnatpolicy.natrule.delete(...)
+  * policy.ftds2svpn.ipseccryptomap.get(...)
+  * policy.ftds2svpn.ipseccryptomap.update(...)
+  * policy.ftds2svpn.s2svpnsummary.get(...)
+  * policy.healthpolicy.get(...)
+  * policy.policylock.create(...)
+  * policy.policylock.get(...)
+  * policy.ravpn.ipsecadvancedsettings.get(...)
+  * policy.ravpn.ipsecadvancedsettings.update(...)
+  * policy.ravpn.ldapattributemap.get(...)
+  * policy.ravpn.ldapattributemap.update(...)
+  * policy.umbrelladnspolicy.create(...)
+  * policy.umbrelladnspolicy.get(...)
+  * policy.umbrelladnspolicy.update(...)
+  * policy.umbrelladnspolicy.delete(...)
+  * policy.umbrelladnspolicy.umbrelladnsrule.get(...)
+  * policy.umbrelladnspolicy.umbrelladnsrule.update(...)
+  * troubleshoot.task.create(...)
+  * update.snapshot(...)
+
+## Documentation
+
+* Migrated documentation from Sphinx to MkDocs with Material theme and mkdocstrings.
+* Added Google-style docstrings to all 312 resource classes, sourced from the FMC OAS3 specs
+  (7.2.5, 7.3.1, 7.4.2). Each docstring includes description, tags, supported operations,
+  operation IDs, and query parameters.
+* API reference pages are now auto-generated at build time from the codebase via
+  `mkdocs-gen-files` and `mkdocs-literate-nav`. Adding a new resource class automatically
+  includes it in the docs without any manual file edits.
+* Added FMC API release constants for 7.6.0, 7.7.0, and 10.0.0 in `defaults.py`.
+
+## Breaking Changes
+
+* `policy.prefilterpolicy.accessrule` renamed to `prefilterrule`.
+* `device.devicerecord.operational.command.get()` filter is now correctly passed as a list to `utils.search_filter()`.
+
+## Fixed
+
+* Fixed `TypeError` in `netmap.host.delete()` and `netmap.vulnerability.delete()` caused by unsupported `url=` keyword argument to `Resource.delete()`.
+* Fixed `cluster.ftddevicecluster.operational.command()` building malformed URLs.
+* Fixed `chassis.operational` methods building malformed URLs.
+* Fixed `health.tunnelsummary` `PATH` pointing to `/health/metrics/{uuid}` instead of `/health/tunnelsummaries/{uuid}`.
+* Fixed `policy.networkanalysispolicy.inspectorconfig` `CONTAINER_PATH` pointing to `intrusionpolicies` instead of `networkanalysispolicies`.
+* Fixed `policy.prefilterpolicy.defaultaction` `CONTAINER_NAME` set to `'AccessPolicy'` instead of `'PrefilterPolicy'`.
+* Fixed `policy.ftds2svpn.endpoint` `CONTAINER_NAME` set to `'Endpoint'` instead of `'FtdS2sVpn'`.
+* Fixed `mapping.PARAMS` missing `group_dependency` and `hostname` entries causing `KeyError` in `support_params` decorator.
+* Fixed `device.devicerecord.operational.command.get()` passing a plain dict to `utils.search_filter()` where a list is expected.
+* Fixed `policy.accesspolicy.loggingsettings` not instantiated in `AccessPolicy.__init__()`.
+* Fixed `policy.identitypolicy` not instantiated in `Policy.__init__()`.
+* Fixed `object.standardaccesslist` missing `MINIMUM_VERSION_REQUIRED_CREATE/UPDATE/DELETE` constants.
+* Fixed missing `ospfv3route` and `ospfv3interface` modules under `virtualrouter`.
+* Fixed `object.communitylist` missing `MINIMUM_VERSION_REQUIRED_CREATE/UPDATE/DELETE` constants.
+* Fixed `policy.ravpn` not instantiated in `Policy.__init__()`.
+* Fixed `update.revert()` incorrectly named `retry`, shadowing the existing `retry()` method.
+
 # 1.2.4 [2026-01-14]
 
 ## Fixed
@@ -114,8 +411,8 @@
   * object.expandedcommunitylist.update(...)
   * object.expandedcommunitylist.delete(...)
   * object.standardcommunitylist.create(...)
-  * object.standardcommunitylist.create(...)
-  * object.standardcommunitylist.create(...)
+  * object.standardcommunitylist.update(...)
+  * object.standardcommunitylist.delete(...)
   * object.standardaccesslist.create(...)
   * object.standardaccesslist.update(...)
   * object.standardaccesslist.delete(...)
@@ -225,7 +522,7 @@
   * GET object.sinetworklist
   * GET object.sinkhole
   * GET object.ssoserver
-  * GET bject.usage
+  * GET object.usage
   * GET policy.accesspolicy.securityintelligencepolicy
   * GET policy.dnspolicy
   * GET policy.dnspolicy.allowdnsrule
@@ -239,7 +536,7 @@
   * GET, UPDATE, DELETE policy.networkanalysispolicy.inspectorconfig
   * GET, UPDATE, DELETE policy.networkanalysispolicy.inspectoroverrideconfig
   * GET policy.ravpn
-  * GET policy.ravpn.addressassignmensettings
+  * GET policy.ravpn.addressassignmentsettings
   * GET policy.ravpn.certificatemapsettings
   * GET policy.ravpn.connectionprofile
 

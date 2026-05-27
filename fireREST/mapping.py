@@ -205,6 +205,7 @@ STATE = {
 }
 
 FILTERS = {
+    'command': 'command',
     'current_security_level': 'currentSecurityLevel',
     'destination_interface': 'destinationInterface',
     'deployed_status': 'deployedStatus',
@@ -252,6 +253,8 @@ FILTERS = {
 PARAMS = {
     'above_category': 'aboveCategory',
     'category': 'category',
+    'group_dependency': 'groupDependency',
+    'hostname': 'hostname',
     'insert_after': 'insertAfter',
     'insert_before': 'insertBefore',
     'name': 'name',

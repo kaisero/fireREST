@@ -1,0 +1,68 @@
+site_name: FireREST
+site_description: Python API client for Cisco Firepower Management Center (FMC)
+repo_url: https://github.com/cromanme/fireREST
+repo_name: cromanme/fireREST
+edit_uri: edit/feature/full_support_7.4/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+plugins:
+  - search
+  - gen-files:
+      scripts:
+        - docs/gen_ref_pages.py
+  - literate-nav:
+      nav_file: SUMMARY.md
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          options:
+            show_source: false
+            show_root_heading: true
+            show_root_full_path: false
+            show_bases: true
+            inherited_members: true
+            heading_level: 2
+            members_order: source
+            docstring_style: google
+            show_submodules: true
+            filters:
+              - "!^_"
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+nav:
+  - "* ": SUMMARY.md

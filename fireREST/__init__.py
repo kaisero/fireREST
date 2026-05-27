@@ -5,8 +5,11 @@ from typing import Optional
 
 from fireREST import defaults
 from fireREST.fmc import Connection
+from fireREST.fmc.analysis import Analysis
 from fireREST.fmc.assignment import Assignment
 from fireREST.fmc.audit import Audit
+from fireREST.fmc.backup import Backup
+from fireREST.fmc.changemanagement import ChangeManagement
 from fireREST.fmc.chassis import Chassis
 from fireREST.fmc.deployment import Deployment
 from fireREST.fmc.device import Device
@@ -17,10 +20,12 @@ from fireREST.fmc.health import Health
 from fireREST.fmc.integration import Integration
 from fireREST.fmc.intelligence import Intelligence
 from fireREST.fmc.job import Job
+from fireREST.fmc.license import License
 from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
 from fireREST.fmc.system import System
+from fireREST.fmc.systemconfiguration import SystemConfiguration
 from fireREST.fmc.troubleshoot import Troubleshoot
 from fireREST.fmc.update import Update
 from fireREST.fmc.user import User
@@ -48,8 +53,11 @@ class FMC:
         )
         self.domain = self.conn.domain
         self.version = self.conn.version
+        self.analysis = Analysis(self.conn)
         self.assignment = Assignment(self.conn)
         self.audit = Audit(self.conn)
+        self.backup = Backup(self.conn)
+        self.changemanagement = ChangeManagement(self.conn)
         self.chassis = Chassis(self.conn)
         self.deployment = Deployment(self.conn)
         self.device = Device(self.conn)
@@ -60,10 +68,12 @@ class FMC:
         self.integration = Integration(self.conn)
         self.intelligence = Intelligence(self.conn)
         self.job = Job(self.conn)
+        self.license = License(self.conn)
         self.netmap = NetMap(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
         self.system = System(self.conn)
+        self.systemconfiguration = SystemConfiguration(self.conn)
         self.troubleshoot = Troubleshoot(self.conn)
         self.update = Update(self.conn)
         self.user = User(self.conn)

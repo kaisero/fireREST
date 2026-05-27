@@ -6,6 +6,29 @@ from fireREST.fmc import Resource
 
 
 class Host(Resource):
+    """Retrieves the host associated with the specified ID in the Network Map.
+
+    **Tags:** Network Map
+
+    **Supported operations:** GET, CREATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllNetmapHost` (GET (list))
+    - `getNetmapHost` (GET)
+    - `createMultipleNetmapHost` (CREATE)
+    - `deleteMultipleNetmapHost` (DELETE (bulk))
+    - `deleteNetmapHost` (DELETE)
+
+    **Query parameters:**
+
+    - `filter` (string, optional): Filters for retrieve and delete operations. Values can be: `ipAddress:{192.168.1.2|'::ffff:c0a8:0102'}`.
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    - `bulk` (boolean, optional): Enables bulk create or delete. This field must be true in order to delete with a filter rather than an identifier.
+    """
+
     NAMESPACE = 'netmap'
     PATH = '/hosts/{uuid}'
     SUPPORTED_FILTERS = ['ip_address']
@@ -29,4 +52,4 @@ class Host(Resource):
                 params = {}
             params['bulk'] = True
         url = self.url(self.PATH.format(uuid=uuid))
-        return super().delete(url=url, uuid=uuid, params=params)
+        return self.conn.delete(url, params)

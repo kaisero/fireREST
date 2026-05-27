@@ -4,6 +4,24 @@ from fireREST.fmc import ChildResource
 
 
 class InterfaceEvent(ChildResource):
+    """Retrieves list of all netmod events on the device.
+
+    **Tags:** Devices
+
+    **Supported operations:** GET, CREATE
+
+    **Operation IDs:**
+
+    - `getInterfaceEvent` (GET (list))
+    - `createInterfaceEvent` (CREATE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/interfaceevents'

@@ -3,6 +3,25 @@ from fireREST.fmc import ChildResource
 
 
 class AddressAssignmentSettings(ChildResource):
+    """Retrieves Address Assignment Setting inside a VPN RA Topology.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, UPDATE
+
+    **Operation IDs:**
+
+    - `getAllFTDRAVpnAddressAssignmentSetting` (GET (list))
+    - `getFTDRAVpnAddressAssignmentSetting` (GET)
+    - `updateFTDRAVpnAddressAssignmentSetting` (UPDATE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     CONTAINER_NAME = 'RaVpn'
     CONTAINER_PATH = '/policy/ravpns/{uuid}'
     PATH = '/policy/ravpns/{container_uuid}/addressassignmentsettings/{uuid}'

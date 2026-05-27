@@ -3,6 +3,27 @@ from fireREST.fmc import ChildResource
 
 
 class ConnectionProfile(ChildResource):
+    """Retrieves Connection Profile data inside a VPN RA Topology.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllFTDRAVpnConnectionProfileModel` (GET (list))
+    - `getFTDRAVpnConnectionProfileModel` (GET)
+    - `createFTDRAVpnConnectionProfileModel` (CREATE)
+    - `updateFTDRAVpnConnectionProfileModel` (UPDATE)
+    - `deleteFTDRAVpnConnectionProfileModel` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     CONTAINER_NAME = 'RaVpn'
     CONTAINER_PATH = '/policy/ravpns/{uuid}'
     PATH = '/policy/ravpns/{container_uuid}/connectionprofiles/{uuid}'

@@ -6,6 +6,24 @@ from fireREST.fmc import ChildResource
 
 
 class Interface(ChildResource):
+    """Retrieve chassis interfaces. (deprecated) Please use /api/fmcconfig/v1/domain/{domainUUID}/chassis/fmcmanagedchassis/{containerUUID}/interfaces and /api/fmcconfig/v1/domain/{domainUUID}/chassis/fmcmanagedchassis/{containerUUID}/interfaces/{interfaceUUID} instead
+
+    **Tags:** Chassis
+
+    **Supported operations:** GET
+
+    **Operation IDs:**
+
+    - `getAllChassisInterface` (GET (list))
+    - `getChassisInterface` (GET)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     CONTAINER_NAME = 'Chassis'
     CONTAINER_PATH = '/chassis/fmcmanagedchassis/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_710

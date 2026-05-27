@@ -6,6 +6,27 @@ from fireREST.fmc.policy.prefilterpolicy.prefilterrule import PrefilterRule
 
 
 class PrefilterPolicy(Resource):
+    """Retrieves prefilter policy associated with the specified ID.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllPrefilterPolicy` (GET (list))
+    - `getPrefilterPolicy` (GET)
+    - `createPrefilterPolicy` (CREATE)
+    - `updatePrefilterPolicy` (UPDATE)
+    - `deletePrefilterPolicy` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     PATH = '/policy/prefilterpolicies/{uuid}'
     IGNORE_FOR_UPDATE = ['rules']
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_650
@@ -16,6 +37,6 @@ class PrefilterPolicy(Resource):
     def __init__(self, conn: Connection):
         super().__init__(conn)
 
-        self.accessrule = PrefilterRule(conn)
+        self.prefilterrule = PrefilterRule(conn)
         self.defaultaction = DefaultAction(conn)
         self.operational = Operational(conn)

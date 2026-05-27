@@ -5,6 +5,28 @@ from fireREST.fmc.policy.networkanalysispolicy.inspectoroverrideconfig import In
 
 
 class NetworkAnalysisPolicy(Resource):
+    """Retrieves the network analysis policy associated with the specified ID.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllSnort3NetworkAnalysisPolicy` (GET (list))
+    - `getSnort3NetworkAnalysisPolicy` (GET)
+    - `createSnort3NetworkAnalysisPolicy` (CREATE)
+    - `updateSnort3NetworkAnalysisPolicy` (UPDATE)
+    - `deleteSnort3NetworkAnalysisPolicy` (DELETE)
+
+    **Query parameters:**
+
+    - `replicateInspectionMode` (string, optional): Flag to replicate inspection mode from Snort 3 version to Snort 2 version.
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     PATH = '/policy/networkanalysispolicies/{uuid}'
     IGNORE_FOR_UPDATE = ['rules']
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_700

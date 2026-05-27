@@ -12,5 +12,5 @@ class Operational(ChildResource):
     @utils.minimum_version_required(version=API_RELEASE_710)
     @utils.resolve_by_name
     def command(self, container_uuid=None, container_name=None, device_id=None, operation=None, params=None):
-        url = self.url(path=f'{self.PATH}/ftdclusterdevicecommands')
+        url = self.url(path=f'{self.PATH.format(container_uuid=container_uuid)}/ftdclusterdevicecommands')
         return self.conn.post(url=url, data={}, params=params)

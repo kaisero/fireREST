@@ -5,11 +5,36 @@ from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
 from fireREST.fmc.policy.accesspolicy.category import Category
 from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
 from fireREST.fmc.policy.accesspolicy.inheritancesettings import InheritanceSettings
+from fireREST.fmc.policy.accesspolicy.loggingsettings import LoggingSettings
 from fireREST.fmc.policy.accesspolicy.operational import Operational
 from fireREST.fmc.policy.accesspolicy.securityintelligencepolicy import SecurityIntelligencePolicy
 
 
 class AccessPolicy(Resource):
+    """Retrieves the access control policy associated with the specified ID.
+
+    **Tags:** Policy
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllAccessPolicy` (GET (list))
+    - `getAccessPolicy` (GET)
+    - `createAccessPolicy` (CREATE)
+    - `updateAccessPolicy` (UPDATE)
+    - `deleteAccessPolicy` (DELETE)
+
+    **Query parameters:**
+
+    - `ignoreWarning` (boolean, optional): Shows any warnings when deleting an access policy, if set to false. If not specified, value is set to true and warnings are ignored. Allowed values are true and false.
+    - `name` (string, optional): If parameter is specified, only the policy matching with the specified name will be displayed.
+    - `filter` (string, optional): Value is of format (including quotes): `"locked:{true|false}"` `locked`query parameter when set to 'true' returns list of Access Policies which are locked and when set to 'false' returns policies which are unlocked.
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     PATH = '/policy/accesspolicies/{uuid}'
     IGNORE_FOR_UPDATE = ['rules']
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_610
@@ -25,6 +50,7 @@ class AccessPolicy(Resource):
         self.category = Category(conn)
         self.defaultaction = DefaultAction(conn)
         self.inheritancesettings = InheritanceSettings(conn)
+        self.loggingsettings = LoggingSettings(conn)
         self.operational = Operational(conn)
         self.securityintelligencepolicy = SecurityIntelligencePolicy(conn)
 

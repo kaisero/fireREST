@@ -1,3 +1,9 @@
+# LLM
+.llm/
+
+# Claude Code (local settings only — commands are tracked)
+.claude/settings.local.json
+
 # test files
 test.py
 
@@ -18,7 +24,15 @@ dist/
 docs/_build/
 
 # Environments
+.idea
+.env
 .venv
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Vscode
 .vscode/
@@ -32,3 +46,4 @@ docs/_build/
 # Cache
 .DS_Store
 build/
+site/

@@ -71,6 +71,9 @@ API_RELEASE_710 = '7.1.0'
 API_RELEASE_720 = '7.2.0'
 API_RELEASE_730 = '7.3.0'
 API_RELEASE_740 = '7.4.0'
+API_RELEASE_760 = '7.6.0'
+API_RELEASE_770 = '7.7.0'
+API_RELEASE_1000 = '10.0.0'
 
 # Execute PUT,POST and DELETE operations by default. Change this switch to only log and not execute requests
 DRY_RUN = False

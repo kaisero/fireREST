@@ -3,6 +3,27 @@ from fireREST.fmc import ChildResource
 
 
 class BridgeGroupInterface(ChildResource):
+    """Retrieves the bridge group interface associated with the specified NGFW device ID and interface ID. If no interface ID is specified, retrieves list of all bridge group interfaces associated with the specified NGFW device ID. <div class="alert alert-warning">More details on netmod events(out of sync interfaces):<b> GET /interfaceevents</b></div>
+
+    **Tags:** Devices
+
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
+
+    **Operation IDs:**
+
+    - `getAllFTDBridgeGroupInterface` (GET (list))
+    - `getFTDBridgeGroupInterface` (GET)
+    - `createFTDBridgeGroupInterface` (CREATE)
+    - `updateFTDBridgeGroupInterface` (UPDATE)
+    - `deleteFTDBridgeGroupInterface` (DELETE)
+
+    **Query parameters:**
+
+    - `offset` (integer, optional): Index of first item to return.
+    - `limit` (integer, optional): Number of items to return.
+    - `expanded` (boolean, optional): Include extended sub-object details in response.
+    """
+
     CONTAINER_NAME = 'DeviceRecord'
     CONTAINER_PATH = '/devices/devicerecords/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/bridgegroupinterfaces/{uuid}'

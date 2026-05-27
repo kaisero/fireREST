@@ -1,7 +1,33 @@
 from fireREST.fmc import Connection
 from fireREST.fmc.object.anyconnectcustomattribute import AnyconnectCustomAttribute
+from fireREST.fmc.object.azureadreaml import AzureAdRealm
+from fireREST.fmc.object.azureadstatus import AzureAdStatus
+from fireREST.fmc.object.ciphersuitelist import CipherSuiteList
+from fireREST.fmc.object.customsiiplist import CustomSiIpList
+from fireREST.fmc.object.customsiiplistdownload import CustomSiIpListDownload
+from fireREST.fmc.object.customsiurllist import CustomSiUrlList
+from fireREST.fmc.object.customsiurllistdownload import CustomSiUrlListDownload
+from fireREST.fmc.object.distinguishedname import DistinguishedName
+from fireREST.fmc.object.distinguishednamegroup import DistinguishedNameGroup
+from fireREST.fmc.object.externalcacertificate import ExternalCaCertificate
+from fireREST.fmc.object.externalcacertificategroup import ExternalCaCertificateGroup
+from fireREST.fmc.object.externalcertificate import ExternalCertificate
+from fireREST.fmc.object.externalcertificategroup import ExternalCertificateGroup
+from fireREST.fmc.object.filecategory import FileCategory
+from fireREST.fmc.object.filetype import FileType
+from fireREST.fmc.object.internalcertgroup import InternalCertGroup
+from fireREST.fmc.object.networkaddressoverride import NetworkAddressOverride
+from fireREST.fmc.object.ntpserver import NtpServer
+from fireREST.fmc.object.resourceprofile import ResourceProfile
+from fireREST.fmc.object.secureclientcustomization import SecureClientCustomization
+from fireREST.fmc.object.testazureadream import TestAzureAdRealm
+from fireREST.fmc.object.anyconnectexternalbrowserpackage import AnyconnectExternalBrowserPackage
 from fireREST.fmc.object.anyconnectpackage import AnyconnectPackage
 from fireREST.fmc.object.anyconnectprofile import AnyconnectProfile
+from fireREST.fmc.object.bfdtemplate import BfdTemplate
+from fireREST.fmc.object.dhcpipv6pool import DhcpIpv6Pool
+from fireREST.fmc.object.internalca import InternalCa
+from fireREST.fmc.object.internalcertificate import InternalCertificate
 from fireREST.fmc.object.anyprotocolportobject import AnyProtocolPortObject
 from fireREST.fmc.object.application import Application
 from fireREST.fmc.object.applicationcategory import ApplicationCategory
@@ -85,7 +111,10 @@ class Object:
     def __init__(self, conn: Connection):
         self.anyprotocolportobject = AnyProtocolPortObject(conn)
         self.anyconnectcustomattribute = AnyconnectCustomAttribute(conn)
+        self.anyconnectexternalbrowserpackage = AnyconnectExternalBrowserPackage(conn)
         self.anyconnectpackage = AnyconnectPackage(conn)
+        self.bfdtemplate = BfdTemplate(conn)
+        self.dhcpipv6pool = DhcpIpv6Pool(conn)
         self.anyconnectprofile = AnyconnectProfile(conn)
         self.application = Application(conn)
         self.applicationcategory = ApplicationCategory(conn)
@@ -119,6 +148,8 @@ class Object:
         self.ikev2policy = Ikev2Policy(conn)
         self.interface = Interface(conn)
         self.interfacegroup = InterfaceGroup(conn)
+        self.internalca = InternalCa(conn)
+        self.internalcertificate = InternalCertificate(conn)
         self.intrusionrule = IntrusionRule(conn)
         self.intrusionrulegroup = IntrusionRuleGroup(conn)
         self.ipv4addresspool = Ipv4AddressPool(conn)
@@ -163,3 +194,24 @@ class Object:
         self.variableset = VariableSet(conn)
         self.vlangrouptag = VlanGroupTag(conn)
         self.vlantag = VlanTag(conn)
+        self.azureadream = AzureAdRealm(conn)
+        self.azureadstatus = AzureAdStatus(conn)
+        self.ciphersuitelist = CipherSuiteList(conn)
+        self.customsiiplist = CustomSiIpList(conn)
+        self.customsiiplistdownload = CustomSiIpListDownload(conn)
+        self.customsiurllist = CustomSiUrlList(conn)
+        self.customsiurllistdownload = CustomSiUrlListDownload(conn)
+        self.distinguishedname = DistinguishedName(conn)
+        self.distinguishednamegroup = DistinguishedNameGroup(conn)
+        self.externalcacertificate = ExternalCaCertificate(conn)
+        self.externalcacertificategroup = ExternalCaCertificateGroup(conn)
+        self.externalcertificate = ExternalCertificate(conn)
+        self.externalcertificategroup = ExternalCertificateGroup(conn)
+        self.filecategory = FileCategory(conn)
+        self.filetype = FileType(conn)
+        self.internalcertgroup = InternalCertGroup(conn)
+        self.networkaddressoverride = NetworkAddressOverride(conn)
+        self.ntpserver = NtpServer(conn)
+        self.resourceprofile = ResourceProfile(conn)
+        self.secureclientcustomization = SecureClientCustomization(conn)
+        self.testazureadream = TestAzureAdRealm(conn)
