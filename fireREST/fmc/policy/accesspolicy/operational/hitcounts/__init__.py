@@ -42,5 +42,6 @@ class Hitcount(ChildResource):
         return super().get(container_uuid, params=params)
 
     @utils.support_params
-    def delete(self):
-        return
+    def delete(self, container_uuid, device_id=None, ids=None, params=None):
+        url = self.url(self.PATH.format(container_uuid=container_uuid, uuid=None))
+        return self.conn.delete(url, params)

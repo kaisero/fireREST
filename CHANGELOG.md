@@ -279,6 +279,7 @@
 ## Fixed
 
 * Fixed `TypeError` in `netmap.host.delete()` and `netmap.vulnerability.delete()` caused by unsupported `url=` keyword argument to `Resource.delete()`.
+* Fixed `policy.accesspolicy.operational.hitcounts.delete()` not accepting `container_uuid`, `device_id`, or `ids` parameters, making it impossible to reset hitcounts (Issue #102).
 * Fixed `cluster.ftddevicecluster.operational.command()` building malformed URLs.
 * Fixed `chassis.operational` methods building malformed URLs.
 * Fixed `health.tunnelsummary` `PATH` pointing to `/health/metrics/{uuid}` instead of `/health/tunnelsummaries/{uuid}`.
