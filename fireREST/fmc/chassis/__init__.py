@@ -1,5 +1,8 @@
+from typing import Dict, Optional
+
+from fireREST import utils
 from fireREST.fmc import Connection, Resource
-from fireREST.defaults import API_RELEASE_710
+from fireREST.defaults import API_RELEASE_710, API_RELEASE_760
 from fireREST.fmc.chassis.appinfo import AppInfo
 from fireREST.fmc.chassis.chassisetherchannelinterface import ChassisEtherChannelInterface
 from fireREST.fmc.chassis.chassisinterface import ChassisInterface
@@ -58,3 +61,8 @@ class Chassis(Resource):
         self.networkmodule = NetworkModule(conn)
         self.operational = Operational(conn)
         self.physicalinterface = PhysicalInterface(conn)
+
+    @utils.minimum_version_required(version=API_RELEASE_760)
+    def switch_mode_readiness_check(self, data: Dict, params: Optional[Dict] = None):
+        url = self.url('/chassis/fmcmanagedchassis/operational/switchmodereadinesscheck')
+        return self.conn.post(url=url, data=data, params=params)

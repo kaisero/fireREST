@@ -1,6 +1,7 @@
 from fireREST.defaults import API_RELEASE_740
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.decryptionpolicy.decryptionpolicyrule import DecryptionPolicyRule
+from fireREST.fmc.policy.decryptionpolicy.standardmodeconfiguration import StandardModeConfiguration
 
 
 class DecryptionPolicy(Resource):
@@ -35,3 +36,4 @@ class DecryptionPolicy(Resource):
     def __init__(self, conn: Connection):
         super().__init__(conn)
         self.decryptionpolicyrule = DecryptionPolicyRule(conn)
+        self.standardmodeconfiguration = StandardModeConfiguration(conn)

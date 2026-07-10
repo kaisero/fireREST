@@ -24,10 +24,13 @@ from fireREST.fmc.license import License
 from fireREST.fmc.netmap import NetMap
 from fireREST.fmc.object import Object
 from fireREST.fmc.policy import Policy
+from fireREST.fmc.search import Search
 from fireREST.fmc.system import System
 from fireREST.fmc.systemconfiguration import SystemConfiguration
+from fireREST.fmc.templates import Templates
 from fireREST.fmc.troubleshoot import Troubleshoot
 from fireREST.fmc.update import Update
+from fireREST.fmc.updates import Updates
 from fireREST.fmc.user import User
 
 logger = logging.getLogger(__name__)
@@ -72,8 +75,11 @@ class FMC:
         self.netmap = NetMap(self.conn)
         self.object = Object(self.conn)
         self.policy = Policy(self.conn)
+        self.search = Search(self.conn)
         self.system = System(self.conn)
         self.systemconfiguration = SystemConfiguration(self.conn)
+        self.templates = Templates(self.conn)
         self.troubleshoot = Troubleshoot(self.conn)
         self.update = Update(self.conn)
+        self.updates = Updates(self.conn)
         self.user = User(self.conn)

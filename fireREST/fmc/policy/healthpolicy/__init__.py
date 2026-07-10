@@ -1,18 +1,21 @@
-from fireREST.defaults import API_RELEASE_720
+from fireREST.defaults import API_RELEASE_720, API_RELEASE_760
 from fireREST.fmc import Resource
 
 
 class HealthPolicy(Resource):
-    """Retrieves the Health Policy with the associated ID.
+    """Retrieves, creates, updates, or deletes health policies.
 
     **Tags:** Policy
 
-    **Supported operations:** GET
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
 
     **Operation IDs:**
 
     - `getAllHealthPolicy` (GET (list))
     - `getHealthPolicy` (GET)
+    - `createHealthPolicy` (CREATE)
+    - `updateHealthPolicy` (UPDATE)
+    - `deleteHealthPolicy` (DELETE)
 
     **Query parameters:**
 
@@ -23,4 +26,7 @@ class HealthPolicy(Resource):
     """
 
     PATH = '/policy/healthpolicies/{uuid}'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_760
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_720
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_760
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_760

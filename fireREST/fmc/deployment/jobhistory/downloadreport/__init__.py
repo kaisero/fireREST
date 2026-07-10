@@ -22,5 +22,5 @@ class DownloadReport(ChildResource):
 
     CONTAINER_NAME = 'JobHistory'
     CONTAINER_PATH = '/deployment/jobhistories/{uuid}'
-    PATH = '/deployment/jobhistories/{container_uuid}/operational/downloadreports/{uuid}'
+    PATH = '/deployment/jobhistories/{container_uuid}/operational/downloadreports'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_720

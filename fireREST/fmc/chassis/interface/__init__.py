@@ -28,7 +28,7 @@ class Interface(ChildResource):
     CONTAINER_PATH = '/chassis/fmcmanagedchassis/{uuid}'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_710
     PATH = '/chassis/fmcmanagedchassis/{container_uuid}/chassisinterfaces/{uuid}'
-    SUPPORTED_PARAMS = ['operation']
+    SUPPORTED_FILTERS = ['operation']
 
     @utils.minimum_version_required(version=API_RELEASE_710)
     @utils.resolve_by_name

@@ -4,5 +4,5 @@ from fireREST.fmc import Resource
 
 class DiscoveryInfo(Resource):
     NAMESPACE = 'tid'
-    PATH = '/taxiiconfig/discoveryinfo/{uuid}'
+    PATH = '/taxiiconfig/discoveryinfo'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_623

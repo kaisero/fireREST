@@ -1,6 +1,7 @@
 from fireREST.fmc import Connection
 from fireREST.fmc.user.authrole import AuthRole
 from fireREST.fmc.user.duoconfig import DuoConfig
+from fireREST.fmc.user.externalauth import ExternalAuthNamespace
 from fireREST.fmc.user.ssoconfig import SsoConfig
 from fireREST.fmc.user.users import Users
 
@@ -9,5 +10,6 @@ class User:
     def __init__(self, conn: Connection):
         self.authrole = AuthRole(conn)
         self.duoconfig = DuoConfig(conn)
+        self.externalauth = ExternalAuthNamespace(conn)
         self.ssoconfig = SsoConfig(conn)
         self.users = Users(conn)

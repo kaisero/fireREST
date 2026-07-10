@@ -4,6 +4,7 @@ from fireREST.fmc.policy.ravpn.addressassignmentsettings import AddressAssignmen
 from fireREST.fmc.policy.ravpn.certificatemapsettings import CertificateMapSettings
 from fireREST.fmc.policy.ravpn.connectionprofile import ConnectionProfile
 from fireREST.fmc.policy.ravpn.ipsecadvancedsettings import IpsecAdvancedSettings
+from fireREST.fmc.policy.ravpn.ipseccryptomap import IpsecCryptoMap
 from fireREST.fmc.policy.ravpn.ldapattributemap import LdapAttributeMap
 from fireREST.fmc.policy.ravpn.loadbalancesettings import LoadBalanceSettings
 from fireREST.fmc.policy.ravpn.secureclientcustomizationsettings import SecureClientCustomizationSettings
@@ -44,6 +45,7 @@ class RaVpn(Resource):
         self.certificatemapsettings = CertificateMapSettings(conn)
         self.connectionprofile = ConnectionProfile(conn)
         self.ipsecadvancedsettings = IpsecAdvancedSettings(conn)
+        self.ipseccryptomap = IpsecCryptoMap(conn)
         self.ldapattributemap = LdapAttributeMap(conn)
         self.loadbalancesettings = LoadBalanceSettings(conn)
         self.secureclientcustomizationsettings = SecureClientCustomizationSettings(conn)

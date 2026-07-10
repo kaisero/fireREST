@@ -15,9 +15,12 @@ from fireREST.fmc.device.devicerecord.physicalinterface import PhysicalInterface
 from fireREST.fmc.device.devicerecord.redundantinterface import RedundantInterface
 from fireREST.fmc.device.devicerecord.routing import Routing
 from fireREST.fmc.device.devicerecord.subinterface import SubInterface
+from fireREST.fmc.device.devicerecord.universalzerotrustsetting import UniversalZeroTrustSetting
 from fireREST.fmc.device.devicerecord.virtualswitch import VirtualSwitch
 from fireREST.fmc.device.devicerecord.virtualtunnelinterface import VirtualTunnelInterface
 from fireREST.fmc.device.devicerecord.vlaninterface import VlanInterface
+from fireREST.fmc.device.devicerecord.vniinterface import VniInterface
+from fireREST.fmc.device.devicerecord.vteppolicy import VtepPolicy
 
 
 class DeviceRecord(Resource):
@@ -70,6 +73,9 @@ class DeviceRecord(Resource):
         self.redundantinterface = RedundantInterface(conn)
         self.routing = Routing(conn)
         self.subinterface = SubInterface(conn)
+        self.universalzerotrustsetting = UniversalZeroTrustSetting(conn)
         self.virtualswitch = VirtualSwitch(conn)
         self.virtualtunnelinterface = VirtualTunnelInterface(conn)
         self.vlaninterface = VlanInterface(conn)
+        self.vniinterface = VniInterface(conn)
+        self.vteppolicy = VtepPolicy(conn)

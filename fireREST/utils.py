@@ -179,7 +179,7 @@ def handle_errors(f):
     """
 
     @wraps(f)
-    @retry(exceptions=exc.RateLimitException, tries=6, delay=10, logger=logger)
+    @retry(exceptions=exc.RateLimitError, tries=6, delay=10, logger=logger)
     def wrapper(*args, **kwargs):
         conn = args[0]
         try:
@@ -225,13 +225,19 @@ def raise_for_status(response):
     :type response: requests.Response
     """
     status_code = response.status_code
+
+    # Direct status-code → exception mapping (no text matching required)
     exceptions = {
-        400: exc.GenericApiError,
+        400: exc.BadRequestError,
+        403: exc.AuthorizationError,
         404: exc.ResourceNotFoundError,
+        405: exc.MethodNotAllowedError,
         422: exc.UnprocessableEntityError,
-        429: exc.RateLimitException,
-        500: exc.GenericApiError,
+        429: exc.RateLimitError,
+        500: exc.ServerError,
     }
+
+    # Text-pattern overrides for codes whose body determines the specific sub-type
     errors = {
         400: [
             {'msg': 'Duplicate Name', 'exception': exc.ResourceAlreadyExistsError},
@@ -242,21 +248,26 @@ def raise_for_status(response):
             {'msg': 'CDO token is invalid', 'exception': exc.AuthError},
             {'msg': 'SCC token is invalid', 'exception': exc.AuthError},
         ],
-        403: [{'msg': 'The user is not authorized', 'exception': exc.AuthorizationError}],
-        405: [{'msg': 'is not supported', 'exception': exc.UnsupportedOperationError}],
+        429: [
+            {'msg': 'Parallel', 'exception': exc.RateLimitWriteError},
+            {'msg': 'parallel requests', 'exception': exc.ConcurrentRequestError},
+        ],
     }
+
     if status_code in errors:
         for error in errors[status_code]:
             if error['msg'] in response.text:
                 raise error['exception'](msg=response.json()['error']['messages'][0]['description'])
+
+    # 5xx codes not explicitly mapped all raise ServerError
+    default_exc = exceptions.get(status_code, exc.ServerError if status_code >= 500 else exc.GenericApiError)
+
     try:
-        raise exceptions.get(status_code, exc.GenericApiError)(
-            msg=response.json()['error']['messages'][0]['description']
-        )
+        raise default_exc(msg=response.json()['error']['messages'][0]['description'])
     except KeyError:
-        raise exceptions.get(status_code, exc.GenericApiError)(msg=response.text)
+        raise default_exc(msg=response.text)
     except ValueError:
-        raise exceptions.get(status_code, HTTPError)()
+        raise default_exc()
 
 
 def search_filter(items=None):

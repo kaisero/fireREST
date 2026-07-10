@@ -6,7 +6,17 @@ from fireREST.fmc import Resource
 
 
 class TestUmbrellaConnection(Resource):
-    PATH = '/integration/testumbrellaconnections'
+    """Test connection to the Umbrella cloud
+
+    **Tags:** Integration
+
+    **Supported operations:** CREATE
+
+    **Operation IDs:**
+
+    - `createTestUmbrellaConnection` (CREATE)
+    """
+    PATH = '/integration/operational/testumbrellaconnections'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_720
 
     @utils.minimum_version_required(version=API_RELEASE_720)

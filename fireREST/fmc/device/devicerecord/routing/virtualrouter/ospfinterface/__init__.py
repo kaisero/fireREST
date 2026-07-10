@@ -1,4 +1,4 @@
-from fireREST.defaults import API_RELEASE_660
+from fireREST.defaults import API_RELEASE_660, API_RELEASE_770
 from fireREST.fmc import NestedChildResource
 
 
@@ -7,12 +7,15 @@ class OspfInterface(NestedChildResource):
 
     **Tags:** Devices
 
-    **Supported operations:** GET
+    **Supported operations:** GET, CREATE, UPDATE, DELETE
 
     **Operation IDs:**
 
     - `getAllVrfOspfInterfacePolicyModel` (GET (list))
     - `getVrfOspfInterfacePolicyModel` (GET)
+    - `createVrfOspfInterfacePolicyModel` (CREATE)
+    - `updateVrfOspfInterfacePolicyModel` (UPDATE)
+    - `deleteVrfOspfInterfacePolicyModel` (DELETE)
 
     **Query parameters:**
 
@@ -26,4 +29,7 @@ class OspfInterface(NestedChildResource):
     CHILD_CONTAINER_NAME = 'VirtualRouter'
     CHILD_CONTAINER_PATH = '/devices/devicerecords/{container_uuid}/routing/virtualrouters/{uuid}'
     PATH = '/devices/devicerecords/{container_uuid}/routing/virtualrouters/{child_container_uuid}/ospfinterface/{uuid}'
+    MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_770
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_660
+    MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_770
+    MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_770

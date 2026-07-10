@@ -17,9 +17,11 @@ from fireREST.fmc.policy.networkanalysispolicy import NetworkAnalysisPolicy
 from fireREST.fmc.policy.policylock import PolicyLock
 from fireREST.fmc.policy.prefilterpolicy import PrefilterPolicy
 from fireREST.fmc.policy.ravpn import RaVpn
+from fireREST.fmc.policy.s2svpnsummary import S2sVpnSummary
 from fireREST.fmc.policy.snmpalert import SnmpAlert
 from fireREST.fmc.policy.syslogalert import SyslogAlert
 from fireREST.fmc.policy.umbrelladnspolicy import UmbrellaDnsPolicy
+from fireREST.fmc.policy.universalzerotrustpolicy import UniversalZeroTrustPolicy
 from fireREST.fmc.policy.vpntunnelstatus import VpnTunnelStatus
 from fireREST.fmc.policy.zerotrustpolicy import ZeroTrustPolicy
 
@@ -36,6 +38,7 @@ class Policy:
         self.ftdnatpolicy = FtdNatPolicy(conn)
         self.ftdplatformsettingspolicy = FtdPlatformSettingsPolicy(conn)
         self.ftds2svpn = FtdS2sVpn(conn)
+        self.s2svpnsummary = S2sVpnSummary(conn)
         self.healthpolicy = HealthPolicy(conn)
         self.identitypolicy = IdentityPolicy(conn)
         self.intrusionpolicy = IntrusionPolicy(conn)
@@ -47,5 +50,6 @@ class Policy:
         self.snmpalert = SnmpAlert(conn)
         self.syslogalert = SyslogAlert(conn)
         self.umbrelladnspolicy = UmbrellaDnsPolicy(conn)
+        self.universalzerotrustpolicy = UniversalZeroTrustPolicy(conn)
         self.vpntunnelstatus = VpnTunnelStatus(conn)
         self.zerotrustpolicy = ZeroTrustPolicy(conn)

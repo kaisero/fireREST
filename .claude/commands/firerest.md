@@ -270,8 +270,36 @@ Before adding any new resource, verify the exact API path in FMC API Explorer (`
 3. Whether a domain UUID is required
 4. Which HTTP methods are supported
 5. Supported filter/query parameters
+6. Whether the endpoint has an individual `/{uuid}` path or is list-only — if list-only, omit `/{uuid}` from PATH
 
 OAS3 specs available:
 - `.llm/fmc_oas3_7.2.5.json`
 - `.llm/fmc_oas3_7.3.1.json`
 - `.llm/fmc_oas3_7.4.2.json`
+
+---
+
+## Audit-Derived Rules (from `AUDIT_REPORT.md`, branch `code-audit`, June 2026)
+
+### TID Namespace URL
+The `'tid'` namespace URL builder in `fireREST/fmc/__init__.py` is **missing** the `/domain/{domainUUID}` segment. Current form produces `/api/fmc_tid/v1{path}`; correct form is `/api/fmc_tid/v1/domain/{domain_id}{path}`. All TID resources return 404 until this is fixed (C-02).
+
+### SUPPORTED_FILTERS / SUPPORTED_PARAMS validation
+Every key in `SUPPORTED_FILTERS` **must** appear in `FILTERS` dict in `fireREST/mapping.py`. Every key in `SUPPORTED_PARAMS` **must** appear in `PARAMS` dict. A missing entry causes a `KeyError` at runtime when the user supplies that kwarg. Also watch for:
+- Keys that belong in `SUPPORTED_FILTERS` accidentally placed in `SUPPORTED_PARAMS` (e.g., `operation`, `section`)
+- Keys that belong in `SUPPORTED_PARAMS` accidentally in `SUPPORTED_FILTERS` (e.g., `section` in NatRule)
+
+### /{uuid} suffix on list-only endpoints
+Many fireREST classes append `/{uuid}` to paths that the OAS3 spec only defines as list endpoints. `fix_url()` strips trailing `/None` so list calls work, but any call with a UUID generates a 404. When the spec has no individual-item path, **omit `/{uuid}` from PATH**. Affected resources found in audit: AllowDnsRule, BlockDnsRule, Hitcount (both), PreviewChanges, ValidationResults, DownloadReport, EmailReport, FpInterfaceStatistics, ManagementConvergenceMode, AppInfo.
+
+### IpsecCryptoMap container
+`IpsecCryptoMap` belongs under `RaVpn` container (`/policy/ravpns/`), NOT `FtdS2sVpn`. The `ftds2svpns` container has no `ipseccryptomaps` endpoint in any spec version.
+
+### S2sVpnSummary
+The `/policy/s2svpnsummaries` endpoint is a top-level `Resource`, not a child of `FtdS2sVpn`. The current `S2sVpnSummary` ChildResource under `FtdS2sVpn` uses a path that does not exist in the spec.
+
+### Known no-ops (unmerged fix)
+`Hitcount.update()` and `Hitcount.delete()` in both AccessPolicy and PrefilterPolicy Hitcount classes `return` without making any HTTP call. Fix is on branch `fix/102-hitcount-delete` (Issue #102), not yet merged to master.
+
+### Deprecated resources
+`health/csdac` (`PATH = '/health/csdac/{uuid}'`) is not present in OAS3 7.4.2 — the endpoint was removed from FMC API.

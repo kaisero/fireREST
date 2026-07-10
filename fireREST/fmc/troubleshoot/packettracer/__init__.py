@@ -4,6 +4,7 @@ from fireREST import utils
 from fireREST.defaults import API_RELEASE_710
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.troubleshoot.packettracer.file import File
+from fireREST.fmc.troubleshoot.packettracer.pcapdetail import PcapDetail
 
 
 class PacketTracer(Resource):
@@ -13,6 +14,7 @@ class PacketTracer(Resource):
     def __init__(self, conn: Connection):
         super().__init__(conn)
         self.file = File(conn)
+        self.pcapdetail = PcapDetail(conn)
 
     @utils.minimum_version_required(version=API_RELEASE_710)
     def trace(self, data: Dict, params: Optional[Dict] = None):

@@ -67,7 +67,14 @@ def clean_desc(text: str) -> str:
 def load_specs() -> dict:
     """Load all three OAS3 JSON files; newest version takes precedence."""
     combined: dict = {}
-    for fname in ['.llm/fmc_oas3_7.2.5.json', '.llm/fmc_oas3_7.3.1.json', '.llm/fmc_oas3_7.4.2.json']:
+    for fname in [
+        '.llm/fmc_oas3_7.2.5.json',
+        '.llm/fmc_oas3_7.3.1.json',
+        '.llm/fmc_oas3_7.4.2.json',
+        '.llm/fmc_oas3_7.6.5.json',
+        '.llm/fmc_oas3_7.7.12.json',
+        '.llm/fmc_oas3_10.0.1.json',
+    ]:
         p = Path(fname)
         if p.exists():
             with p.open(encoding='utf-8') as f:

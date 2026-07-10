@@ -4,5 +4,5 @@ from fireREST.fmc import Resource
 
 class Collection(Resource):
     NAMESPACE = 'tid'
-    PATH = '/taxiiconfig/collections/{uuid}'
+    PATH = '/taxiiconfig/collections'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_623

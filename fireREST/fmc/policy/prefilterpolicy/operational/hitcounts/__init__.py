@@ -1,3 +1,5 @@
+from typing import Dict, Optional
+
 from fireREST import utils
 from fireREST.defaults import API_RELEASE_640
 from fireREST.fmc import ChildResource
@@ -28,19 +30,23 @@ class Hitcount(ChildResource):
 
     CONTAINER_NAME = 'PrefilterPolicy'
     CONTAINER_PATH = '/policy/prefilterpolicies/{uuid}'
-    PATH = '/policy/prefilterpolicies/{container_uuid}/operational/hitcounts/{uuid}'
+    PATH = '/policy/prefilterpolicies/{container_uuid}/operational/hitcounts'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_640
     MINIMUM_VERSION_REQUIRED_UPDATE = API_RELEASE_640
     MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_640
 
     @utils.support_params
-    def update(self):
-        return
+    def get(self, container_uuid, params=None):
+        return super().get(container_uuid, params=params)
 
+    @utils.minimum_version_required
     @utils.support_params
-    def get(self):
-        return
+    def update(self, data: Dict, container_uuid: Optional[str] = None, params=None):
+        url = self.url(self.PATH.format(container_uuid=container_uuid))
+        return self.conn.put(url, data, params, self.IGNORE_FOR_UPDATE)
 
+    @utils.minimum_version_required
     @utils.support_params
-    def delete(self):
-        return
+    def delete(self, container_uuid: Optional[str] = None, params=None):
+        url = self.url(self.PATH.format(container_uuid=container_uuid))
+        return self.conn.delete(url, params)

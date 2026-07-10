@@ -103,12 +103,14 @@ response = fmc.object.network.delete(name='NetObjViaAPI')
 
 ## Supported operations
 
-Since FireREST does not try to provide a python object model nearly all api calls up to version 7.4.0 are available which includes but is not limited to
+Since FireREST does not try to provide a python object model nearly all api calls up to version 10.0.0 are available which includes but is not limited to
 the following CRUD operations:
 
 ```
 ├── analysis
 │   ├── activesessions
+│   ├── filter
+│   ├── identifieduser
 │   └── useractivity
 ├── assignment
 │   └── policyassignment
@@ -149,6 +151,10 @@ the following CRUD operations:
 │   ├── pendingchangesrequest
 │   └── rollbackrequest
 ├── device
+│   ├── bulkcommand
+│   ├── bulkregistration
+│   ├── certificate
+│   ├── certificatesexportdata
 │   ├── devicerecord
 │   │   ├── bridgegroupinterface
 │   │   ├── dhcp
@@ -166,6 +172,7 @@ the following CRUD operations:
 │   │   ├── operational
 │   │   │   ├── command
 │   │   │   ├── metric
+│   │   │   ├── outofbandchange
 │   │   │   └── virtualaccessinterface
 │   │   ├── physicalinterface
 │   │   ├── redundantinterface
@@ -173,17 +180,20 @@ the following CRUD operations:
 │   │   │   ├── bfdpolicy
 │   │   │   ├── bgp
 │   │   │   ├── bgpgeneralsettings
+│   │   │   ├── ecmpzone
 │   │   │   ├── eigrproute
 │   │   │   ├── ipv4staticroute
 │   │   │   ├── ipv6staticroute
 │   │   │   ├── ospfinterface
 │   │   │   ├── ospfv2route
 │   │   │   ├── ospfv3interface
+│   │   │   ├── ospfv3route
 │   │   │   ├── policybasedroute
 │   │   │   ├── staticroute
 │   │   │   └── virtualrouter
 │   │   │       ├── bfdpolicy
 │   │   │       ├── bgp
+│   │   │       ├── ecmpzone
 │   │   │       ├── eigrproute
 │   │   │       ├── ipv4staticroute
 │   │   │       ├── ipv6staticroute
@@ -193,10 +203,16 @@ the following CRUD operations:
 │   │   │       ├── ospfv3route
 │   │   │       └── policybasedroute
 │   │   ├── subinterface
+│   │   ├── universalzerotrustsetting
 │   │   ├── virtualswitch
 │   │   ├── virtualtunnelinterface
-│   │   └── vlaninterface
-│   └── devicesettings
+│   │   ├── vlaninterface
+│   │   ├── vniinterface
+│   │   └── vteppolicy
+│   ├── devicesettings
+│   ├── downloadsamplecsv
+│   ├── ltpdevicerecord
+│   └── managecertificate
 ├── devicecluster
 │   └── ftddevicecluster
 │       ├── clusterhealthmonitorsettings
@@ -208,8 +224,9 @@ the following CRUD operations:
 │       ├── failoverinterfacemacaddressconfig
 │       └── monitoredinterface
 ├── health
+│   ├── aggregatemetric
 │   ├── alert
-│   ├── csdac
+│   ├── event
 │   ├── metric
 │   ├── pathmonitoredinterface
 │   ├── ravpngateway
@@ -218,14 +235,22 @@ the following CRUD operations:
 │   │   └── tunneldetails
 │   └── tunnelsummary
 ├── integration
+│   ├── aiops
+│   │   ├── aiconfiguration
+│   │   ├── tsdbupload
+│   │   └── tsdbuploadstatus
 │   ├── cdfmcsnapshot
 │   ├── cloudeventsconfig
+│   ├── cloudintegration
 │   ├── cloudregion
 │   ├── ebssnapshot
 │   ├── externallookup
 │   ├── externalstorage
 │   ├── fmchastatus
+│   ├── ftdcloudstatus
+│   ├── metricconfiguration
 │   ├── securexconfig
+│   ├── splunkprofile
 │   ├── testumbrellaconnection
 │   ├── umbrella
 │   │   ├── datacenter
@@ -270,6 +295,7 @@ the following CRUD operations:
 │   ├── azureadstatus
 │   ├── bfdtemplate
 │   ├── certenrollment
+│   ├── certenrollmentoverride
 │   ├── certificatemap
 │   ├── ciphersuitelist
 │   ├── communitylist
@@ -284,11 +310,14 @@ the following CRUD operations:
 │   ├── distinguishednamegroup
 │   ├── dnsservergroup
 │   │   └── override
+│   ├── downloadrealm
 │   ├── dynamicobject
 │   │   └── mapping
 │   ├── endpointdevicetype
 │   ├── expandedcommunitylist
 │   ├── extendedaccesslist
+│   ├── extendedcommunitylist
+│   │   └── override
 │   ├── externalcacertificate
 │   ├── externalcacertificategroup
 │   ├── externalcertificate
@@ -327,6 +356,9 @@ the following CRUD operations:
 │   ├── isesecuritygrouptag
 │   ├── keychain
 │   │   └── override
+│   ├── localrealmuser
+│   ├── macaddresspool
+│   ├── macaddresspooloverride
 │   ├── network
 │   │   └── override
 │   ├── networkaddress
@@ -336,6 +368,8 @@ the following CRUD operations:
 │   ├── ntpserver
 │   ├── operational
 │   │   ├── findoverlaps
+│   │   ├── realmstatus
+│   │   ├── testrealm
 │   │   └── usage
 │   ├── policylist
 │   ├── port
@@ -351,9 +385,12 @@ the following CRUD operations:
 │   ├── realmusergroup
 │   ├── resourceprofile
 │   ├── routemap
+│   ├── samlrealmuserandgroup
 │   ├── secureclientcustomization
 │   ├── securitygrouptag
 │   ├── securityzone
+│   ├── serviceaccessobject
+│   ├── serviceaccessobjectoverride
 │   ├── sidnsfeed
 │   ├── sidnslist
 │   ├── sinetworkfeed
@@ -376,6 +413,7 @@ the following CRUD operations:
 │   ├── urlcategory
 │   ├── urlgroup
 │   │   └── override
+│   ├── variable
 │   ├── variableset
 │   ├── vlangrouptag
 │   │   └── override
@@ -384,8 +422,10 @@ the following CRUD operations:
 ├── policy
 │   ├── accesspolicy
 │   │   ├── accessrule
+│   │   ├── advancedloggingsetting
 │   │   ├── category
 │   │   ├── defaultaction
+│   │   ├── evesetting
 │   │   ├── inheritancesettings
 │   │   ├── loggingsettings
 │   │   ├── operational
@@ -400,10 +440,12 @@ the following CRUD operations:
 │   │   ├── timesynchronizationsettings
 │   │   └── timezonesettings
 │   ├── decryptionpolicy
-│   │   └── decryptionpolicyrule
+│   │   ├── decryptionpolicyrule
+│   │   └── standardmodeconfiguration
 │   ├── dnspolicy
 │   │   ├── allowdnsrule
-│   │   └── blockdnsrule
+│   │   ├── blockdnsrule
+│   │   └── dnsrule
 │   ├── dynamicaccesspolicy
 │   ├── filepolicy
 │   │   └── filerule
@@ -413,18 +455,23 @@ the following CRUD operations:
 │   │   ├── manualnatrule
 │   │   └── natrule
 │   ├── ftdplatformsettingspolicy
+│   │   ├── bannersetting
+│   │   ├── eventlist
+│   │   ├── externalauthsetting
 │   │   ├── httpaccesssettings
 │   │   ├── netflowpolicies
-│   │   └── snmpsettings
+│   │   ├── snmpsettings
+│   │   └── sshaccesssetting
 │   ├── ftds2svpn
 │   │   ├── advancedsettings
 │   │   ├── endpoint
 │   │   ├── ikesettings
 │   │   ├── ipseccryptomap
-│   │   ├── ipsecsettings
-│   │   └── s2svpnsummary
+│   │   └── ipsecsettings
 │   ├── healthpolicy
 │   ├── identitypolicy
+│   │   ├── identitycategory
+│   │   └── identityrule
 │   ├── intrusionpolicy
 │   │   ├── intrusionrule
 │   │   └── intrusionrulegroup
@@ -443,17 +490,26 @@ the following CRUD operations:
 │   │   ├── certificatemapsettings
 │   │   ├── connectionprofile
 │   │   ├── ipsecadvancedsettings
+│   │   ├── ipseccryptomap
 │   │   ├── ldapattributemap
 │   │   ├── loadbalancesettings
 │   │   └── secureclientcustomizationsettings
+│   ├── s2svpnsummary
 │   ├── snmpalert
 │   ├── syslogalert
 │   ├── umbrelladnspolicy
 │   │   └── umbrelladnsrule
+│   ├── universalzerotrustpolicy
+│   ├── universalzerotrustrule
 │   ├── vpntunnelstatus
 │   └── zerotrustpolicy
 │       ├── application
 │       └── applicationgroup
+├── search
+│   ├── devicesearch
+│   ├── globalsearch
+│   ├── objectsearch
+│   └── policysearch
 ├── system
 │   └── info
 │       ├── domain
@@ -461,17 +517,46 @@ the following CRUD operations:
 ├── systemconfiguration
 │   ├── changemanagementconfig
 │   └── remotemanagementaccess
+├── templates
+│   ├── devicetemplate
+│   │   ├── association
+│   │   ├── defaultmodelmapping
+│   │   ├── modelmapping
+│   │   ├── objectoverride
+│   │   ├── templateinterface
+│   │   ├── templatevariable
+│   │   └── vpnsetting
+│   └── supporteddevicemodel
 ├── troubleshoot
+│   ├── cpuprofiler
+│   │   └── module
 │   ├── device
 │   ├── packettracer
-│   │   └── file
+│   │   ├── file
+│   │   └── pcapdetail
+│   ├── radkit
+│   │   └── service
+│   ├── snortprofiler
+│   │   └── rule
 │   └── task
 ├── update
 │   └── upgradepackage
 │       └── applicabledevice
+├── updates
+│   ├── contentupdate
+│   ├── contentupdateoperation
+│   └── deviceupgradeinfo
 └── user
     ├── authrole
     ├── duoconfig
+    ├── externalauth
+    │   ├── applyexternalauth
+    │   ├── authconfigobject
+    │   ├── externalauth
+    │   ├── fetchldapattributes
+    │   ├── fetchldapdns
+    │   ├── ldapconfigobject
+    │   └── radiusconfigobject
     ├── ssoconfig
     └── users
 ```

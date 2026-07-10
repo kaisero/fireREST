@@ -2,10 +2,16 @@
 .llm/
 
 # Claude Code (local settings only — commands are tracked)
-.claude/settings.local.json
+.claude/
 
 # test files
 test.py
+
+# Audit artifacts (dev-only, not part of the package)
+audit_api.py
+AUDIT_REPORT.md
+audit_findings.json
+audit_raw_output.txt
 
 # Byte-compiled
 __pycache__/

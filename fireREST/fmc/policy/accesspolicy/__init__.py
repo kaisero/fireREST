@@ -2,8 +2,10 @@ from fireREST import utils
 from fireREST.defaults import API_RELEASE_610
 from fireREST.fmc import Connection, Resource
 from fireREST.fmc.policy.accesspolicy.accessrule import AccessRule
+from fireREST.fmc.policy.accesspolicy.advancedloggingsetting import AdvancedLoggingSetting
 from fireREST.fmc.policy.accesspolicy.category import Category
 from fireREST.fmc.policy.accesspolicy.defaultaction import DefaultAction
+from fireREST.fmc.policy.accesspolicy.evesetting import EveSetting
 from fireREST.fmc.policy.accesspolicy.inheritancesettings import InheritanceSettings
 from fireREST.fmc.policy.accesspolicy.loggingsettings import LoggingSettings
 from fireREST.fmc.policy.accesspolicy.operational import Operational
@@ -52,6 +54,8 @@ class AccessPolicy(Resource):
         self.inheritancesettings = InheritanceSettings(conn)
         self.loggingsettings = LoggingSettings(conn)
         self.operational = Operational(conn)
+        self.advancedloggingsetting = AdvancedLoggingSetting(conn)
+        self.evesetting = EveSetting(conn)
         self.securityintelligencepolicy = SecurityIntelligencePolicy(conn)
 
     @utils.support_params

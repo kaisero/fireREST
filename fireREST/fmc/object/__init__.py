@@ -1,5 +1,10 @@
 from fireREST.fmc import Connection
 from fireREST.fmc.object.anyconnectcustomattribute import AnyconnectCustomAttribute
+from fireREST.fmc.object.downloadrealm import DownloadRealm
+from fireREST.fmc.object.macaddresspool import MacAddressPool
+from fireREST.fmc.object.samlrealmuserandgroup import SamlRealmUserAndGroup
+from fireREST.fmc.object.serviceaccessobject import ServiceAccessObject
+from fireREST.fmc.object.variable import Variable
 from fireREST.fmc.object.azureadreaml import AzureAdRealm
 from fireREST.fmc.object.azureadstatus import AzureAdStatus
 from fireREST.fmc.object.ciphersuitelist import CipherSuiteList
@@ -47,6 +52,8 @@ from fireREST.fmc.object.dynamicobject import DynamicObject
 from fireREST.fmc.object.endpointdevicetype import EndpointDeviceType
 from fireREST.fmc.object.expandedcommunitylist import ExpandedCommunityList
 from fireREST.fmc.object.extendedaccesslist import ExtendedAccessList
+from fireREST.fmc.object.extendedcommunitylist import ExtendedCommunityList
+from fireREST.fmc.object.localrealmuser import LocalRealmUser
 from fireREST.fmc.object.fqdn import Fqdn
 from fireREST.fmc.object.geolocation import GeoLocation
 from fireREST.fmc.object.globaltimezone import GlobalTimeZone
@@ -134,6 +141,8 @@ class Object:
         self.endpointdevicetype = EndpointDeviceType(conn)
         self.expandedcommunitylist = ExpandedCommunityList(conn)
         self.extendedaccesslist = ExtendedAccessList(conn)
+        self.extendedcommunitylist = ExtendedCommunityList(conn)
+        self.localrealmuser = LocalRealmUser(conn)
         self.fqdn = Fqdn(conn)
         self.geolocation = GeoLocation(conn)
         self.globaltimezone = GlobalTimeZone(conn)
@@ -194,6 +203,11 @@ class Object:
         self.variableset = VariableSet(conn)
         self.vlangrouptag = VlanGroupTag(conn)
         self.vlantag = VlanTag(conn)
+        self.downloadrealm = DownloadRealm(conn)
+        self.macaddresspool = MacAddressPool(conn)
+        self.samlrealmuserandgroup = SamlRealmUserAndGroup(conn)
+        self.serviceaccessobject = ServiceAccessObject(conn)
+        self.variable = Variable(conn)
         self.azureadream = AzureAdRealm(conn)
         self.azureadstatus = AzureAdStatus(conn)
         self.ciphersuitelist = CipherSuiteList(conn)

@@ -22,5 +22,5 @@ class ValidationResults(ChildResource):
 
     CONTAINER_NAME = 'Ticket'
     CONTAINER_PATH = '/changemanagement/tickets/{uuid}'
-    PATH = '/changemanagement/tickets/{container_uuid}/validationresults/{uuid}'
+    PATH = '/changemanagement/tickets/{container_uuid}/validationresults'
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_740

@@ -1,3 +1,201 @@
+# Unreleased
+
+## Breaking Changes
+
+* `policy.ftds2svpn.ipseccryptomap` moved to `policy.ravpn.ipseccryptomap`. The `ftds2svpns` container never had an `ipseccryptomaps` endpoint in any spec version; all calls were returning 404.
+* `policy.ftds2svpn.s2svpnsummary` moved to `policy.s2svpnsummary`. The resource is a top-level list endpoint and was never a child of `FtdS2sVpn`.
+* `intelligence.tid.*` and `intelligence.taxiiconfig.*` URL builder now includes the required `/domain/{domainUUID}` segment. All TID and TaxiiConfig calls were returning 404 previously.
+* `integration.ebssnapshot` path corrected from `/integration/ebssnapshots/` to `/integration/ebssnapshot/` (singular).
+* `policy.policylock` path corrected from `/policy/policylocks/` to `/policy/operational/policylocks`.
+* `object.operational.usage` path corrected from `/objects/operational/usage` to `/object/operational/usage`.
+* `health.csdac` removed. The `/health/csdac` endpoint was removed from the FMC API in 7.4.x.
+
+## New
+
+* Added granular HTTP exception types to `fireREST.exceptions` based on the FMC ResponseStructure:
+  * `BadRequestError` — HTTP 400 (invalid parameters, missing fields, invalidated policy object)
+  * `MethodNotAllowedError` — HTTP 405 (method not permitted on this resource)
+  * `ServerError` — HTTP 5xx catch-all for FMC server-side failures
+  * `RateLimitError` — HTTP 429 rate limit exceeded (canonical rename of `RateLimitException`)
+  * `ConcurrentRequestError` — HTTP 429 when more than 10 parallel connections from the same IP
+  * `RateLimitWriteError` — HTTP 429 when a parallel write operation is blocked
+  * `RateLimitException` preserved as a backward-compatible alias for `RateLimitError`
+
+* Added `search` namespace with four discovery endpoints:
+  * search.device.get(...)
+  * search.glob.get(...)
+  * search.object.get(...)
+  * search.policy.get(...)
+* Added `object.extendedcommunitylist` resource:
+  * object.extendedcommunitylist.get(...)
+  * object.extendedcommunitylist.create(...)
+  * object.extendedcommunitylist.update(...)
+  * object.extendedcommunitylist.delete(...)
+  * object.extendedcommunitylist.override.get(...)
+* Added `object.localrealmuser` resource:
+  * object.localrealmuser.get(...)
+  * object.localrealmuser.create(...)
+  * object.localrealmuser.update(...)
+  * object.localrealmuser.delete(...)
+* Added VXLAN interface resources:
+  * device.devicerecord.vniinterface.get(...)
+  * device.devicerecord.vniinterface.create(...)
+  * device.devicerecord.vniinterface.update(...)
+  * device.devicerecord.vniinterface.delete(...)
+  * device.devicerecord.vteppolicy.get(...)
+  * device.devicerecord.vteppolicy.create(...)
+  * device.devicerecord.vteppolicy.update(...)
+  * device.devicerecord.vteppolicy.delete(...)
+* Added ECMP zone and OSPFv3 route resources:
+  * device.devicerecord.routing.ecmpzone.get(...)
+  * device.devicerecord.routing.ecmpzone.create(...)
+  * device.devicerecord.routing.ecmpzone.update(...)
+  * device.devicerecord.routing.ecmpzone.delete(...)
+  * device.devicerecord.routing.ospfv3route.get(...)
+  * device.devicerecord.routing.virtualrouter.ecmpzone.get(...)
+  * device.devicerecord.routing.virtualrouter.ecmpzone.create(...)
+  * device.devicerecord.routing.virtualrouter.ecmpzone.update(...)
+  * device.devicerecord.routing.virtualrouter.ecmpzone.delete(...)
+* Added `policy.ravpn.ipseccryptomap` resource (moved from `policy.ftds2svpn.ipseccryptomap`):
+  * policy.ravpn.ipseccryptomap.get(...)
+  * policy.ravpn.ipseccryptomap.update(...)
+* Added top-level `policy.s2svpnsummary` resource (moved from `policy.ftds2svpn.s2svpnsummary`):
+  * policy.s2svpnsummary.get(...)
+* Added FMC 7.6 support — new `templates` namespace with full device template management:
+  * templates.devicetemplate.get/create/update/delete(...)
+  * templates.devicetemplate.apply(data, container_uuid=...)
+  * templates.devicetemplate.generate(data)
+  * templates.devicetemplate.association.get/delete(...)
+  * templates.devicetemplate.defaultmodelmapping.get(...)
+  * templates.devicetemplate.modelmapping.get/create/update/delete(...)
+  * templates.devicetemplate.objectoverride.get/update(...)
+  * templates.devicetemplate.templateinterface.get/create/delete(...)
+  * templates.devicetemplate.templatevariable.get(...)
+  * templates.devicetemplate.vpnsetting.get/create/update/delete(...)
+  * templates.supporteddevicemodel.get(...)
+* Added FMC 7.6 `analysis.identifieduser` resource:
+  * analysis.identifieduser.get(...)
+  * analysis.identifieduser.delete(...)
+* Added FMC 7.6 `chassis.switch_mode_readiness_check(data)` method
+* Added FMC 7.6 device resources:
+  * device.ltpdevicerecord.get/delete(...)
+  * device.bulkregistration.create(...)
+  * device.downloadsamplecsv.get(...)
+* Added FMC 7.6 `health.event` resource:
+  * health.event.get(...)
+* Added FMC 7.6 object resources:
+  * object.macaddresspool.get/create/update/delete(...)
+  * object.macaddresspool.override.get(...)
+  * object.samlrealmuserandgroup.get(...)
+  * object.variable.get/create/update/delete(...)
+  * object.downloadrealm.create(...)
+  * object.operational.realmstatus.get(...)
+  * object.operational.testrealm.create(...)
+* Added FMC 7.6 write operations to `policy.healthpolicy`:
+  * policy.healthpolicy.create/update/delete(...)
+* Added FMC 7.6 troubleshoot profiler resources:
+  * troubleshoot.cpuprofiler.module.get/create(...)
+  * troubleshoot.snortprofiler.rule.get/create(...)
+* Added FMC 7.7 write operations to OSPFv2/v3 routing resources:
+  * device.devicerecord.routing.ospfv2route.create/update/delete(...)
+  * device.devicerecord.routing.ospfv3interface.create/update/delete(...)
+  * device.devicerecord.routing.ospfv3route.create/update/delete(...)
+  * device.devicerecord.routing.virtualrouter.ospfv2route.create/update/delete(...)
+  * device.devicerecord.routing.virtualrouter.ospfinterface.create/update/delete(...)
+* Added FMC 7.7 device certificate resources:
+  * device.certificate.get(...)
+  * device.certificatesexportdata.get(...)
+  * device.managecertificate.create(...)
+  * device.devicerecord.operational.outofbandchange.get/create(...)
+* Added FMC 7.7 `health.aggregatemetric` resource:
+  * health.aggregatemetric.get(...)
+* Added FMC 7.7 `integration.aiops` sub-namespace:
+  * integration.aiops.aiconfiguration.get/create(...)
+  * integration.aiops.tsdbupload.create(...)
+  * integration.aiops.tsdbuploadstatus.get(...)
+* Added FMC 7.7 `integration.cloudintegration` resource:
+  * integration.cloudintegration.get(...)
+* Added FMC 7.7 object resources:
+  * object.certenrollment.override.get(...)
+  * object.serviceaccessobject.get/create/update/delete(...)
+  * object.serviceaccessobject.override.get(...)
+* Added FMC 7.7 `policy.ftdplatformsettingspolicy` children:
+  * policy.ftdplatformsettingspolicy.bannersetting.get/update(...)
+  * policy.ftdplatformsettingspolicy.eventlist.get/create/update/delete(...)
+  * policy.ftdplatformsettingspolicy.sshaccesssetting.get/create/update/delete(...)
+* Added FMC 7.7 write operation to `policy.accesspolicy.securityintelligencepolicy`:
+  * policy.accesspolicy.securityintelligencepolicy.update(...)
+* Added FMC 7.7 `troubleshoot.radkit` sub-namespace:
+  * troubleshoot.radkit.service.get/create(...)
+* Added FMC 10.0 `analysis.filter` resource:
+  * analysis.filter.get/create/update/delete(...)
+* Added FMC 10.0 `device.bulkcommand` resource:
+  * device.bulkcommand.create(...)
+* Added FMC 10.0 `device.devicerecord.universalzerotrustsetting` resource:
+  * device.devicerecord.universalzerotrustsetting.get/update(...)
+* Added FMC 10.0 integration resources:
+  * integration.ftdcloudstatus.get(...)
+  * integration.metricconfiguration.get/create(...)
+  * integration.splunkprofile.get/create/update/delete(...)
+* Added FMC 10.0 `policy.accesspolicy` children:
+  * policy.accesspolicy.advancedloggingsetting.get/update(...)
+  * policy.accesspolicy.evesetting.get/update(...)
+* Added FMC 10.0 `policy.universalzerotrustpolicy` resource:
+  * policy.universalzerotrustpolicy.get/update(...)
+  * policy.universalzerotrustpolicy.universalzerotrustrule.get/create/update/delete(...)
+* Added FMC 10.0 write operations to `policy.dnspolicy`:
+  * policy.dnspolicy.create/update/delete(...)
+  * policy.dnspolicy.dnsrule.get/create/update/delete(...)
+* Added FMC 10.0 write operations to `policy.identitypolicy`:
+  * policy.identitypolicy.create/update/delete(...)
+  * policy.identitypolicy.identitycategory.get/create/update/delete(...)
+  * policy.identitypolicy.identityrule.get/create/update/delete(...)
+* Added FMC 10.0 `policy.decryptionpolicy.standardmodeconfiguration` resource:
+  * policy.decryptionpolicy.standardmodeconfiguration.get/update(...)
+* Added FMC 10.0 `policy.ftdplatformsettingspolicy.externalauthsetting` resource:
+  * policy.ftdplatformsettingspolicy.externalauthsetting.get/update(...)
+* Added FMC 10.0 `updates` namespace:
+  * updates.contentupdate.get/update(...)
+  * updates.contentupdateoperation.create(...)
+  * updates.deviceupgradeinfo.get(...)
+* Added FMC 10.0 `user.externalauth` sub-namespace:
+  * user.externalauth.externalauth.get/update(...)
+  * user.externalauth.applyexternalauth.create(...)
+  * user.externalauth.fetchldapattributes.create(...)
+  * user.externalauth.fetchldapdns.create(...)
+  * user.externalauth.authconfigobject.get(...)
+  * user.externalauth.ldapconfigobject.get/create/update/delete(...)
+  * user.externalauth.radiusconfigobject.get/create/update/delete(...)
+* Added FMC 10.0 `troubleshoot.packettracer.pcapdetail` resource:
+  * troubleshoot.packettracer.pcapdetail.get/create(...)
+
+## Fixed
+
+* Fixed HTTP 403 responses always raising `AuthorizationError` instead of falling through to `GenericApiError` when response text did not match the expected substring.
+* Fixed HTTP 405 responses always raising `MethodNotAllowedError` instead of falling through to `GenericApiError` when response text did not match the expected substring.
+* Fixed HTTP 5xx responses beyond 500 (502, 503, 504) falling through to `GenericApiError` instead of raising `ServerError`.
+* Fixed HTTP 429 responses not distinguishing between rate limit, concurrent connection, and parallel write errors; now raises `RateLimitWriteError` or `ConcurrentRequestError` as appropriate.
+* Fixed TID namespace URL builder missing `/domain/{domainUUID}` segment (all `intelligence.tid.*` calls returned 404).
+* Fixed TaxiiConfig `collection` and `discoveryinfo` PATH including spurious `/{uuid}` suffix for POST-only endpoints.
+* Fixed `AllowDnsRule` PATH using singular `allowdnsrule` instead of plural `allowdnsrules`, and incorrectly appending `/{uuid}` to a list-only endpoint.
+* Fixed `BlockDnsRule` PATH using singular `blockdnsrule` instead of plural `blockdnsrules`, and incorrectly appending `/{uuid}` to a list-only endpoint.
+* Fixed `EbsSnapshot` PATH using plural `ebssnapshots` instead of singular `ebssnapshot`.
+* Fixed `PolicyLock` PATH missing `/operational/` segment and incorrectly appending `/{uuid}`.
+* Fixed `Usage` PATH using `/objects/` instead of `/object/`.
+* Fixed `Hitcount` (AccessPolicy and PrefilterPolicy) PATH appending `/{uuid}` to a filter-based list endpoint; implemented `update()` and `delete()` which were no-ops returning without making any HTTP call.
+* Fixed `S2sVpnSummary` implemented as `ChildResource` of `FtdS2sVpn` with a non-existent container path; converted to top-level `Resource`.
+* Fixed `PreviewChanges` PATH appending `/{uuid}` to a list-only endpoint.
+* Fixed `ValidationResults` PATH appending `/{uuid}` to a list-only endpoint.
+* Fixed `DownloadReport` (deployment) PATH appending `/{uuid}` to a list-only endpoint.
+* Fixed `EmailReport` PATH appending `/{uuid}` and declaring `MINIMUM_VERSION_REQUIRED_GET` for a CREATE-only endpoint.
+* Fixed `FpInterfaceStatistics` PATH appending `/{uuid}` to a list-only endpoint.
+* Fixed `ManagementConvergenceMode` PATH appending `/{uuid}` to a list/create-only endpoint.
+* Fixed `TestUmbrellaConnection` PATH missing `/operational/` segment.
+* Fixed `JobHistory` `SUPPORTED_FILTERS` referencing `device_uuid` which does not exist in the `FILTERS` mapping; corrected to `device_uuids`.
+* Fixed `NatRule` `section` misplaced in `SUPPORTED_FILTERS`; moved to `SUPPORTED_PARAMS` so it is sent as a query parameter instead of a filter value.
+* Fixed `ChassisInterface` `operation` misplaced in `SUPPORTED_PARAMS`; moved to `SUPPORTED_FILTERS` so it is sent as `filter=operation:...`.
+* Fixed missing `FILTERS` mapping entries for `entity_uuid`, `parent_entity_types`, `parent_uuid`, `query_function`, `regex_filter`, `source`, `step`, and `uuid`; absence caused `KeyError` at runtime when these filter kwargs were passed.
+
 # 1.3.0 [2026-06-12]
 
 ## Breaking Changes

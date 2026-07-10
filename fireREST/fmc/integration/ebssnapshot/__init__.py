@@ -3,6 +3,17 @@ from fireREST.fmc import Resource
 
 
 class EbsSnapshot(Resource):
-    PATH = '/integration/ebssnapshots/{uuid}'
+    """Retrieves or creates an EBS snapshot.
+
+    **Tags:** Integration
+
+    **Supported operations:** GET, CREATE
+
+    **Operation IDs:**
+
+    - `getEBSSnapshot` (GET)
+    - `createEBSSnapshot` (CREATE)
+    """
+    PATH = '/integration/ebssnapshot/{uuid}'
     MINIMUM_VERSION_REQUIRED_CREATE = API_RELEASE_720
     MINIMUM_VERSION_REQUIRED_GET = API_RELEASE_720

@@ -31,8 +31,8 @@ class NatRule(ChildResource):
     CONTAINER_PATH = '/policy/ftdnatpolicies/{uuid}'
     PATH = '/policy/ftdnatpolicies/{container_uuid}/natrules/{uuid}'
     MINIMUM_VERSION_REQUIRED_DELETE = API_RELEASE_720
+    SUPPORTED_PARAMS = ['section']
     SUPPORTED_FILTERS = [
-        'section',
         'source_interface',
         'destination_interface',
         'original_source',
